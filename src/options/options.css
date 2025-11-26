@@ -1069,3 +1069,117 @@ textarea {
   border-radius: 6px;
   cursor: pointer;
 }
+
+/* === SECTION RACCOURCIS === */
+.shortcuts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.shortcut-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  transition: all 0.2s;
+}
+
+.shortcut-item:hover {
+  border-color: var(--accent-start);
+  background: rgba(102, 126, 234, 0.05);
+}
+
+.shortcut-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.shortcut-name {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--text-primary);
+}
+
+.shortcut-desc {
+  font-size: 13px;
+  color: var(--text-muted);
+  max-width: 400px;
+}
+
+.shortcut-key-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.shortcut-key-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 120px;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.shortcut-key-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.shortcut-key-btn.recording {
+  background: linear-gradient(135deg, #f39c12, #e67e22);
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.shortcut-key-btn .key-display {
+  font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+}
+
+.btn-small {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.shortcut-options {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-color);
+}
+
+.shortcut-help {
+  margin-top: 32px;
+  padding: 20px;
+  background: rgba(102, 126, 234, 0.1);
+  border: 1px solid rgba(102, 126, 234, 0.3);
+  border-radius: 12px;
+}
+
+.shortcut-help h4 {
+  margin-bottom: 8px;
+  color: var(--accent-start);
+  font-size: 14px;
+}
+
+.shortcut-help p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}

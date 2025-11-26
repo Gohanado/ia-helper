@@ -25,6 +25,10 @@
           <span class="nav-icon">P</span>
           <span data-i18n="presets">Presets</span>
         </button>
+        <button class="nav-item" data-section="shortcuts">
+          <span class="nav-icon">K</span>
+          <span data-i18n="shortcuts">Raccourcis</span>
+        </button>
         <button class="nav-item" data-section="about">
           <span class="nav-icon">i</span>
           <span data-i18n="about">A propos</span>
@@ -111,6 +115,99 @@
         <div class="active-preset-actions" id="preset-actions-display">
           <h3 data-i18n="presetActions">Actions du preset</h3>
           <p class="empty-state" data-i18n="clickPresetToSee">Cliquez sur un preset pour voir ses actions.</p>
+        </div>
+      </section>
+
+      <!-- Section Raccourcis -->
+      <section class="section" id="section-shortcuts">
+        <h2 data-i18n="shortcuts">Raccourcis clavier</h2>
+        <p class="section-desc" data-i18n="shortcutsDesc">Configurez les raccourcis clavier pour acceder rapidement aux fonctionnalites.</p>
+
+        <div class="shortcuts-list">
+          <!-- Raccourci prompt rapide -->
+          <div class="shortcut-item">
+            <div class="shortcut-info">
+              <span class="shortcut-name" data-i18n="quickPrompt">Prompt rapide</span>
+              <span class="shortcut-desc" data-i18n="quickPromptDesc">Ouvre un champ de saisie pour interagir avec l'IA. Si du texte est selectionne, il sera inclus dans le prompt.</span>
+            </div>
+            <div class="shortcut-key-wrapper">
+              <button class="shortcut-key-btn" id="shortcut-quick-prompt" data-shortcut="quickPrompt">
+                <span class="key-display">Alt + I</span>
+              </button>
+              <button class="btn btn-small btn-secondary" id="btn-reset-shortcut-quick">Reset</button>
+            </div>
+          </div>
+
+          <!-- Raccourci corriger -->
+          <div class="shortcut-item">
+            <div class="shortcut-info">
+              <span class="shortcut-name" data-i18n="correctShortcut">Corriger le texte</span>
+              <span class="shortcut-desc" data-i18n="correctShortcutDesc">Corrige l'orthographe et la grammaire du texte selectionne.</span>
+            </div>
+            <div class="shortcut-key-wrapper">
+              <button class="shortcut-key-btn" id="shortcut-correct" data-shortcut="correct">
+                <span class="key-display">Alt + C</span>
+              </button>
+              <button class="btn btn-small btn-secondary" id="btn-reset-shortcut-correct">Reset</button>
+            </div>
+          </div>
+
+          <!-- Raccourci traduire -->
+          <div class="shortcut-item">
+            <div class="shortcut-info">
+              <span class="shortcut-name" data-i18n="translateShortcut">Traduire</span>
+              <span class="shortcut-desc" data-i18n="translateShortcutDesc">Traduit le texte selectionne dans la langue par defaut.</span>
+            </div>
+            <div class="shortcut-key-wrapper">
+              <button class="shortcut-key-btn" id="shortcut-translate" data-shortcut="translate">
+                <span class="key-display">Alt + T</span>
+              </button>
+              <button class="btn btn-small btn-secondary" id="btn-reset-shortcut-translate">Reset</button>
+            </div>
+          </div>
+
+          <!-- Raccourci resumer -->
+          <div class="shortcut-item">
+            <div class="shortcut-info">
+              <span class="shortcut-name" data-i18n="summarizeShortcut">Resumer</span>
+              <span class="shortcut-desc" data-i18n="summarizeShortcutDesc">Resume le texte selectionne.</span>
+            </div>
+            <div class="shortcut-key-wrapper">
+              <button class="shortcut-key-btn" id="shortcut-summarize" data-shortcut="summarize">
+                <span class="key-display">Alt + S</span>
+              </button>
+              <button class="btn btn-small btn-secondary" id="btn-reset-shortcut-summarize">Reset</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group shortcut-options">
+          <label class="toggle-label">
+            <input type="checkbox" id="shortcuts-enabled" checked>
+            <span class="toggle-switch"></span>
+            <span class="toggle-text" data-i18n="enableShortcuts">Activer les raccourcis clavier</span>
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label for="default-translate-lang" data-i18n="defaultTranslateLang">Langue de traduction par defaut</label>
+          <select id="default-translate-lang">
+            <option value="en">Anglais</option>
+            <option value="fr">Francais</option>
+            <option value="es">Espagnol</option>
+            <option value="de">Allemand</option>
+            <option value="it">Italien</option>
+            <option value="pt">Portugais</option>
+          </select>
+        </div>
+
+        <div class="form-actions">
+          <button id="btn-save-shortcuts" class="btn btn-primary" data-i18n="save">Sauvegarder</button>
+        </div>
+
+        <div class="shortcut-help">
+          <h4 data-i18n="howToChange">Comment modifier un raccourci</h4>
+          <p data-i18n="howToChangeDesc">Cliquez sur le bouton du raccourci, puis appuyez sur la nouvelle combinaison de touches (ex: Ctrl+Shift+K). Utilisez Alt, Ctrl ou Shift + une lettre.</p>
         </div>
       </section>
 

@@ -12,6 +12,19 @@ const DEFAULT_CONFIG = {
   responseLanguage: 'fr'
 };
 
+// Raccourcis par defaut
+const DEFAULT_SHORTCUTS = {
+  quickPrompt: { key: 'i', alt: true, ctrl: false, shift: false },
+  correct: { key: 'c', alt: true, ctrl: false, shift: false },
+  translate: { key: 't', alt: true, ctrl: false, shift: false },
+  summarize: { key: 's', alt: true, ctrl: false, shift: false }
+};
+
+let shortcuts = { ...DEFAULT_SHORTCUTS };
+let shortcutsEnabled = true;
+let defaultTranslateLang = 'en';
+let recordingShortcut = null;
+
 // Configuration actuelle
 let config = { ...DEFAULT_CONFIG };
 let customPrompts = {};
@@ -110,6 +123,9 @@ function setupEventListeners() {
   if (btnAddPreset) {
     btnAddPreset.addEventListener('click', showAddPresetModal);
   }
+
+  // Setup raccourcis
+  setupShortcutListeners();
 }
 
 // Tester la connexion
@@ -829,4 +845,161 @@ function saveActionToPreset() {
   // Cette fonction est utilisee quand on ajoute une action depuis le modal simple
   // Pour l'instant on ferme juste le modal
   closeActionModal();
+}
+
+// === GESTION DES RACCOURCIS ===
+
+// Charger les raccourcis sauvegardes
+async function loadShortcuts() {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(['shortcuts', 'shortcutsEnabled', 'defaultTranslateLang'], (result) => {
+      if (result.shortcuts) {
+        shortcuts = { ...DEFAULT_SHORTCUTS, ...result.shortcuts };
+      }
+      shortcutsEnabled = result.shortcutsEnabled !== false;
+      defaultTranslateLang = result.defaultTranslateLang || 'en';
+      resolve();
+    });
+  });
+}
+
+// Afficher un raccourci
+function formatShortcut(shortcut) {
+  const parts = [];
+  if (shortcut.ctrl) parts.push('Ctrl');
+  if (shortcut.alt) parts.push('Alt');
+  if (shortcut.shift) parts.push('Shift');
+  parts.push(shortcut.key.toUpperCase());
+  return parts.join(' + ');
+}
+
+// Mettre a jour l'affichage des raccourcis
+function updateShortcutDisplays() {
+  Object.keys(shortcuts).forEach(name => {
+    const btn = document.querySelector(`[data-shortcut="${name}"] .key-display`);
+    if (btn) {
+      btn.textContent = formatShortcut(shortcuts[name]);
+    }
+  });
+
+  const enabledCheckbox = document.getElementById('shortcuts-enabled');
+  if (enabledCheckbox) enabledCheckbox.checked = shortcutsEnabled;
+
+  const langSelect = document.getElementById('default-translate-lang');
+  if (langSelect) langSelect.value = defaultTranslateLang;
+}
+
+// Setup des listeners pour les raccourcis
+function setupShortcutListeners() {
+  loadShortcuts().then(() => {
+    updateShortcutDisplays();
+  });
+
+  // Boutons de raccourci (enregistrement)
+  document.querySelectorAll('.shortcut-key-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const shortcutName = btn.dataset.shortcut;
+      startRecordingShortcut(btn, shortcutName);
+    });
+  });
+
+  // Boutons reset
+  document.getElementById('btn-reset-shortcut-quick')?.addEventListener('click', () => {
+    shortcuts.quickPrompt = { ...DEFAULT_SHORTCUTS.quickPrompt };
+    updateShortcutDisplays();
+  });
+  document.getElementById('btn-reset-shortcut-correct')?.addEventListener('click', () => {
+    shortcuts.correct = { ...DEFAULT_SHORTCUTS.correct };
+    updateShortcutDisplays();
+  });
+  document.getElementById('btn-reset-shortcut-translate')?.addEventListener('click', () => {
+    shortcuts.translate = { ...DEFAULT_SHORTCUTS.translate };
+    updateShortcutDisplays();
+  });
+  document.getElementById('btn-reset-shortcut-summarize')?.addEventListener('click', () => {
+    shortcuts.summarize = { ...DEFAULT_SHORTCUTS.summarize };
+    updateShortcutDisplays();
+  });
+
+  // Toggle activation
+  document.getElementById('shortcuts-enabled')?.addEventListener('change', (e) => {
+    shortcutsEnabled = e.target.checked;
+  });
+
+  // Langue traduction par defaut
+  document.getElementById('default-translate-lang')?.addEventListener('change', (e) => {
+    defaultTranslateLang = e.target.value;
+  });
+
+  // Sauvegarder raccourcis
+  document.getElementById('btn-save-shortcuts')?.addEventListener('click', saveShortcuts);
+}
+
+// Commencer l'enregistrement d'un raccourci
+function startRecordingShortcut(btn, shortcutName) {
+  // Retirer l'etat recording des autres boutons
+  document.querySelectorAll('.shortcut-key-btn.recording').forEach(b => {
+    b.classList.remove('recording');
+  });
+
+  btn.classList.add('recording');
+  btn.querySelector('.key-display').textContent = 'Appuyez...';
+  recordingShortcut = shortcutName;
+
+  // Listener temporaire pour capturer la touche
+  const handler = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // Ignorer les touches modificatrices seules
+    if (['Control', 'Alt', 'Shift', 'Meta'].includes(e.key)) return;
+
+    const newShortcut = {
+      key: e.key.toLowerCase(),
+      alt: e.altKey,
+      ctrl: e.ctrlKey,
+      shift: e.shiftKey
+    };
+
+    // Verifier qu'au moins un modificateur est utilise
+    if (!newShortcut.alt && !newShortcut.ctrl && !newShortcut.shift) {
+      showNotification('Utilisez Alt, Ctrl ou Shift + une touche', 'error');
+      return;
+    }
+
+    shortcuts[shortcutName] = newShortcut;
+    btn.classList.remove('recording');
+    recordingShortcut = null;
+    updateShortcutDisplays();
+    document.removeEventListener('keydown', handler, true);
+  };
+
+  document.addEventListener('keydown', handler, true);
+
+  // Annuler si on clique ailleurs
+  setTimeout(() => {
+    const cancelHandler = (e) => {
+      if (!btn.contains(e.target)) {
+        btn.classList.remove('recording');
+        recordingShortcut = null;
+        updateShortcutDisplays();
+        document.removeEventListener('click', cancelHandler);
+      }
+    };
+    document.addEventListener('click', cancelHandler);
+  }, 100);
+}
+
+// Sauvegarder les raccourcis
+async function saveShortcuts() {
+  await chrome.storage.local.set({
+    shortcuts: shortcuts,
+    shortcutsEnabled: shortcutsEnabled,
+    defaultTranslateLang: defaultTranslateLang
+  });
+
+  // Notifier le content script
+  chrome.runtime.sendMessage({ type: 'SHORTCUTS_UPDATED' });
+
+  showNotification('Raccourcis sauvegardes !', 'success');
 }

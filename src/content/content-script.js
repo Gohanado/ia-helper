@@ -433,8 +433,427 @@
     }
   });
 
+  // === RACCOURCIS CLAVIER ET POPUP RAPIDE ===
+
+  // Raccourcis par defaut
+  const DEFAULT_SHORTCUTS = {
+    quickPrompt: { key: 'i', alt: true, ctrl: false, shift: false },
+    correct: { key: 'c', alt: true, ctrl: false, shift: false },
+    translate: { key: 't', alt: true, ctrl: false, shift: false },
+    summarize: { key: 's', alt: true, ctrl: false, shift: false }
+  };
+
+  let shortcuts = { ...DEFAULT_SHORTCUTS };
+  let shortcutsEnabled = true;
+  let defaultTranslateLang = 'en';
+
+  // Charger les raccourcis
+  async function loadShortcuts() {
+    return new Promise((resolve) => {
+      chrome.storage.local.get(['shortcuts', 'shortcutsEnabled', 'defaultTranslateLang'], (result) => {
+        if (result.shortcuts) {
+          shortcuts = { ...DEFAULT_SHORTCUTS, ...result.shortcuts };
+        }
+        shortcutsEnabled = result.shortcutsEnabled !== false;
+        defaultTranslateLang = result.defaultTranslateLang || 'en';
+        resolve();
+      });
+    });
+  }
+
+  // Verifier si un raccourci correspond
+  function matchShortcut(e, shortcut) {
+    return e.key.toLowerCase() === shortcut.key.toLowerCase() &&
+           e.altKey === shortcut.alt &&
+           e.ctrlKey === shortcut.ctrl &&
+           e.shiftKey === shortcut.shift;
+  }
+
+  // Listener de raccourcis
+  document.addEventListener('keydown', async (e) => {
+    if (!shortcutsEnabled) return;
+
+    // Ignorer si on est dans le modal de prompt rapide
+    if (document.getElementById('ia-helper-quick-modal')) {
+      if (e.key === 'Escape') {
+        closeQuickModal();
+      }
+      return;
+    }
+
+    // Prompt rapide (Alt+I par defaut)
+    if (matchShortcut(e, shortcuts.quickPrompt)) {
+      e.preventDefault();
+      openQuickPromptModal();
+      return;
+    }
+
+    // Corriger (Alt+C par defaut)
+    if (matchShortcut(e, shortcuts.correct)) {
+      e.preventDefault();
+      executeShortcutAction('correct_errors');
+      return;
+    }
+
+    // Traduire (Alt+T par defaut)
+    if (matchShortcut(e, shortcuts.translate)) {
+      e.preventDefault();
+      executeShortcutAction('translate', defaultTranslateLang);
+      return;
+    }
+
+    // Resumer (Alt+S par defaut)
+    if (matchShortcut(e, shortcuts.summarize)) {
+      e.preventDefault();
+      executeShortcutAction('summarize');
+      return;
+    }
+  });
+
+  // Executer une action via raccourci
+  function executeShortcutAction(actionId, targetLang = null) {
+    const selection = window.getSelection();
+    const selectedText = selection ? selection.toString().trim() : '';
+
+    if (!selectedText) {
+      showNotification('Selectionnez du texte d\'abord', 'error');
+      return;
+    }
+
+    // Envoyer au handler d'action
+    handleAction({
+      actionId: actionId,
+      actionType: targetLang ? 'translate' : 'selection',
+      selectedText: selectedText,
+      targetLanguage: targetLang,
+      isEditable: false
+    });
+  }
+
+  // Creer et ouvrir le modal de prompt rapide
+  function openQuickPromptModal() {
+    // Capturer le texte selectionne avant d'ouvrir le modal
+    const selection = window.getSelection();
+    const selectedText = selection ? selection.toString().trim() : '';
+
+    // Supprimer un modal existant
+    closeQuickModal();
+
+    // Creer le modal
+    const modal = document.createElement('div');
+    modal.id = 'ia-helper-quick-modal';
+    modal.innerHTML = `
+      <div class="ia-quick-overlay"></div>
+      <div class="ia-quick-container">
+        <div class="ia-quick-header">
+          <span class="ia-quick-title">IA Helper - Prompt rapide</span>
+          <button class="ia-quick-close">&times;</button>
+        </div>
+        ${selectedText ? `
+          <div class="ia-quick-context">
+            <div class="ia-quick-context-label">Texte selectionne:</div>
+            <div class="ia-quick-context-text">${escapeHtml(selectedText.substring(0, 200))}${selectedText.length > 200 ? '...' : ''}</div>
+          </div>
+          <div class="ia-quick-mode">
+            <label class="ia-quick-mode-option">
+              <input type="radio" name="ia-mode" value="with" checked>
+              <span>Utiliser comme contexte</span>
+            </label>
+            <label class="ia-quick-mode-option">
+              <input type="radio" name="ia-mode" value="only">
+              <span>Traiter le texte uniquement</span>
+            </label>
+            <label class="ia-quick-mode-option">
+              <input type="radio" name="ia-mode" value="without">
+              <span>Ignorer la selection</span>
+            </label>
+          </div>
+        ` : ''}
+        <div class="ia-quick-input-wrapper">
+          <textarea class="ia-quick-input" placeholder="${selectedText ? 'Que voulez-vous faire avec ce texte?' : 'Posez votre question ou donnez une instruction...'}" rows="3"></textarea>
+        </div>
+        <div class="ia-quick-actions">
+          <button class="ia-quick-btn ia-quick-btn-secondary ia-quick-cancel">Annuler</button>
+          <button class="ia-quick-btn ia-quick-btn-primary ia-quick-send">
+            <span>Envoyer</span>
+            <span class="ia-quick-shortcut">Enter</span>
+          </button>
+        </div>
+      </div>
+    `;
+
+    // Ajouter les styles
+    const styles = document.createElement('style');
+    styles.id = 'ia-helper-quick-styles';
+    styles.textContent = `
+      #ia-helper-quick-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 2147483647;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      }
+      .ia-quick-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(3px);
+      }
+      .ia-quick-container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        max-width: 560px;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        border-radius: 16px;
+        box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        overflow: hidden;
+        animation: ia-quick-appear 0.2s ease-out;
+      }
+      @keyframes ia-quick-appear {
+        from { opacity: 0; transform: translate(-50%, -50%) scale(0.95); }
+        to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      }
+      .ia-quick-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .ia-quick-title {
+        font-weight: 600;
+        font-size: 16px;
+        color: #fff;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .ia-quick-close {
+        background: none;
+        border: none;
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 24px;
+        cursor: pointer;
+        padding: 0;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        transition: all 0.2s;
+      }
+      .ia-quick-close:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+      }
+      .ia-quick-context {
+        padding: 16px 20px;
+        background: rgba(102, 126, 234, 0.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .ia-quick-context-label {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.5);
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .ia-quick-context-text {
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.8);
+        line-height: 1.5;
+        max-height: 80px;
+        overflow-y: auto;
+      }
+      .ia-quick-mode {
+        padding: 12px 20px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .ia-quick-mode-option {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.7);
+      }
+      .ia-quick-mode-option input {
+        accent-color: #667eea;
+      }
+      .ia-quick-mode-option:hover {
+        color: #fff;
+      }
+      .ia-quick-input-wrapper {
+        padding: 20px;
+      }
+      .ia-quick-input {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 14px 16px;
+        font-size: 15px;
+        color: #fff;
+        resize: none;
+        outline: none;
+        transition: all 0.2s;
+        font-family: inherit;
+      }
+      .ia-quick-input::placeholder {
+        color: rgba(255, 255, 255, 0.4);
+      }
+      .ia-quick-input:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+      }
+      .ia-quick-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        padding: 16px 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        background: rgba(0, 0, 0, 0.2);
+      }
+      .ia-quick-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+      }
+      .ia-quick-btn-secondary {
+        background: rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.8);
+      }
+      .ia-quick-btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.15);
+      }
+      .ia-quick-btn-primary {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: #fff;
+      }
+      .ia-quick-btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+      }
+      .ia-quick-shortcut {
+        font-size: 11px;
+        padding: 2px 6px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
+      }
+    `;
+
+    if (!document.getElementById('ia-helper-quick-styles')) {
+      document.head.appendChild(styles);
+    }
+
+    document.body.appendChild(modal);
+
+    // Focus sur le champ de saisie
+    const input = modal.querySelector('.ia-quick-input');
+    setTimeout(() => input.focus(), 100);
+
+    // Stocker le texte selectionne
+    modal.dataset.selectedText = selectedText;
+
+    // Event listeners
+    modal.querySelector('.ia-quick-close').addEventListener('click', closeQuickModal);
+    modal.querySelector('.ia-quick-cancel').addEventListener('click', closeQuickModal);
+    modal.querySelector('.ia-quick-overlay').addEventListener('click', closeQuickModal);
+    modal.querySelector('.ia-quick-send').addEventListener('click', () => sendQuickPrompt(modal));
+
+    // Enter pour envoyer (Shift+Enter pour nouvelle ligne)
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendQuickPrompt(modal);
+      }
+    });
+  }
+
+  // Fermer le modal
+  function closeQuickModal() {
+    const modal = document.getElementById('ia-helper-quick-modal');
+    if (modal) modal.remove();
+  }
+
+  // Echapper le HTML
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  // Envoyer le prompt rapide
+  function sendQuickPrompt(modal) {
+    const input = modal.querySelector('.ia-quick-input').value.trim();
+    const selectedText = modal.dataset.selectedText || '';
+
+    if (!input && !selectedText) {
+      showNotification('Entrez une instruction', 'error');
+      return;
+    }
+
+    // Determiner le mode
+    let mode = 'without';
+    const modeRadio = modal.querySelector('input[name="ia-mode"]:checked');
+    if (modeRadio) mode = modeRadio.value;
+
+    // Construire le prompt final
+    let finalPrompt = '';
+    let content = '';
+
+    if (mode === 'with' && selectedText) {
+      // Utiliser le texte comme contexte
+      finalPrompt = input || 'Analyse ce texte et donne-moi des informations utiles.';
+      content = selectedText;
+    } else if (mode === 'only' && selectedText) {
+      // Traiter uniquement le texte selectionne
+      finalPrompt = input || 'Traite ce texte.';
+      content = selectedText;
+    } else {
+      // Ignorer la selection ou pas de selection
+      finalPrompt = input;
+      content = input;
+    }
+
+    closeQuickModal();
+
+    // Ouvrir la page de resultats avec le prompt personnalise
+    const systemPrompt = `Tu es un assistant IA intelligent et polyvalent. L'utilisateur te demande: "${finalPrompt}". Reponds de maniere claire, precise et utile.`;
+
+    openResultsPage('quick_prompt', content, systemPrompt, null);
+  }
+
+  // Recharger les raccourcis si mis a jour
+  chrome.runtime.onMessage.addListener((message) => {
+    if (message.type === 'SHORTCUTS_UPDATED') {
+      loadShortcuts();
+    }
+  });
+
   // Initialisation
   loadConfig().then(() => {
+    loadShortcuts();
     console.log('IA Helper Content Script charge');
   });
 })();
