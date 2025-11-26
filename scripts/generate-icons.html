@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Generateur d'icones IA Helper</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #1a1a2e; color: white; }
+    canvas { border: 1px solid #333; margin: 10px; }
+    .icons { display: flex; gap: 20px; flex-wrap: wrap; }
+    button { padding: 15px 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+             border: none; color: white; cursor: pointer; border-radius: 10px; font-size: 16px; margin-top: 20px; }
+    a { color: #667eea; }
+  </style>
+</head>
+<body>
+  <h1>Generateur d'icones IA Helper</h1>
+  <p>Cliquez sur le bouton pour telecharger les icones.</p>
+  
+  <div class="icons">
+    <div><canvas id="icon16" width="16" height="16"></canvas><br>16x16</div>
+    <div><canvas id="icon32" width="32" height="32"></canvas><br>32x32</div>
+    <div><canvas id="icon48" width="48" height="48"></canvas><br>48x48</div>
+    <div><canvas id="icon128" width="128" height="128"></canvas><br>128x128</div>
+  </div>
+  
+  <button onclick="downloadAll()">Telecharger toutes les icones</button>
+  
+  <script>
+    const sizes = [16, 32, 48, 128];
+    
+    function drawIcon(canvas) {
+      const ctx = canvas.getContext('2d');
+      const size = canvas.width;
+      const padding = size * 0.1;
+      
+      // Gradient background
+      const gradient = ctx.createLinearGradient(0, 0, size, size);
+      gradient.addColorStop(0, '#667eea');
+      gradient.addColorStop(1, '#764ba2');
+      
+      // Rounded rectangle
+      const radius = size * 0.2;
+      ctx.beginPath();
+      ctx.roundRect(padding, padding, size - padding * 2, size - padding * 2, radius);
+      ctx.fillStyle = gradient;
+      ctx.fill();
+      
+      // Text "IA"
+      ctx.fillStyle = 'white';
+      ctx.font = `bold ${size * 0.35}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('IA', size / 2, size / 2);
+    }
+    
+    // Draw all icons
+    sizes.forEach(size => {
+      const canvas = document.getElementById('icon' + size);
+      drawIcon(canvas);
+    });
+    
+    function downloadAll() {
+      sizes.forEach(size => {
+        const canvas = document.getElementById('icon' + size);
+        const link = document.createElement('a');
+        link.download = `icon${size}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      });
+    }
+  </script>
+</body>
+</html>
+

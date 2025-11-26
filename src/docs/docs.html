@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documentation - IA Helper</title>
+  <link rel="stylesheet" href="docs.css">
+</head>
+<body>
+  <div class="docs-container">
+    <aside class="docs-sidebar">
+      <div class="docs-logo">
+        <h1>IA Helper</h1>
+        <span class="version">v1.0.0</span>
+      </div>
+      <nav class="docs-nav">
+        <a href="#getting-started" class="nav-link active">Demarrage</a>
+        <a href="#configuration" class="nav-link">Configuration</a>
+        <a href="#context-menus" class="nav-link">Menus contextuels</a>
+        <a href="#presets" class="nav-link">Presets Pro</a>
+        <a href="#custom-actions" class="nav-link">Actions personnalisees</a>
+        <a href="#streaming" class="nav-link">Streaming</a>
+        <a href="#languages" class="nav-link">Langues</a>
+        <a href="#troubleshooting" class="nav-link">Depannage</a>
+      </nav>
+    </aside>
+
+    <main class="docs-content">
+      <section id="getting-started">
+        <h2>Demarrage rapide</h2>
+        <p>IA Helper est un assistant IA intelligent pour Chrome connecte a un serveur Ollama. Il vous permet d'utiliser des modeles d'IA locaux pour analyser, corriger, traduire et reformuler du texte.</p>
+        
+        <h3>Prerequis</h3>
+        <ul>
+          <li>Un serveur Ollama installe et en cours d'execution</li>
+          <li>Au moins un modele telecharge (ex: llama3, mistral, gemma)</li>
+          <li>Google Chrome (version 88+)</li>
+        </ul>
+
+        <h3>Installation</h3>
+        <ol>
+          <li>Ouvrez <code>chrome://extensions/</code></li>
+          <li>Activez le "Mode developpeur"</li>
+          <li>Cliquez sur "Charger l'extension non empaquetee"</li>
+          <li>Selectionnez le dossier <code>ia-helper</code></li>
+        </ol>
+      </section>
+
+      <section id="configuration">
+        <h2>Configuration</h2>
+        <p>Accedez aux options via clic droit > IA Helper > Options ou en cliquant sur l'icone du plugin.</p>
+        
+        <h3>Connexion au serveur</h3>
+        <ul>
+          <li><strong>URL du serveur:</strong> Par defaut <code>http://localhost:11434</code></li>
+          <li><strong>Modele:</strong> Selectionnez le modele a utiliser</li>
+          <li><strong>Streaming:</strong> Activez pour voir les reponses en temps reel</li>
+        </ul>
+
+        <h3>Langues</h3>
+        <ul>
+          <li><strong>Langue interface:</strong> FR, EN, ES, IT, PT</li>
+          <li><strong>Langue reponse IA:</strong> Force l'IA a repondre dans une langue specifique</li>
+        </ul>
+      </section>
+
+      <section id="context-menus">
+        <h2>Menus contextuels</h2>
+        <p>IA Helper ajoute des options au menu contextuel (clic droit) selon le contexte:</p>
+
+        <h3>Sur du texte selectionne</h3>
+        <ul>
+          <li>Resumer le texte</li>
+          <li>Traduire (vers plusieurs langues)</li>
+          <li>Expliquer simplement</li>
+          <li>Extraire les points cles</li>
+          <li>Analyser le sentiment</li>
+        </ul>
+
+        <h3>Dans un champ de saisie</h3>
+        <ul>
+          <li>Corriger les erreurs</li>
+          <li>Traduire</li>
+          <li>Reformuler en Mail Pro</li>
+          <li>Developper le contenu</li>
+          <li>Ameliorer le style</li>
+        </ul>
+
+        <h3>Sur une page (sans selection)</h3>
+        <ul>
+          <li>Resumer cette page</li>
+          <li>Extraire les points essentiels</li>
+          <li>Traduire cette page</li>
+        </ul>
+      </section>
+
+      <section id="presets">
+        <h2>Presets Professionnels</h2>
+        <p>Activez des ensembles d'actions specialisees pour votre metier:</p>
+        <ul>
+          <li><strong>Support IT:</strong> Resume ticket, suggerer solution, rediger reponse</li>
+          <li><strong>Service Client:</strong> Analyser sentiment, reponse empathique</li>
+          <li><strong>Developpeur:</strong> Expliquer code, revue de code, debug</li>
+          <li><strong>Etudiant:</strong> Expliquer simplement, creer resume, questions</li>
+          <li><strong>Redacteur:</strong> Ameliorer style, optimiser SEO, idees titres</li>
+          <li><strong>Commercial:</strong> Analyser prospect, argumentaire, email suivi</li>
+          <li><strong>Chercheur:</strong> Points cles, identifier biais, resume article</li>
+        </ul>
+      </section>
+
+      <section id="custom-actions">
+        <h2>Actions personnalisees</h2>
+        <p>Creez vos propres actions avec des prompts personnalises:</p>
+        <ol>
+          <li>Allez dans Options > Personnalisation</li>
+          <li>Cliquez sur "Ajouter une action"</li>
+          <li>Donnez un nom et choisissez le contexte</li>
+          <li>Redigez le prompt systeme</li>
+          <li>Vos actions apparaitront dans "Mes actions"</li>
+        </ol>
+      </section>
+
+      <section id="streaming">
+        <h2>Mode Streaming</h2>
+        <p>Le streaming permet de voir la reponse de l'IA en temps reel.</p>
+        <ul>
+          <li>Dans un champ de saisie: le texte s'affiche directement</li>
+          <li>En analyse: le resultat s'affiche progressivement</li>
+        </ul>
+      </section>
+
+      <section id="languages">
+        <h2>Support multilingue</h2>
+        <p>IA Helper supporte 5 langues: Francais, English, Espanol, Italiano, Portugues.</p>
+        <p>Vous pouvez forcer l'IA a repondre dans une langue specifique (sauf pour les traductions).</p>
+      </section>
+
+      <section id="troubleshooting">
+        <h2>Depannage</h2>
+        <h3>L'extension ne fonctionne pas</h3>
+        <ul>
+          <li>Verifiez que Ollama est en cours d'execution</li>
+          <li>Testez la connexion dans les options</li>
+          <li>Rechargez l'extension dans chrome://extensions</li>
+        </ul>
+        <h3>Erreur de connexion</h3>
+        <ul>
+          <li>Verifiez l'URL du serveur (par defaut: http://localhost:11434)</li>
+          <li>Assurez-vous qu'aucun pare-feu ne bloque la connexion</li>
+        </ul>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
+

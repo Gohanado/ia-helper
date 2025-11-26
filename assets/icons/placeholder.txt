@@ -1,0 +1,19 @@
+ICONES REQUISES POUR LE PLUGIN IA HELPER
+==========================================
+
+Veuillez placer les icones suivantes dans ce dossier:
+- icon16.png  (16x16 pixels)
+- icon32.png  (32x32 pixels)
+- icon48.png  (48x48 pixels)
+- icon128.png (128x128 pixels)
+
+Ces icones seront utilisees pour:
+- L'icone du plugin dans la barre d'outils Chrome
+- L'icone dans les menus contextuels
+- L'icone dans la page des extensions Chrome
+
+Recommandations:
+- Format PNG avec transparence
+- Design simple et reconnaissable
+- Couleurs coherentes avec le theme du plugin (violet/bleu gradient)
+

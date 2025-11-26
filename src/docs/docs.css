@@ -1,0 +1,134 @@
+:root {
+  --bg-primary: #0a0f1a;
+  --bg-secondary: #111827;
+  --bg-card: #1a2332;
+  --text-primary: #ffffff;
+  --text-secondary: #e2e8f0;
+  --text-muted: #94a3b8;
+  --accent-start: #667eea;
+  --accent-end: #764ba2;
+  --border-color: rgba(255, 255, 255, 0.1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.docs-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.docs-sidebar {
+  width: 260px;
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border-color);
+  padding: 24px;
+  position: fixed;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.docs-logo h1 {
+  font-size: 24px;
+  background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 4px;
+}
+
+.version {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.docs-nav {
+  margin-top: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nav-link {
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.nav-link:hover, .nav-link.active {
+  background: rgba(102, 126, 234, 0.15);
+  color: var(--accent-start);
+}
+
+.docs-content {
+  flex: 1;
+  margin-left: 260px;
+  padding: 48px 64px;
+  max-width: 900px;
+}
+
+section {
+  margin-bottom: 48px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+h2 {
+  font-size: 28px;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+h3 {
+  font-size: 18px;
+  color: var(--text-primary);
+  margin: 24px 0 12px;
+}
+
+p {
+  margin-bottom: 16px;
+}
+
+ul, ol {
+  margin-left: 24px;
+  margin-bottom: 16px;
+}
+
+li {
+  margin-bottom: 8px;
+}
+
+code {
+  background: rgba(102, 126, 234, 0.2);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: 'Consolas', monospace;
+  font-size: 14px;
+  color: var(--accent-start);
+}
+
+strong {
+  color: var(--text-primary);
+}
+
+@media (max-width: 768px) {
+  .docs-sidebar {
+    display: none;
+  }
+  .docs-content {
+    margin-left: 0;
+    padding: 24px;
+  }
+}
+

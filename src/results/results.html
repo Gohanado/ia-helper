@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IA Helper - Resultats</title>
+  <link rel="stylesheet" href="results.css">
+</head>
+<body>
+  <div class="results-container">
+    <!-- Header -->
+    <header class="results-header">
+      <div class="header-left">
+        <img src="../../assets/icons/icon48.png" alt="IA Helper" class="header-logo">
+        <div>
+          <h1>IA Helper</h1>
+          <span class="action-badge" id="action-name">Analyse</span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="copy-dropdown">
+          <button class="btn-icon" id="btn-copy-menu" title="Options de copie">
+            <span>Copier</span>
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+              <path d="M2 4L6 8L10 4"/>
+            </svg>
+          </button>
+          <div class="copy-menu" id="copy-menu">
+            <button class="copy-option" id="btn-copy-markdown">
+              <span class="copy-icon">MD</span>
+              <span>Copier en Markdown</span>
+            </button>
+            <button class="copy-option" id="btn-copy-text">
+              <span class="copy-icon">Aa</span>
+              <span>Copier en texte brut</span>
+            </button>
+            <button class="copy-option" id="btn-copy-html">
+              <span class="copy-icon">&lt;/&gt;</span>
+              <span>Copier en HTML</span>
+            </button>
+          </div>
+        </div>
+        <button class="btn-icon" id="btn-new-tab" title="Ouvrir dans un nouvel onglet">
+          <span>Nouvel onglet</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="results-main">
+      <!-- Original Content Panel -->
+      <section class="panel panel-original">
+        <div class="panel-header">
+          <h2>Texte original</h2>
+          <button class="btn-sm" id="btn-toggle-original">Reduire</button>
+        </div>
+        <div class="panel-content" id="original-content">
+          <p class="placeholder">Chargement...</p>
+        </div>
+      </section>
+
+      <!-- Result Panel -->
+      <section class="panel panel-result">
+        <div class="panel-header">
+          <h2>Resultat</h2>
+          <div class="panel-status" id="status">
+            <span class="status-dot"></span>
+            <span class="status-text">En attente...</span>
+          </div>
+        </div>
+        <div class="panel-content" id="result-content">
+          <p class="placeholder">La reponse apparaitra ici...</p>
+        </div>
+      </section>
+    </main>
+
+    <!-- Refinement Section -->
+    <section class="refinement-section">
+      <h3>Affiner le resultat</h3>
+      <div class="refinement-options">
+        <button class="btn-refine" id="btn-regenerate">
+          <span>Regenerer</span>
+        </button>
+        <button class="btn-refine" id="btn-shorter">
+          <span>Plus court</span>
+        </button>
+        <button class="btn-refine" id="btn-longer">
+          <span>Plus long</span>
+        </button>
+        <button class="btn-refine" id="btn-formal">
+          <span>Plus formel</span>
+        </button>
+        <button class="btn-refine" id="btn-casual">
+          <span>Plus decontracte</span>
+        </button>
+      </div>
+      
+      <div class="custom-prompt-section">
+        <label for="custom-prompt">Ajouter des instructions:</label>
+        <div class="input-with-btn">
+          <textarea id="custom-prompt" placeholder="Ex: Reformule en utilisant des termes plus techniques..."></textarea>
+          <button class="btn btn-primary" id="btn-send-custom">Envoyer</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="results-footer">
+      <div class="footer-info">
+        <span id="token-count">0 tokens</span>
+        <span id="generation-time">0s</span>
+      </div>
+      <div class="footer-actions">
+        <button class="btn btn-secondary" id="btn-close">Fermer</button>
+        <button class="btn btn-primary" id="btn-apply">Appliquer</button>
+      </div>
+    </footer>
+  </div>
+
+  <script src="results.js" type="module"></script>
+</body>
+</html>
+

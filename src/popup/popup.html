@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IA Helper</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <!-- Header -->
+    <header class="popup-header">
+      <div class="logo-container">
+        <img src="../../assets/icons/icon48.png" alt="IA Helper" class="logo">
+        <div class="title-container">
+          <h1>IA Helper</h1>
+          <span class="version">v1.0.0</span>
+        </div>
+      </div>
+      <div class="status-indicator" id="status-indicator">
+        <span class="status-dot"></span>
+        <span class="status-text">Connexion...</span>
+      </div>
+    </header>
+
+    <!-- Connexion Info -->
+    <section class="connection-info" id="connection-info">
+      <div class="info-row">
+        <span class="info-label">Serveur:</span>
+        <span class="info-value" id="server-url">Non configure</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Modele:</span>
+        <span class="info-value" id="model-name">Non selectionne</span>
+      </div>
+    </section>
+
+    <!-- Quick Actions -->
+    <section class="quick-actions">
+      <h2>Actions rapides</h2>
+      <div class="actions-grid">
+        <button class="action-btn" id="btn-correct" title="Corriger le texte selectionne">
+          <span class="action-icon">Aa</span>
+          <span class="action-label">Corriger</span>
+        </button>
+        <button class="action-btn" id="btn-translate" title="Traduire le texte selectionne">
+          <span class="action-icon">Tr</span>
+          <span class="action-label">Traduire</span>
+        </button>
+        <button class="action-btn" id="btn-summarize" title="Resumer le texte selectionne">
+          <span class="action-icon">Rs</span>
+          <span class="action-label">Resumer</span>
+        </button>
+        <button class="action-btn" id="btn-mail" title="Reformuler en mail pro">
+          <span class="action-icon">Mp</span>
+          <span class="action-label">Mail Pro</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Translate Submenu (hidden by default) -->
+    <section class="translate-menu hidden" id="translate-menu">
+      <h2>Traduire en:</h2>
+      <div class="language-list">
+        <button class="lang-btn" data-lang="fr">FR Francais</button>
+        <button class="lang-btn" data-lang="en">GB English</button>
+        <button class="lang-btn" data-lang="it">IT Italiano</button>
+        <button class="lang-btn" data-lang="es">ES Espanol</button>
+      </div>
+      <button class="back-btn" id="btn-back">Retour</button>
+    </section>
+
+    <!-- Pro Section -->
+    <section class="pro-section">
+      <h2>IA Helper Pro</h2>
+      <div class="pro-actions">
+        <button class="pro-btn" id="btn-ticket">
+          <span>Analyser cette page</span>
+        </button>
+        <button class="pro-btn" id="btn-chronology">
+          <span>Chronologie</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="popup-footer">
+      <button class="footer-btn" id="btn-options">
+        <span>Options</span>
+      </button>
+      <button class="footer-btn" id="btn-help">
+        <span>Aide</span>
+      </button>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
+
