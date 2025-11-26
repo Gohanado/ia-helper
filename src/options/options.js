@@ -306,13 +306,30 @@ function renderAllPresetsGrid() {
   grid.innerHTML = '';
 
   const icons = {
-    'support_it': 'H',
-    'customer_service': 'C',
-    'sales': 'V',
-    'developer': 'D',
-    'writer': 'W',
-    'student': 'E',
-    'researcher': 'R'
+    'support_it': 'IT',
+    'customer_service': 'SC',
+    'sales': 'CO',
+    'developer': 'DEV',
+    'writer': 'RED',
+    'student': 'ETU',
+    'researcher': 'REC',
+    'hr_recruiter': 'RH',
+    'manager': 'MGR',
+    'legal': 'JUR',
+    'marketing': 'MKT',
+    'product_manager': 'PM',
+    'ux_designer': 'UX',
+    'data_analyst': 'DA',
+    'community_manager': 'CM',
+    'trainer': 'FOR',
+    'translator': 'TRA',
+    'journalist': 'JOU',
+    'freelance': 'FRE',
+    'healthcare': 'MED',
+    'ecommerce': 'ECO',
+    'copywriter': 'CPY',
+    'content_creator': 'YT',
+    'personal_assistant': 'PA'
   };
 
   // D'abord les presets personnalises
