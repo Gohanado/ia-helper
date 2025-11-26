@@ -272,7 +272,8 @@
     ru: 'russe',
     zh: 'chinois',
     ja: 'japonais',
-    ar: 'arabe'
+    ar: 'arabe',
+    ko: 'coreen'
   };
 
   // Ecouter les messages du background script

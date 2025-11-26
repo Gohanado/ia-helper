@@ -17,16 +17,10 @@
     "url": "https://github.com/Gohanado/ia-helper/issues"
   },
   "homepage": "https://github.com/Gohanado/ia-helper#readme",
-  "funding": [
-    {
-      "type": "ko-fi",
-      "url": "https://ko-fi.com/gohanado"
-    },
-    {
-      "type": "paypal",
-      "url": "https://paypal.me/gohanado"
-    }
-  ],
+  "funding": {
+    "type": "paypal",
+    "url": "https://paypal.me/gohanado"
+  },
   "keywords": [
     "chrome-extension",
     "ollama",

@@ -441,7 +441,14 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 });
 
 // Initialisation a l'installation
-chrome.runtime.onInstalled.addListener(async () => {
+chrome.runtime.onInstalled.addListener(async (details) => {
+  // Si c'est une nouvelle installation, activer les presets par defaut
+  if (details.reason === 'install') {
+    const defaultActivePresets = ['student', 'personal_assistant', 'writer', 'developer'];
+    await chrome.storage.local.set({ activePresets: defaultActivePresets });
+    console.log('Presets par defaut actives:', defaultActivePresets);
+  }
+
   await loadConfig();
   await createContextMenus();
   console.log('IA Helper installe avec succes');

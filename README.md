@@ -16,9 +16,7 @@ IA Helper est **100% gratuit** et **sans publicites**. Si vous appreciez le proj
 
 | Plateforme | Lien |
 |------------|------|
-| Ko-fi | [Faire un don](https://ko-fi.com/gohanado) |
 | PayPal | [Faire un don](https://paypal.me/gohanado) |
-| GitHub Sponsors | [Devenir sponsor](https://github.com/sponsors/Gohanado) |
 
 Chaque don aide a maintenir et ameliorer le projet!
 
@@ -226,8 +224,9 @@ Voir [CHANGELOG.md](CHANGELOG.md) pour l'historique complet des versions.
 | Ressource | Lien |
 |-----------|------|
 | Documentation | [docs/README.md](docs/README.md) |
-| Signaler un bug | [GitHub Issues](https://github.com/Gohanado/ia-helper/issues) |
-| Soutenir le projet | [Ko-fi](https://ko-fi.com/gohanado) |
+| Signaler un bug | [Creer une issue](https://github.com/Gohanado/ia-helper/issues/new?template=bug_report.md) |
+| Proposer une amelioration | [Creer une issue](https://github.com/Gohanado/ia-helper/issues/new?template=feature_request.md) |
+| Soutenir le projet | [PayPal](https://paypal.me/gohanado) |
 | Contact | contact@badom.ch |
 
 ---

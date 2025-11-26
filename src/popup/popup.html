@@ -17,80 +17,119 @@
           <span class="version">v1.0.0</span>
         </div>
       </div>
-      <div class="status-indicator" id="status-indicator">
+      <div class="status-badge" id="status-badge">
         <span class="status-dot"></span>
-        <span class="status-text">Connexion...</span>
+        <span class="status-text">...</span>
       </div>
     </header>
 
-    <!-- Connexion Info -->
-    <section class="connection-info" id="connection-info">
-      <div class="info-row">
-        <span class="info-label">Serveur:</span>
-        <span class="info-value" id="server-url">Non configure</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">Modele:</span>
-        <span class="info-value" id="model-name">Non selectionne</span>
-      </div>
-    </section>
+    <!-- Main Content (tabs) -->
+    <nav class="popup-tabs">
+      <button class="tab-btn active" data-tab="actions">Actions</button>
+      <button class="tab-btn" data-tab="presets">Presets</button>
+      <button class="tab-btn" data-tab="translate">Traduire</button>
+    </nav>
 
-    <!-- Quick Actions -->
-    <section class="quick-actions">
-      <h2>Actions rapides</h2>
-      <div class="actions-grid">
-        <button class="action-btn" id="btn-correct" title="Corriger le texte selectionne">
+    <!-- Tab: Actions -->
+    <section class="tab-content active" id="tab-actions">
+      <div class="actions-grid-6">
+        <button class="action-card" data-action="correct_errors">
           <span class="action-icon">Aa</span>
-          <span class="action-label">Corriger</span>
+          <span class="action-name">Corriger</span>
         </button>
-        <button class="action-btn" id="btn-translate" title="Traduire le texte selectionne">
-          <span class="action-icon">Tr</span>
-          <span class="action-label">Traduire</span>
-        </button>
-        <button class="action-btn" id="btn-summarize" title="Resumer le texte selectionne">
+        <button class="action-card" data-action="summarize">
           <span class="action-icon">Rs</span>
-          <span class="action-label">Resumer</span>
+          <span class="action-name">Resumer</span>
         </button>
-        <button class="action-btn" id="btn-mail" title="Reformuler en mail pro">
-          <span class="action-icon">Mp</span>
-          <span class="action-label">Mail Pro</span>
+        <button class="action-card" data-action="explain_simple">
+          <span class="action-icon">Ex</span>
+          <span class="action-name">Expliquer</span>
+        </button>
+        <button class="action-card" data-action="reformat_mail_pro">
+          <span class="action-icon">Pr</span>
+          <span class="action-name">Pro</span>
+        </button>
+        <button class="action-card" data-action="improve_style">
+          <span class="action-icon">St</span>
+          <span class="action-name">Style</span>
+        </button>
+        <button class="action-card" data-action="expand_content">
+          <span class="action-icon">De</span>
+          <span class="action-name">Developper</span>
+        </button>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <div class="page-actions">
+        <button class="page-action-btn" data-action="quick_summarize_page">
+          <span class="btn-icon">P</span>
+          <span>Resumer cette page</span>
+        </button>
+        <button class="page-action-btn" data-action="quick_extract_main">
+          <span class="btn-icon">L</span>
+          <span>Points cles de la page</span>
         </button>
       </div>
     </section>
 
-    <!-- Translate Submenu (hidden by default) -->
-    <section class="translate-menu hidden" id="translate-menu">
-      <h2>Traduire en:</h2>
-      <div class="language-list">
-        <button class="lang-btn" data-lang="fr">FR Francais</button>
-        <button class="lang-btn" data-lang="en">GB English</button>
-        <button class="lang-btn" data-lang="it">IT Italiano</button>
-        <button class="lang-btn" data-lang="es">ES Espanol</button>
+    <!-- Tab: Presets -->
+    <section class="tab-content" id="tab-presets">
+      <div class="presets-list" id="presets-list">
+        <!-- Filled by JS -->
       </div>
-      <button class="back-btn" id="btn-back">Retour</button>
+      <p class="presets-hint">Activez plus de presets dans les Options</p>
     </section>
 
-    <!-- Pro Section -->
-    <section class="pro-section">
-      <h2>IA Helper Pro</h2>
-      <div class="pro-actions">
-        <button class="pro-btn" id="btn-ticket">
-          <span>Analyser cette page</span>
-        </button>
-        <button class="pro-btn" id="btn-chronology">
-          <span>Chronologie</span>
-        </button>
+    <!-- Tab: Translate -->
+    <section class="tab-content" id="tab-translate">
+      <div class="translate-grid">
+        <button class="lang-card" data-lang="fr"><span class="flag">FR</span>Francais</button>
+        <button class="lang-card" data-lang="en"><span class="flag">EN</span>English</button>
+        <button class="lang-card" data-lang="es"><span class="flag">ES</span>Espanol</button>
+        <button class="lang-card" data-lang="it"><span class="flag">IT</span>Italiano</button>
+        <button class="lang-card" data-lang="de"><span class="flag">DE</span>Deutsch</button>
+        <button class="lang-card" data-lang="pt"><span class="flag">PT</span>Portugues</button>
+        <button class="lang-card" data-lang="nl"><span class="flag">NL</span>Nederlands</button>
+        <button class="lang-card" data-lang="ru"><span class="flag">RU</span>Russkiy</button>
+        <button class="lang-card" data-lang="zh"><span class="flag">ZH</span>Zhongwen</button>
+        <button class="lang-card" data-lang="ja"><span class="flag">JA</span>Nihongo</button>
+        <button class="lang-card" data-lang="ar"><span class="flag">AR</span>Arabi</button>
+        <button class="lang-card" data-lang="ko"><span class="flag">KO</span>Hangugeo</button>
       </div>
     </section>
+
+    <!-- Connection Info (collapsible) -->
+    <details class="connection-details">
+      <summary>
+        <span id="model-display">Modele: ...</span>
+      </summary>
+      <div class="connection-info">
+        <div class="info-row">
+          <span class="label">Serveur</span>
+          <span class="value" id="server-url">localhost:11434</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Modele</span>
+          <span class="value" id="model-name">-</span>
+        </div>
+      </div>
+    </details>
 
     <!-- Footer -->
     <footer class="popup-footer">
-      <button class="footer-btn" id="btn-options">
-        <span>Options</span>
+      <button class="footer-btn" id="btn-options" title="Options">
+        <span class="footer-icon">Opt</span>
       </button>
-      <button class="footer-btn" id="btn-help">
-        <span>Aide</span>
+      <button class="footer-btn" id="btn-help" title="Documentation">
+        <span class="footer-icon">Doc</span>
       </button>
+      <a class="footer-btn" id="btn-bug" href="https://github.com/Gohanado/ia-helper/issues/new?template=bug_report.md" target="_blank" title="Signaler un bug">
+        <span class="footer-icon">Bug</span>
+      </a>
+      <a class="footer-btn support-btn" href="https://paypal.me/gohanado" target="_blank" title="Soutenir le projet">
+        <span class="footer-icon">Don</span>
+      </a>
     </footer>
   </div>
 
