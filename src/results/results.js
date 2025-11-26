@@ -216,13 +216,13 @@ async function startGeneration() {
           const json = JSON.parse(line);
           if (json.response) {
             currentResult += json.response;
-            elements.resultContent.innerHTML = currentResult + '<span class="streaming-cursor"></span>';
+            renderMarkdown(currentResult, elements.resultContent, true);
           }
         } catch (e) {}
       }
     }
 
-    elements.resultContent.innerHTML = currentResult;
+    renderMarkdown(currentResult, elements.resultContent, false);
     setStatus('done', 'Termine');
     updateStats();
 
@@ -278,13 +278,13 @@ async function refine(additionalPrompt) {
           const json = JSON.parse(line);
           if (json.response) {
             currentResult += json.response;
-            elements.resultContent.innerHTML = currentResult + '<span class="streaming-cursor"></span>';
+            renderMarkdown(currentResult, elements.resultContent, true);
           }
         } catch (e) {}
       }
     }
 
-    elements.resultContent.innerHTML = currentResult;
+    renderMarkdown(currentResult, elements.resultContent, false);
     setStatus('done', 'Affinage termine');
     updateStats();
 
@@ -342,26 +342,129 @@ function showNotification(message, type = 'info') {
   setTimeout(() => notification.remove(), 2000);
 }
 
-// Convertir Markdown en HTML basique
+// Convertir Markdown en HTML complet
 function convertMarkdownToHtml(markdown) {
-  return markdown
-    // Titres
-    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
-    // Gras et italique
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    .replace(/__(.+?)__/g, '<strong>$1</strong>')
-    .replace(/_(.+?)_/g, '<em>$1</em>')
-    // Code
-    .replace(/`(.+?)`/g, '<code>$1</code>')
-    // Liens
-    .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2">$1</a>')
-    // Listes
-    .replace(/^\s*[-*+]\s(.+)$/gm, '<li>$1</li>')
-    // Paragraphes
-    .replace(/\n\n/g, '</p><p>')
-    .replace(/^/, '<p>')
-    .replace(/$/, '</p>');
+  if (!markdown) return '';
+
+  let html = markdown;
+
+  // Echapper les caracteres HTML dangereux
+  html = html.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  // Blocs de code (```)
+  html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (match, lang, code) => {
+    const langClass = lang ? ` class="language-${lang}"` : '';
+    return `<pre><code${langClass}>${code.trim()}</code></pre>`;
+  });
+
+  // Code inline (`)
+  html = html.replace(/`([^`]+)`/g, '<code class="inline">$1</code>');
+
+  // Titres
+  html = html.replace(/^#{6}\s+(.+)$/gm, '<h6>$1</h6>');
+  html = html.replace(/^#{5}\s+(.+)$/gm, '<h5>$1</h5>');
+  html = html.replace(/^#{4}\s+(.+)$/gm, '<h4>$1</h4>');
+  html = html.replace(/^###\s+(.+)$/gm, '<h3>$1</h3>');
+  html = html.replace(/^##\s+(.+)$/gm, '<h2>$1</h2>');
+  html = html.replace(/^#\s+(.+)$/gm, '<h1>$1</h1>');
+
+  // Gras et italique (ordre important)
+  html = html.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+  html = html.replace(/___(.+?)___/g, '<strong><em>$1</em></strong>');
+  html = html.replace(/__(.+?)__/g, '<strong>$1</strong>');
+  html = html.replace(/_([^_]+)_/g, '<em>$1</em>');
+
+  // Barre (strikethrough)
+  html = html.replace(/~~(.+?)~~/g, '<del>$1</del>');
+
+  // Citations
+  html = html.replace(/^&gt;\s+(.+)$/gm, '<blockquote>$1</blockquote>');
+
+  // Lignes horizontales
+  html = html.replace(/^[-*_]{3,}$/gm, '<hr>');
+
+  // Liens
+  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+
+  // Listes non ordonnees
+  html = html.replace(/^[\s]*[-*+]\s+(.+)$/gm, '<li>$1</li>');
+
+  // Listes ordonnees
+  html = html.replace(/^[\s]*\d+\.\s+(.+)$/gm, '<li class="ordered">$1</li>');
+
+  // Regrouper les <li> consecutifs en <ul> ou <ol>
+  html = html.replace(/(<li class="ordered">.*<\/li>\n?)+/g, (match) => {
+    return '<ol>' + match.replace(/ class="ordered"/g, '') + '</ol>';
+  });
+  html = html.replace(/(<li>.*<\/li>\n?)+/g, (match) => {
+    if (!match.includes('<ol>')) {
+      return '<ul>' + match + '</ul>';
+    }
+    return match;
+  });
+
+  // Fusionner les blockquotes consecutifs
+  html = html.replace(/<\/blockquote>\n<blockquote>/g, '<br>');
+
+  // Tableaux simples
+  html = html.replace(/^\|(.+)\|$/gm, (match, content) => {
+    const cells = content.split('|').map(c => c.trim());
+    const isHeader = cells.some(c => /^[-:]+$/.test(c));
+    if (isHeader) return ''; // Ligne de separation
+    const tag = 'td';
+    return '<tr>' + cells.map(c => `<${tag}>${c}</${tag}>`).join('') + '</tr>';
+  });
+  html = html.replace(/(<tr>.*<\/tr>\n?)+/g, (match) => {
+    return '<table>' + match + '</table>';
+  });
+
+  // Paragraphes (lignes non vides qui ne sont pas deja dans un tag)
+  const lines = html.split('\n');
+  const processedLines = [];
+  let inParagraph = false;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    const isBlockElement = /^<(h[1-6]|ul|ol|li|pre|blockquote|hr|table|tr|td|th)/.test(line) ||
+                           /<\/(ul|ol|pre|blockquote|table)>$/.test(line);
+
+    if (line === '') {
+      if (inParagraph) {
+        processedLines.push('</p>');
+        inParagraph = false;
+      }
+      processedLines.push('');
+    } else if (isBlockElement) {
+      if (inParagraph) {
+        processedLines.push('</p>');
+        inParagraph = false;
+      }
+      processedLines.push(line);
+    } else {
+      if (!inParagraph) {
+        processedLines.push('<p>' + line);
+        inParagraph = true;
+      } else {
+        processedLines.push('<br>' + line);
+      }
+    }
+  }
+
+  if (inParagraph) {
+    processedLines.push('</p>');
+  }
+
+  return processedLines.join('\n');
+}
+
+// Rendre le markdown avec mise a jour en temps reel
+function renderMarkdown(text, targetElement, isStreaming = false) {
+  const html = convertMarkdownToHtml(text);
+  if (isStreaming) {
+    targetElement.innerHTML = '<div class="markdown-body">' + html + '<span class="streaming-cursor"></span></div>';
+  } else {
+    targetElement.innerHTML = '<div class="markdown-body">' + html + '</div>';
+  }
 }

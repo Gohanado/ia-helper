@@ -414,9 +414,210 @@ textarea:focus {
   background: var(--accent-start);
   margin-left: 2px;
   animation: blink 0.7s infinite;
+  vertical-align: text-bottom;
 }
 
 @keyframes blink {
   0%, 100% { opacity: 1; }
   50% { opacity: 0; }
+}
+
+/* ========== MARKDOWN STYLES ========== */
+.markdown-body {
+  line-height: 1.8;
+  font-size: 15px;
+  color: var(--text-primary);
+}
+
+/* Titres */
+.markdown-body h1 {
+  font-size: 1.8em;
+  font-weight: 700;
+  margin: 1.2em 0 0.6em 0;
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid var(--border-color);
+  background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.markdown-body h2 {
+  font-size: 1.5em;
+  font-weight: 600;
+  margin: 1em 0 0.5em 0;
+  padding-bottom: 0.2em;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--accent-start);
+}
+
+.markdown-body h3 {
+  font-size: 1.25em;
+  font-weight: 600;
+  margin: 0.9em 0 0.4em 0;
+  color: var(--text-primary);
+}
+
+.markdown-body h4, .markdown-body h5, .markdown-body h6 {
+  font-size: 1.1em;
+  font-weight: 600;
+  margin: 0.8em 0 0.4em 0;
+  color: var(--text-secondary);
+}
+
+/* Paragraphes */
+.markdown-body p {
+  margin: 0.8em 0;
+}
+
+/* Gras et italique */
+.markdown-body strong {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.markdown-body em {
+  font-style: italic;
+  color: var(--text-secondary);
+}
+
+.markdown-body del {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+/* Liens */
+.markdown-body a {
+  color: var(--accent-start);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--accent-start);
+  transition: all 0.2s ease;
+}
+
+.markdown-body a:hover {
+  color: var(--accent-end);
+  border-bottom-style: solid;
+}
+
+/* Code inline */
+.markdown-body code.inline {
+  background: rgba(102, 126, 234, 0.15);
+  color: #e06c75;
+  padding: 0.2em 0.5em;
+  border-radius: 4px;
+  font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+  font-size: 0.9em;
+  border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+/* Blocs de code */
+.markdown-body pre {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 1em 0;
+  overflow-x: auto;
+}
+
+.markdown-body pre code {
+  font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+  font-size: 0.9em;
+  line-height: 1.6;
+  color: #abb2bf;
+  background: transparent;
+  padding: 0;
+  border: none;
+}
+
+/* Listes */
+.markdown-body ul, .markdown-body ol {
+  margin: 0.8em 0;
+  padding-left: 2em;
+}
+
+.markdown-body li {
+  margin: 0.4em 0;
+  line-height: 1.6;
+}
+
+.markdown-body ul li {
+  list-style-type: disc;
+}
+
+.markdown-body ul li::marker {
+  color: var(--accent-start);
+}
+
+.markdown-body ol li {
+  list-style-type: decimal;
+}
+
+.markdown-body ol li::marker {
+  color: var(--accent-start);
+  font-weight: 600;
+}
+
+/* Listes imbriquees */
+.markdown-body ul ul, .markdown-body ol ol,
+.markdown-body ul ol, .markdown-body ol ul {
+  margin: 0.3em 0;
+}
+
+/* Citations */
+.markdown-body blockquote {
+  margin: 1em 0;
+  padding: 0.8em 1.2em;
+  border-left: 4px solid var(--accent-start);
+  background: rgba(102, 126, 234, 0.1);
+  border-radius: 0 8px 8px 0;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* Ligne horizontale */
+.markdown-body hr {
+  border: none;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-color), transparent);
+  margin: 2em 0;
+}
+
+/* Tableaux */
+.markdown-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.markdown-body th, .markdown-body td {
+  padding: 12px 16px;
+  text-align: left;
+  border: 1px solid var(--border-color);
+}
+
+.markdown-body th {
+  background: rgba(102, 126, 234, 0.2);
+  font-weight: 600;
+  color: var(--accent-start);
+}
+
+.markdown-body tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.markdown-body tr:hover {
+  background: rgba(102, 126, 234, 0.05);
+}
+
+/* Animation d'apparition */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.markdown-body > * {
+  animation: fadeIn 0.2s ease-out;
 }

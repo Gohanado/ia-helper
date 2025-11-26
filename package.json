@@ -1,4 +1,32 @@
 {
+  "name": "ia-helper",
+  "version": "1.0.0",
+  "description": "Extension Chrome d'assistant IA intelligent connectee a Ollama",
+  "author": "Gohanado",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Gohanado/ia-helper.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Gohanado/ia-helper/issues"
+  },
+  "homepage": "https://github.com/Gohanado/ia-helper#readme",
+  "keywords": [
+    "chrome-extension",
+    "ollama",
+    "ai-assistant",
+    "translation",
+    "text-processing",
+    "local-ai"
+  ],
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "scripts": {
+    "icons": "node scripts/create-icons.js"
+  },
+  "devDependencies": {},
   "dependencies": {
     "canvas": "^3.2.0"
   }
