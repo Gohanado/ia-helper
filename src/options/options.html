@@ -43,21 +43,39 @@
         <h2 data-i18n="serverConfig">Configuration du serveur</h2>
 
         <div class="form-group">
-          <label for="ollama-url" data-i18n="serverUrl">URL du serveur Ollama</label>
+          <label for="provider-select">Fournisseur IA</label>
+          <select id="provider-select">
+            <option value="ollama">Ollama (local)</option>
+            <option value="openai">OpenAI</option>
+            <option value="anthropic">Anthropic (Claude)</option>
+            <option value="groq">Groq</option>
+            <option value="openrouter">OpenRouter</option>
+            <option value="custom">Personnalise (compatible OpenAI)</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="api-url-group">
+          <label for="api-url" id="api-url-label">URL du serveur Ollama</label>
           <div class="input-with-btn">
-            <input type="text" id="ollama-url" placeholder="http://localhost:11434">
-            <button id="btn-test-connection" class="btn btn-secondary" data-i18n="testConnection">Tester</button>
+            <input type="text" id="api-url" placeholder="http://localhost:11434">
+            <button id="btn-test-connection" class="btn btn-secondary">Tester</button>
           </div>
           <div class="connection-status" id="connection-status"></div>
         </div>
 
+        <div class="form-group" id="api-key-group" style="display: none;">
+          <label for="api-key">Cle API</label>
+          <input type="password" id="api-key" placeholder="sk-...">
+          <p class="form-hint">Votre cle API est stockee localement et jamais partagee.</p>
+        </div>
+
         <div class="form-group">
-          <label for="model-select" data-i18n="model">Modele</label>
+          <label for="model-select">Modele</label>
           <div class="input-with-btn">
             <select id="model-select">
-              <option value="" data-i18n="selectModel">Selectionnez un modele</option>
+              <option value="">Selectionnez un modele</option>
             </select>
-            <button id="btn-refresh-models" class="btn btn-secondary" data-i18n="refreshModels">Actualiser</button>
+            <button id="btn-refresh-models" class="btn btn-secondary">Actualiser</button>
           </div>
         </div>
 
@@ -98,99 +116,88 @@
         </div>
       </section>
 
-      <!-- Section Presets -->
+      <!-- Section Actions -->
       <section class="section" id="section-presets">
-        <h2 data-i18n="presets">Presets</h2>
-        <p class="section-desc" data-i18n="presetsDesc">Activez des ensembles d'actions pour le menu contextuel. Chaque preset ajoute un sous-menu dans IA Helper.</p>
+        <h2>Actions du menu contextuel</h2>
+        <p class="section-desc">Choisissez les actions disponibles dans le menu clic-droit. Activez ou desactivez chaque fonction individuellement.</p>
 
-        <div class="presets-section-header">
-          <h3 data-i18n="allPresets">Tous les presets</h3>
-          <button id="btn-add-preset" class="btn btn-primary" data-i18n="createPreset">Creer un preset</button>
+        <!-- Actions Essentielles -->
+        <div class="actions-category">
+          <h3 class="category-title">Essentiels</h3>
+          <p class="category-desc">Actions de base recommandees pour tous</p>
+          <div class="actions-grid" id="actions-essential">
+            <!-- Genere par JS -->
+          </div>
         </div>
 
-        <div class="presets-grid" id="all-presets-grid">
-          <!-- Tous les presets (personnalises + integres) -->
+        <!-- Actions Pratiques -->
+        <div class="actions-category">
+          <h3 class="category-title">Pratiques</h3>
+          <p class="category-desc">Actions utiles au quotidien</p>
+          <div class="actions-grid" id="actions-practical">
+            <!-- Genere par JS -->
+          </div>
         </div>
 
-        <div class="active-preset-actions" id="preset-actions-display">
-          <h3 data-i18n="presetActions">Actions du preset</h3>
-          <p class="empty-state" data-i18n="clickPresetToSee">Cliquez sur un preset pour voir ses actions.</p>
+        <!-- Actions Techniques -->
+        <div class="actions-category">
+          <h3 class="category-title">Techniques</h3>
+          <p class="category-desc">Pour developpeurs et techniques</p>
+          <div class="actions-grid" id="actions-technical">
+            <!-- Genere par JS -->
+          </div>
+        </div>
+
+        <!-- Actions Analyse -->
+        <div class="actions-category">
+          <h3 class="category-title">Analyse</h3>
+          <p class="category-desc">Analyse et comprehension de texte</p>
+          <div class="actions-grid" id="actions-analysis">
+            <!-- Genere par JS -->
+          </div>
+        </div>
+
+        <!-- Traduction -->
+        <div class="actions-category">
+          <h3 class="category-title">Traduction</h3>
+          <p class="category-desc">Langues disponibles pour la traduction rapide</p>
+          <div class="actions-grid" id="actions-translate">
+            <!-- Genere par JS -->
+          </div>
+        </div>
+
+        <!-- Actions Personnalisees -->
+        <div class="actions-category">
+          <h3 class="category-title">Mes actions personnalisees</h3>
+          <p class="category-desc">Creez vos propres actions avec des prompts personnalises</p>
+          <div class="actions-grid" id="actions-custom">
+            <!-- Genere par JS -->
+          </div>
+          <button id="btn-add-custom-action" class="btn btn-primary" style="margin-top: 16px;">+ Ajouter une action</button>
+        </div>
+
+        <div class="form-actions" style="margin-top: 24px;">
+          <button id="btn-enable-all" class="btn btn-secondary">Tout activer</button>
+          <button id="btn-disable-all" class="btn btn-secondary">Tout desactiver</button>
+          <button id="btn-reset-actions" class="btn btn-secondary">Valeurs par defaut</button>
         </div>
       </section>
 
       <!-- Section Raccourcis -->
       <section class="section" id="section-shortcuts">
-        <h2 data-i18n="shortcuts">Raccourcis clavier</h2>
-        <p class="section-desc" data-i18n="shortcutsDesc">Configurez les raccourcis clavier pour acceder rapidement aux fonctionnalites.</p>
-
-        <div class="shortcuts-list">
-          <!-- Raccourci prompt rapide -->
-          <div class="shortcut-item">
-            <div class="shortcut-info">
-              <span class="shortcut-name" data-i18n="quickPrompt">Prompt rapide</span>
-              <span class="shortcut-desc" data-i18n="quickPromptDesc">Ouvre un champ de saisie pour interagir avec l'IA. Si du texte est selectionne, il sera inclus dans le prompt.</span>
-            </div>
-            <div class="shortcut-key-wrapper">
-              <button class="shortcut-key-btn" id="shortcut-quick-prompt" data-shortcut="quickPrompt">
-                <span class="key-display">Alt + I</span>
-              </button>
-              <button class="btn btn-small btn-secondary" id="btn-reset-shortcut-quick">Reset</button>
-            </div>
-          </div>
-
-          <!-- Raccourci corriger -->
-          <div class="shortcut-item">
-            <div class="shortcut-info">
-              <span class="shortcut-name" data-i18n="correctShortcut">Corriger le texte</span>
-              <span class="shortcut-desc" data-i18n="correctShortcutDesc">Corrige l'orthographe et la grammaire du texte selectionne.</span>
-            </div>
-            <div class="shortcut-key-wrapper">
-              <button class="shortcut-key-btn" id="shortcut-correct" data-shortcut="correct">
-                <span class="key-display">Alt + C</span>
-              </button>
-              <button class="btn btn-small btn-secondary" id="btn-reset-shortcut-correct">Reset</button>
-            </div>
-          </div>
-
-          <!-- Raccourci traduire -->
-          <div class="shortcut-item">
-            <div class="shortcut-info">
-              <span class="shortcut-name" data-i18n="translateShortcut">Traduire</span>
-              <span class="shortcut-desc" data-i18n="translateShortcutDesc">Traduit le texte selectionne dans la langue par defaut.</span>
-            </div>
-            <div class="shortcut-key-wrapper">
-              <button class="shortcut-key-btn" id="shortcut-translate" data-shortcut="translate">
-                <span class="key-display">Alt + T</span>
-              </button>
-              <button class="btn btn-small btn-secondary" id="btn-reset-shortcut-translate">Reset</button>
-            </div>
-          </div>
-
-          <!-- Raccourci resumer -->
-          <div class="shortcut-item">
-            <div class="shortcut-info">
-              <span class="shortcut-name" data-i18n="summarizeShortcut">Resumer</span>
-              <span class="shortcut-desc" data-i18n="summarizeShortcutDesc">Resume le texte selectionne.</span>
-            </div>
-            <div class="shortcut-key-wrapper">
-              <button class="shortcut-key-btn" id="shortcut-summarize" data-shortcut="summarize">
-                <span class="key-display">Alt + S</span>
-              </button>
-              <button class="btn btn-small btn-secondary" id="btn-reset-shortcut-summarize">Reset</button>
-            </div>
-          </div>
-        </div>
+        <h2>Raccourcis clavier</h2>
+        <p class="section-desc">Configurez les raccourcis clavier pour acceder rapidement aux actions. Cliquez sur un raccourci pour le modifier.</p>
 
         <div class="form-group shortcut-options">
           <label class="toggle-label">
             <input type="checkbox" id="shortcuts-enabled" checked>
             <span class="toggle-switch"></span>
-            <span class="toggle-text" data-i18n="enableShortcuts">Activer les raccourcis clavier</span>
+            <span class="toggle-text">Activer les raccourcis clavier</span>
           </label>
         </div>
 
         <div class="form-group">
-          <label for="default-translate-lang" data-i18n="defaultTranslateLang">Langue de traduction par defaut</label>
+          <label for="default-translate-lang">Langue de traduction par defaut</label>
           <select id="default-translate-lang">
             <option value="en">Anglais</option>
             <option value="fr">Francais</option>
@@ -198,11 +205,23 @@
             <option value="de">Allemand</option>
             <option value="it">Italien</option>
             <option value="pt">Portugais</option>
+            <option value="zh">Chinois</option>
+            <option value="ja">Japonais</option>
+            <option value="ko">Coreen</option>
+            <option value="ar">Arabe</option>
+            <option value="ru">Russe</option>
           </select>
         </div>
 
+        <h3 style="margin-top: 24px;">Raccourcis configures</h3>
+        <div class="shortcuts-list" id="shortcuts-list">
+          <!-- Genere par JS -->
+        </div>
+
+        <button id="btn-add-shortcut" class="btn btn-secondary" style="margin-top: 16px;">+ Ajouter un raccourci</button>
+
         <div class="form-actions">
-          <button id="btn-save-shortcuts" class="btn btn-primary" data-i18n="save">Sauvegarder</button>
+          <button id="btn-save-shortcuts" class="btn btn-primary">Sauvegarder</button>
         </div>
 
         <div class="shortcut-help">

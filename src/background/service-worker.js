@@ -1,100 +1,191 @@
 // Service Worker Background pour IA Helper
-// Gere les menus contextuels et la communication avec Ollama
+// Gere les menus contextuels et la communication avec plusieurs providers IA
 
-// Configuration par defaut (inline pour eviter les problemes d'import)
+// Configuration par defaut
 const DEFAULT_CONFIG = {
-  ollamaUrl: 'http://localhost:11434',
+  provider: 'ollama',
+  apiUrl: 'http://localhost:11434',
+  apiKey: '',
   selectedModel: '',
-  streamingEnabled: true,
-  languages: [
-    { code: 'fr', name: 'Francais', flag: 'FR' },
-    { code: 'en', name: 'English', flag: 'GB' },
-    { code: 'it', name: 'Italiano', flag: 'IT' },
-    { code: 'es', name: 'Espanol', flag: 'ES' }
-  ]
+  streamingEnabled: true
 };
 
-const INPUT_ACTIONS = [
-  { id: 'correct_errors', name: 'Corriger les erreurs', enabled: true },
-  { id: 'translate', name: 'Traduire', enabled: true, hasSubmenu: true },
-  { id: 'reformat_mail_pro', name: 'Reformuler en Mail Pro', enabled: true },
-  { id: 'expand_content', name: 'Developper le contenu', enabled: true },
-  { id: 'summarize_input', name: 'Resumer', enabled: true },
-  { id: 'improve_style', name: 'Ameliorer le style', enabled: true }
-];
-
-const SELECTION_ACTIONS = [
-  { id: 'summarize', name: 'Resumer le texte', enabled: true },
-  { id: 'translate_selection', name: 'Traduire', enabled: true, hasSubmenu: true },
-  { id: 'explain_chronology', name: 'Expliquer la chronologie', enabled: true },
-  { id: 'explain_simple', name: 'Expliquer simplement', enabled: true },
-  { id: 'extract_key_points', name: 'Extraire les points cles', enabled: true },
-  { id: 'analyze_sentiment', name: 'Analyser le sentiment', enabled: true }
-];
-
-const PRO_ACTIONS = [];
-
-// Presets professionnels (inline)
-const PROFESSIONAL_PRESETS = {
-  support_it: {
-    name: 'Support IT',
-    actions: [
-      { id: 'ticket_summary', name: 'Resumer le ticket', prompt: 'Resume ce ticket de support.' },
-      { id: 'last_message', name: 'Dernier message', prompt: 'Extrait le dernier message client.' },
-      { id: 'suggest_solution', name: 'Suggerer solution', prompt: 'Suggere des solutions.' },
-      { id: 'draft_response', name: 'Rediger reponse', prompt: 'Redige une reponse professionnelle.' }
-    ]
+// Providers supportes
+const PROVIDERS = {
+  ollama: {
+    name: 'Ollama (local)',
+    defaultUrl: 'http://localhost:11434',
+    needsKey: false,
+    modelsEndpoint: '/api/tags',
+    chatEndpoint: '/api/chat'
   },
-  customer_service: {
-    name: 'Service Client',
-    actions: [
-      { id: 'customer_sentiment', name: 'Analyser sentiment', prompt: 'Analyse le sentiment du client.' },
-      { id: 'complaint_summary', name: 'Resumer reclamation', prompt: 'Resume cette reclamation.' },
-      { id: 'empathetic_response', name: 'Reponse empathique', prompt: 'Redige une reponse empathique.' }
-    ]
+  openai: {
+    name: 'OpenAI',
+    defaultUrl: 'https://api.openai.com/v1',
+    needsKey: true,
+    modelsEndpoint: '/models',
+    chatEndpoint: '/chat/completions',
+    defaultModels: ['gpt-4o', 'gpt-4o-mini', 'gpt-4-turbo', 'gpt-3.5-turbo']
   },
-  developer: {
-    name: 'Developpeur',
-    actions: [
-      { id: 'code_explain', name: 'Expliquer code', prompt: 'Explique ce code.' },
-      { id: 'code_review', name: 'Revue de code', prompt: 'Fais une revue de ce code.' },
-      { id: 'code_refactor', name: 'Refactoriser', prompt: 'Propose une refactorisation.' },
-      { id: 'debug_help', name: 'Aide debug', prompt: 'Aide a debugger cette erreur.' }
-    ]
+  anthropic: {
+    name: 'Anthropic',
+    defaultUrl: 'https://api.anthropic.com/v1',
+    needsKey: true,
+    chatEndpoint: '/messages',
+    defaultModels: ['claude-sonnet-4-20250514', 'claude-3-5-sonnet-20241022', 'claude-3-haiku-20240307']
   },
-  student: {
-    name: 'Etudiant',
-    actions: [
-      { id: 'explain_simple', name: 'Expliquer simplement', prompt: 'Explique simplement ce concept.' },
-      { id: 'create_summary', name: 'Creer resume', prompt: 'Cree un resume de revision.' },
-      { id: 'quiz_me', name: 'Me tester', prompt: 'Pose-moi des questions sur ce sujet.' }
-    ]
+  groq: {
+    name: 'Groq',
+    defaultUrl: 'https://api.groq.com/openai/v1',
+    needsKey: true,
+    modelsEndpoint: '/models',
+    chatEndpoint: '/chat/completions',
+    defaultModels: ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant', 'mixtral-8x7b-32768']
   },
-  writer: {
-    name: 'Redacteur',
-    actions: [
-      { id: 'improve_style', name: 'Ameliorer style', prompt: 'Ameliore le style de ce texte.' },
-      { id: 'seo_optimize', name: 'Optimiser SEO', prompt: 'Optimise ce texte pour le SEO.' },
-      { id: 'headline_ideas', name: 'Idees titres', prompt: 'Propose des titres accrocheurs.' }
-    ]
+  openrouter: {
+    name: 'OpenRouter',
+    defaultUrl: 'https://openrouter.ai/api/v1',
+    needsKey: true,
+    modelsEndpoint: '/models',
+    chatEndpoint: '/chat/completions',
+    defaultModels: ['openai/gpt-4o', 'anthropic/claude-3.5-sonnet', 'google/gemini-pro']
   },
-  sales: {
-    name: 'Commercial',
-    actions: [
-      { id: 'lead_analysis', name: 'Analyser prospect', prompt: 'Analyse ce prospect.' },
-      { id: 'sales_pitch', name: 'Argumentaire', prompt: 'Genere un argumentaire de vente.' },
-      { id: 'follow_up_email', name: 'Email suivi', prompt: 'Redige un email de suivi.' }
-    ]
-  },
-  researcher: {
-    name: 'Chercheur',
-    actions: [
-      { id: 'extract_key_points', name: 'Points cles', prompt: 'Extrait les points cles.' },
-      { id: 'identify_bias', name: 'Identifier biais', prompt: 'Identifie les biais potentiels.' },
-      { id: 'literature_summary', name: 'Resume article', prompt: 'Resume cet article pour revue.' }
-    ]
+  custom: {
+    name: 'Personnalise',
+    defaultUrl: '',
+    needsKey: true,
+    modelsEndpoint: '/models',
+    chatEndpoint: '/chat/completions'
   }
 };
+
+// Actions de base (inline pour le service worker)
+const BASE_ACTIONS = {
+  // === ESSENTIELS ===
+  correct_errors: {
+    id: 'correct_errors',
+    name: 'Corriger l\'orthographe',
+    prompt: 'Corrige uniquement les fautes d\'orthographe et de grammaire. Renvoie le texte corrige.',
+    category: 'essential',
+    defaultEnabled: true
+  },
+  summarize: {
+    id: 'summarize',
+    name: 'Resumer',
+    prompt: 'Resume ce texte de maniere concise en gardant les informations essentielles.',
+    category: 'essential',
+    defaultEnabled: true
+  },
+  explain_simple: {
+    id: 'explain_simple',
+    name: 'Expliquer simplement',
+    prompt: 'Explique ce texte de maniere simple et accessible.',
+    category: 'essential',
+    defaultEnabled: true
+  },
+  improve_style: {
+    id: 'improve_style',
+    name: 'Ameliorer le style',
+    prompt: 'Ameliore le style de ce texte pour le rendre plus clair et fluide.',
+    category: 'essential',
+    defaultEnabled: true
+  },
+  expand_content: {
+    id: 'expand_content',
+    name: 'Developper',
+    prompt: 'Developpe ce texte en ajoutant des details et explications.',
+    category: 'essential',
+    defaultEnabled: true
+  },
+  reformat_mail_pro: {
+    id: 'reformat_mail_pro',
+    name: 'Email professionnel',
+    prompt: 'Transforme ce texte en email professionnel avec formules de politesse.',
+    category: 'essential',
+    defaultEnabled: true
+  },
+
+  // === PRATIQUES ===
+  bullet_points: {
+    id: 'bullet_points',
+    name: 'Liste a puces',
+    prompt: 'Convertis ce texte en une liste a puces claire et organisee.',
+    category: 'practical',
+    defaultEnabled: false
+  },
+  extract_key_points: {
+    id: 'extract_key_points',
+    name: 'Points cles',
+    prompt: 'Extrait les points cles et informations importantes de ce texte.',
+    category: 'practical',
+    defaultEnabled: false
+  },
+  make_shorter: {
+    id: 'make_shorter',
+    name: 'Raccourcir',
+    prompt: 'Raccourcis ce texte en gardant uniquement l\'essentiel.',
+    category: 'practical',
+    defaultEnabled: false
+  },
+  make_formal: {
+    id: 'make_formal',
+    name: 'Ton formel',
+    prompt: 'Reecris ce texte avec un ton plus formel et professionnel.',
+    category: 'practical',
+    defaultEnabled: false
+  },
+  make_casual: {
+    id: 'make_casual',
+    name: 'Ton decontracte',
+    prompt: 'Reecris ce texte avec un ton plus decontracte et amical.',
+    category: 'practical',
+    defaultEnabled: false
+  },
+
+  // === TECHNIQUES ===
+  explain_code: {
+    id: 'explain_code',
+    name: 'Expliquer le code',
+    prompt: 'Explique ce code de maniere claire.',
+    category: 'technical',
+    defaultEnabled: false
+  },
+  review_code: {
+    id: 'review_code',
+    name: 'Revue de code',
+    prompt: 'Fais une revue de ce code et suggere des ameliorations.',
+    category: 'technical',
+    defaultEnabled: false
+  },
+  debug_help: {
+    id: 'debug_help',
+    name: 'Aide debug',
+    prompt: 'Analyse cette erreur et suggere des solutions.',
+    category: 'technical',
+    defaultEnabled: false
+  },
+
+  // === ANALYSE ===
+  sentiment_analysis: {
+    id: 'sentiment_analysis',
+    name: 'Analyser le sentiment',
+    prompt: 'Analyse le sentiment de ce texte. Positif, negatif ou neutre?',
+    category: 'analysis',
+    defaultEnabled: false
+  }
+};
+
+// Categories
+const ACTION_CATEGORIES = {
+  essential: { name: 'Essentiels', order: 1 },
+  practical: { name: 'Pratiques', order: 2 },
+  technical: { name: 'Techniques', order: 3 },
+  analysis: { name: 'Analyse', order: 4 }
+};
+
+// Actions par defaut
+const DEFAULT_ENABLED_ACTIONS = Object.keys(BASE_ACTIONS)
+  .filter(key => BASE_ACTIONS[key].defaultEnabled);
 
 // Configuration actuelle
 let config = { ...DEFAULT_CONFIG };
@@ -163,143 +254,97 @@ async function createContextMenus() {
       });
     }
 
-    // === ACTIONS RAPIDES (toujours visible) ===
-    chrome.contextMenus.create({
-      id: 'quick-section',
-      title: 'Actions rapides',
-      parentId: 'ia-helper-main',
-      contexts: ctx
-    });
-
+    // === ACTIONS DE PAGE (toujours visible) ===
     chrome.contextMenus.create({
       id: 'quick_summarize_page',
       title: 'Resumer cette page',
-      parentId: 'quick-section',
+      parentId: 'ia-helper-main',
       contexts: ctx
     });
 
     chrome.contextMenus.create({
       id: 'quick_extract_main',
       title: 'Extraire les points essentiels',
-      parentId: 'quick-section',
+      parentId: 'ia-helper-main',
       contexts: ctx
     });
 
-    // === ACTIONS POUR CHAMPS DE SAISIE ===
+    // Separateur
     chrome.contextMenus.create({
-      id: 'input-section',
-      title: 'Edition de texte',
+      id: 'separator-1',
+      type: 'separator',
       parentId: 'ia-helper-main',
-      contexts: ['editable']
+      contexts: ctx
     });
 
-    for (const action of INPUT_ACTIONS.filter(a => a.enabled)) {
-      if (action.hasSubmenu && action.id === 'translate') {
-        chrome.contextMenus.create({
-          id: `input-${action.id}`,
-          title: action.name,
-          parentId: 'input-section',
-          contexts: ['editable']
-        });
-        for (const lang of config.languages) {
-          chrome.contextMenus.create({
-            id: `input-translate-${lang.code}`,
-            title: `${lang.flag} ${lang.name}`,
-            parentId: `input-${action.id}`,
-            contexts: ['editable']
-          });
-        }
-      } else {
-        chrome.contextMenus.create({
-          id: `input-${action.id}`,
-          title: action.name,
-          parentId: 'input-section',
-          contexts: ['editable']
-        });
+    // === ACTIONS INDIVIDUELLES ACTIVEES ===
+    const enabledActions = await getStoredActions('enabledActions', DEFAULT_ENABLED_ACTIONS);
+    const customActions = await getStoredActions('customActions', []);
+
+    // Grouper par categorie
+    const actionsByCategory = {};
+    for (const actionId of enabledActions) {
+      const action = BASE_ACTIONS[actionId];
+      if (!action) continue;
+      if (!actionsByCategory[action.category]) {
+        actionsByCategory[action.category] = [];
       }
+      actionsByCategory[action.category].push(action);
     }
 
-    // === ACTIONS POUR SELECTION DE TEXTE ===
-    chrome.contextMenus.create({
-      id: 'selection-section',
-      title: 'Analyser la selection',
-      parentId: 'ia-helper-main',
-      contexts: ['selection']
-    });
+    // Creer les menus par categorie
+    const categories = Object.keys(actionsByCategory).sort(
+      (a, b) => (ACTION_CATEGORIES[a]?.order || 99) - (ACTION_CATEGORIES[b]?.order || 99)
+    );
 
-    for (const action of SELECTION_ACTIONS.filter(a => a.enabled)) {
-      if (action.hasSubmenu && action.id === 'translate_selection') {
+    for (const category of categories) {
+      const categoryInfo = ACTION_CATEGORIES[category];
+      const actions = actionsByCategory[category];
+
+      // Creer sous-menu de categorie
+      chrome.contextMenus.create({
+        id: `category-${category}`,
+        title: categoryInfo?.name || category,
+        parentId: 'ia-helper-main',
+        contexts: ctx
+      });
+
+      // Ajouter les actions de la categorie
+      for (const action of actions) {
         chrome.contextMenus.create({
-          id: `selection-${action.id}`,
+          id: `action-${action.id}`,
           title: action.name,
-          parentId: 'selection-section',
-          contexts: ['selection']
-        });
-        for (const lang of config.languages) {
-          chrome.contextMenus.create({
-            id: `selection-translate-${lang.code}`,
-            title: `${lang.flag} ${lang.name}`,
-            parentId: `selection-${action.id}`,
-            contexts: ['selection']
-          });
-        }
-      } else {
-        chrome.contextMenus.create({
-          id: `selection-${action.id}`,
-          title: action.name,
-          parentId: 'selection-section',
-          contexts: ['selection']
-        });
-      }
-    }
-
-    // === PRESETS INTEGRES ===
-    const activePresets = await getStoredActions('activePresets', []);
-
-    if (activePresets.length > 0) {
-      for (const presetId of activePresets) {
-        const preset = PROFESSIONAL_PRESETS[presetId];
-        if (!preset) continue;
-
-        chrome.contextMenus.create({
-          id: `preset-${presetId}`,
-          title: preset.name,
-          parentId: 'ia-helper-main',
+          parentId: `category-${category}`,
           contexts: ctx
         });
-
-        for (const action of preset.actions) {
-          chrome.contextMenus.create({
-            id: `preset-${presetId}-${action.id}`,
-            title: action.name,
-            parentId: `preset-${presetId}`,
-            contexts: ctx
-          });
-        }
       }
     }
 
-    // === PRESETS PERSONNALISES ===
-    const customPresets = await getStoredActions('customPresets', []);
-    const enabledCustomPresets = customPresets.filter(p => p.enabled);
+    // === ACTIONS PERSONNALISEES ===
+    const enabledCustomActions = customActions.filter(a => enabledActions.includes(a.id));
 
-    if (enabledCustomPresets.length > 0) {
-      for (const preset of enabledCustomPresets) {
+    if (enabledCustomActions.length > 0) {
+      chrome.contextMenus.create({
+        id: 'separator-custom',
+        type: 'separator',
+        parentId: 'ia-helper-main',
+        contexts: ctx
+      });
+
+      chrome.contextMenus.create({
+        id: 'custom-actions-section',
+        title: 'Mes actions',
+        parentId: 'ia-helper-main',
+        contexts: ctx
+      });
+
+      for (const action of enabledCustomActions) {
         chrome.contextMenus.create({
-          id: `custompreset-${preset.id}`,
-          title: preset.name,
-          parentId: 'ia-helper-main',
+          id: `custom-${action.id}`,
+          title: action.name,
+          parentId: 'custom-actions-section',
           contexts: ctx
         });
-
-        for (const action of preset.actions) {
-          chrome.contextMenus.create({
-            id: `custompreset-${preset.id}-${action.id}`,
-            title: action.name,
-            parentId: `custompreset-${preset.id}`,
-            contexts: ctx
-          });
-        }
       }
     }
 
@@ -340,51 +385,26 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     targetLanguage = menuId.replace('translate-to-', '');
     actionId = 'translate';
   }
-  // Parser les presets integres (format: preset-{presetId}-{actionId})
-  else if (menuId.match(/^preset-([^-]+)-(.+)$/)) {
-    actionType = 'preset';
-    actionId = menuId;
-    const match = menuId.match(/^preset-([^-]+)-(.+)$/);
-    if (match) {
-      const presetId = match[1];
-      const presetActionId = match[2];
-      const preset = PROFESSIONAL_PRESETS[presetId];
-      const action = preset?.actions.find(a => a.id === presetActionId);
-      // Verifier si un prompt personnalise existe
-      const customPrompts = await getStoredActions('customPrompts', {});
-      const customKey = `${presetId}_${presetActionId}`;
-      presetPrompt = customPrompts[customKey] || action?.prompt || '';
+  // Actions individuelles (format: action-{actionId})
+  else if (menuId.startsWith('action-')) {
+    actionType = 'action';
+    actionId = menuId.replace('action-', '');
+    const action = BASE_ACTIONS[actionId];
+    if (action) {
+      presetPrompt = action.prompt;
     }
   }
-  // Parser les presets personnalises (format: custompreset-{presetId}-{actionId})
-  else if (menuId.match(/^custompreset-([^-]+)-(.+)$/)) {
-    actionType = 'custompreset';
-    actionId = menuId;
-    const match = menuId.match(/^custompreset-([^-]+)-(.+)$/);
-    if (match) {
-      const presetId = match[1];
-      const presetActionId = match[2];
-      const customPresets = await getStoredActions('customPresets', []);
-      const preset = customPresets.find(p => p.id === presetId);
-      const action = preset?.actions.find(a => a.id === presetActionId);
-      presetPrompt = action?.prompt || '';
+  // Actions personnalisees (format: custom-{actionId})
+  else if (menuId.startsWith('custom-')) {
+    actionType = 'custom';
+    actionId = menuId.replace('custom-', '');
+    const customActions = await getStoredActions('customActions', []);
+    const action = customActions.find(a => a.id === actionId);
+    if (action) {
+      presetPrompt = action.prompt;
     }
   }
-  else if (menuId.startsWith('input-translate-')) {
-    actionType = 'input';
-    actionId = 'translate';
-    targetLanguage = menuId.replace('input-translate-', '');
-  } else if (menuId.startsWith('selection-translate-')) {
-    actionType = 'selection';
-    actionId = 'translate';
-    targetLanguage = menuId.replace('selection-translate-', '');
-  } else if (menuId.startsWith('input-')) {
-    actionType = 'input';
-    actionId = menuId.replace('input-', '');
-  } else if (menuId.startsWith('selection-')) {
-    actionType = 'selection';
-    actionId = menuId.replace('selection-', '');
-  } else if (menuId.startsWith('quick_')) {
+  else if (menuId.startsWith('quick_')) {
     actionType = 'quick';
     actionId = menuId;
   }
@@ -442,11 +462,10 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 
 // Initialisation a l'installation
 chrome.runtime.onInstalled.addListener(async (details) => {
-  // Si c'est une nouvelle installation, activer les presets par defaut
+  // Si c'est une nouvelle installation, activer les actions par defaut
   if (details.reason === 'install') {
-    const defaultActivePresets = ['student', 'personal_assistant', 'writer', 'developer'];
-    await chrome.storage.local.set({ activePresets: defaultActivePresets });
-    console.log('Presets par defaut actives:', defaultActivePresets);
+    await chrome.storage.local.set({ enabledActions: DEFAULT_ENABLED_ACTIONS });
+    console.log('Actions par defaut activees:', DEFAULT_ENABLED_ACTIONS);
   }
 
   await loadConfig();
@@ -471,7 +490,7 @@ chrome.runtime.onStartup.addListener(async () => {
 // Ecouter les changements de configuration
 chrome.storage.onChanged.addListener(async (changes, area) => {
   if (area === 'local') {
-    if (changes.config || changes.inputActions || changes.selectionActions || changes.proActions) {
+    if (changes.config || changes.enabledActions || changes.customPresets) {
       await loadConfig();
       await createContextMenus();
     }

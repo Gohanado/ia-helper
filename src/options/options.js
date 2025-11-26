@@ -1,59 +1,113 @@
 // Options Page Script - IA Helper
 
-import { PROFESSIONAL_PRESETS, PRESET_LIST } from '../config/presets.js';
 import { t } from '../i18n/translations.js';
 
-// Configuration par defaut (inline)
+// Configuration par defaut
 const DEFAULT_CONFIG = {
-  ollamaUrl: 'http://localhost:11434',
+  provider: 'ollama',
+  apiUrl: 'http://localhost:11434',
+  apiKey: '',
   selectedModel: '',
   streamingEnabled: true,
   interfaceLanguage: 'fr',
   responseLanguage: 'fr'
 };
 
-// Raccourcis par defaut
-const DEFAULT_SHORTCUTS = {
-  quickPrompt: { key: 'i', alt: true, ctrl: false, shift: false },
-  correct: { key: 'c', alt: true, ctrl: false, shift: false },
-  translate: { key: 't', alt: true, ctrl: false, shift: false },
-  summarize: { key: 's', alt: true, ctrl: false, shift: false }
+// Providers supportes
+const PROVIDERS = {
+  ollama: { name: 'Ollama (local)', defaultUrl: 'http://localhost:11434', needsKey: false },
+  openai: { name: 'OpenAI', defaultUrl: 'https://api.openai.com/v1', needsKey: true, defaultModels: ['gpt-4o', 'gpt-4o-mini', 'gpt-4-turbo', 'gpt-3.5-turbo'] },
+  anthropic: { name: 'Anthropic', defaultUrl: 'https://api.anthropic.com/v1', needsKey: true, defaultModels: ['claude-sonnet-4-20250514', 'claude-3-5-sonnet-20241022', 'claude-3-haiku-20240307'] },
+  groq: { name: 'Groq', defaultUrl: 'https://api.groq.com/openai/v1', needsKey: true, defaultModels: ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant', 'mixtral-8x7b-32768'] },
+  openrouter: { name: 'OpenRouter', defaultUrl: 'https://openrouter.ai/api/v1', needsKey: true, defaultModels: ['openai/gpt-4o', 'anthropic/claude-3.5-sonnet'] },
+  custom: { name: 'Personnalise', defaultUrl: '', needsKey: true }
 };
 
-let shortcuts = { ...DEFAULT_SHORTCUTS };
+// Langues de traduction
+const TRANSLATE_LANGUAGES = [
+  { code: 'fr', name: 'Francais' },
+  { code: 'en', name: 'Anglais' },
+  { code: 'es', name: 'Espagnol' },
+  { code: 'de', name: 'Allemand' },
+  { code: 'it', name: 'Italien' },
+  { code: 'pt', name: 'Portugais' },
+  { code: 'zh', name: 'Chinois' },
+  { code: 'ja', name: 'Japonais' },
+  { code: 'ko', name: 'Coreen' },
+  { code: 'ar', name: 'Arabe' },
+  { code: 'ru', name: 'Russe' },
+  { code: 'nl', name: 'Neerlandais' }
+];
+
+// Actions de base
+const BASE_ACTIONS = {
+  correct_errors: { id: 'correct_errors', name: 'Corriger l\'orthographe', description: 'Corrige les fautes', category: 'essential', defaultEnabled: true },
+  summarize: { id: 'summarize', name: 'Resumer', description: 'Resume le texte', category: 'essential', defaultEnabled: true },
+  explain_simple: { id: 'explain_simple', name: 'Expliquer simplement', description: 'Explique simplement', category: 'essential', defaultEnabled: true },
+  improve_style: { id: 'improve_style', name: 'Ameliorer le style', description: 'Ameliore la clarte', category: 'essential', defaultEnabled: true },
+  expand_content: { id: 'expand_content', name: 'Developper', description: 'Developpe le texte', category: 'essential', defaultEnabled: true },
+  reformat_mail_pro: { id: 'reformat_mail_pro', name: 'Email professionnel', description: 'Format email pro', category: 'essential', defaultEnabled: true },
+  bullet_points: { id: 'bullet_points', name: 'Liste a puces', description: 'Convertit en liste', category: 'practical', defaultEnabled: false },
+  extract_key_points: { id: 'extract_key_points', name: 'Points cles', description: 'Extrait l\'essentiel', category: 'practical', defaultEnabled: false },
+  make_shorter: { id: 'make_shorter', name: 'Raccourcir', description: 'Reduit la longueur', category: 'practical', defaultEnabled: false },
+  make_formal: { id: 'make_formal', name: 'Ton formel', description: 'Rend plus formel', category: 'practical', defaultEnabled: false },
+  make_casual: { id: 'make_casual', name: 'Ton decontracte', description: 'Rend plus decontracte', category: 'practical', defaultEnabled: false },
+  explain_code: { id: 'explain_code', name: 'Expliquer le code', description: 'Explique le code', category: 'technical', defaultEnabled: false },
+  review_code: { id: 'review_code', name: 'Revue de code', description: 'Analyse le code', category: 'technical', defaultEnabled: false },
+  debug_help: { id: 'debug_help', name: 'Aide debug', description: 'Aide a debugger', category: 'technical', defaultEnabled: false },
+  sentiment_analysis: { id: 'sentiment_analysis', name: 'Analyser le sentiment', description: 'Analyse le ton', category: 'analysis', defaultEnabled: false }
+};
+
+const DEFAULT_ENABLED_ACTIONS = Object.keys(BASE_ACTIONS).filter(k => BASE_ACTIONS[k].defaultEnabled);
+
+// Raccourcis par defaut
+const DEFAULT_SHORTCUTS = {
+  quickPrompt: { key: 'i', alt: true, ctrl: false, shift: false, actionId: 'quickPrompt', actionName: 'Prompt rapide' }
+};
+
+let shortcuts = {};
 let shortcutsEnabled = true;
 let defaultTranslateLang = 'en';
 let recordingShortcut = null;
+let customActions = [];
+let enabledTranslations = ['fr', 'en', 'es', 'de'];
 
 // Configuration actuelle
 let config = { ...DEFAULT_CONFIG };
-let customPrompts = {};
-let activePresets = [];
+let enabledActions = [...DEFAULT_ENABLED_ACTIONS];
 let customPresets = [];
 let currentLang = 'fr';
 
-// Elements DOM
-const elements = {
-  ollamaUrl: document.getElementById('ollama-url'),
-  modelSelect: document.getElementById('model-select'),
-  streamingEnabled: document.getElementById('streaming-enabled'),
-  interfaceLanguage: document.getElementById('interface-language'),
-  responseLanguage: document.getElementById('response-language'),
-  connectionStatus: document.getElementById('connection-status')
-};
+// Elements DOM (initialises apres DOMContentLoaded)
+let elements = {};
 
 // Initialisation
 document.addEventListener('DOMContentLoaded', async () => {
+  // Initialiser les elements DOM
+  elements = {
+    providerSelect: document.getElementById('provider-select'),
+    apiUrl: document.getElementById('api-url'),
+    apiKey: document.getElementById('api-key'),
+    apiUrlGroup: document.getElementById('api-url-group'),
+    apiKeyGroup: document.getElementById('api-key-group'),
+    apiUrlLabel: document.getElementById('api-url-label'),
+    modelSelect: document.getElementById('model-select'),
+    streamingEnabled: document.getElementById('streaming-enabled'),
+    interfaceLanguage: document.getElementById('interface-language'),
+    responseLanguage: document.getElementById('response-language'),
+    connectionStatus: document.getElementById('connection-status')
+  };
+
   await loadAllSettings();
-  await loadActivePresets();
-  await loadCustomPresets();
+  await loadEnabledActions();
+  await loadCustomActions();
+  await loadShortcuts();
   applyTranslations();
   setupNavigation();
   setupEventListeners();
-  setupModalListeners();
-  setupPresetModalListeners();
-  renderAllPresetsGrid();
-  // Charger les modeles au demarrage pour restaurer la selection
+  setupProviderListeners();
+  renderActionsGrid();
+  renderShortcutsList();
   refreshModels();
 });
 
@@ -72,18 +126,83 @@ function applyTranslations() {
 // Charger tous les parametres
 async function loadAllSettings() {
   return new Promise((resolve) => {
-    chrome.storage.local.get(['config', 'customPrompts'], (result) => {
-      config = result.config || DEFAULT_CONFIG;
-      customPrompts = result.customPrompts || {};
+    chrome.storage.local.get(['config'], (result) => {
+      config = { ...DEFAULT_CONFIG, ...result.config };
 
       // Remplir les champs
-      elements.ollamaUrl.value = config.ollamaUrl || '';
-      elements.streamingEnabled.checked = config.streamingEnabled !== false;
-      elements.interfaceLanguage.value = config.interfaceLanguage || 'fr';
-      elements.responseLanguage.value = config.responseLanguage || 'auto';
+      if (elements.providerSelect) elements.providerSelect.value = config.provider || 'ollama';
+      if (elements.apiUrl) elements.apiUrl.value = config.apiUrl || PROVIDERS[config.provider]?.defaultUrl || '';
+      if (elements.apiKey) elements.apiKey.value = config.apiKey || '';
+      if (elements.streamingEnabled) elements.streamingEnabled.checked = config.streamingEnabled !== false;
+      if (elements.interfaceLanguage) elements.interfaceLanguage.value = config.interfaceLanguage || 'fr';
+      if (elements.responseLanguage) elements.responseLanguage.value = config.responseLanguage || 'auto';
 
+      updateProviderUI(config.provider);
       resolve();
     });
+  });
+}
+
+// Charger les actions personnalisees
+async function loadCustomActions() {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(['customActions'], (result) => {
+      customActions = result.customActions || [];
+      resolve();
+    });
+  });
+}
+
+// Mettre a jour l'UI selon le provider
+function updateProviderUI(provider) {
+  const providerConfig = PROVIDERS[provider];
+  if (!providerConfig) return;
+
+  // Afficher/masquer le champ API key
+  if (elements.apiKeyGroup) {
+    elements.apiKeyGroup.style.display = providerConfig.needsKey ? 'block' : 'none';
+  }
+
+  // Mettre a jour le label de l'URL
+  if (elements.apiUrlLabel) {
+    if (provider === 'ollama') {
+      elements.apiUrlLabel.textContent = 'URL du serveur Ollama';
+    } else if (provider === 'custom') {
+      elements.apiUrlLabel.textContent = 'URL de l\'API (compatible OpenAI)';
+    } else {
+      elements.apiUrlLabel.textContent = `URL de l\'API ${providerConfig.name}`;
+    }
+  }
+
+  // Pre-remplir l'URL par defaut si vide
+  if (elements.apiUrl && !elements.apiUrl.value && providerConfig.defaultUrl) {
+    elements.apiUrl.value = providerConfig.defaultUrl;
+  }
+}
+
+// Listeners pour le changement de provider
+function setupProviderListeners() {
+  elements.providerSelect?.addEventListener('change', (e) => {
+    const provider = e.target.value;
+    const providerConfig = PROVIDERS[provider];
+
+    // Mettre a jour l'URL par defaut
+    if (elements.apiUrl && providerConfig?.defaultUrl) {
+      elements.apiUrl.value = providerConfig.defaultUrl;
+    }
+
+    updateProviderUI(provider);
+
+    // Mettre a jour les modeles par defaut
+    if (providerConfig?.defaultModels) {
+      elements.modelSelect.innerHTML = '<option value="">Selectionnez un modele</option>';
+      providerConfig.defaultModels.forEach(model => {
+        const option = document.createElement('option');
+        option.value = model;
+        option.textContent = model;
+        elements.modelSelect.appendChild(option);
+      });
+    }
   });
 }
 
@@ -107,46 +226,69 @@ function setupNavigation() {
 // Event listeners
 function setupEventListeners() {
   // Test connexion
-  document.getElementById('btn-test-connection').addEventListener('click', testConnection);
+  document.getElementById('btn-test-connection')?.addEventListener('click', testConnection);
 
   // Rafraichir modeles
-  document.getElementById('btn-refresh-models').addEventListener('click', refreshModels);
+  document.getElementById('btn-refresh-models')?.addEventListener('click', refreshModels);
 
   // Sauvegarder connexion
-  document.getElementById('btn-save-connection').addEventListener('click', saveConnectionSettings);
+  document.getElementById('btn-save-connection')?.addEventListener('click', saveConnectionSettings);
 
   // Reset
-  document.getElementById('btn-reset').addEventListener('click', resetToDefaults);
+  document.getElementById('btn-reset')?.addEventListener('click', resetToDefaults);
 
-  // Creer preset
-  const btnAddPreset = document.getElementById('btn-add-preset');
-  if (btnAddPreset) {
-    btnAddPreset.addEventListener('click', showAddPresetModal);
-  }
+  // Actions
+  document.getElementById('btn-enable-all')?.addEventListener('click', () => toggleAllActions(true));
+  document.getElementById('btn-disable-all')?.addEventListener('click', () => toggleAllActions(false));
+  document.getElementById('btn-reset-actions')?.addEventListener('click', resetActionsToDefault);
+  document.getElementById('btn-add-custom-action')?.addEventListener('click', showAddCustomActionModal);
 
-  // Setup raccourcis
-  setupShortcutListeners();
+  // Raccourcis
+  document.getElementById('btn-add-shortcut')?.addEventListener('click', showAddShortcutModal);
+  document.getElementById('btn-save-shortcuts')?.addEventListener('click', saveShortcuts);
+  document.getElementById('shortcuts-enabled')?.addEventListener('change', (e) => {
+    shortcutsEnabled = e.target.checked;
+  });
+  document.getElementById('default-translate-lang')?.addEventListener('change', (e) => {
+    defaultTranslateLang = e.target.value;
+  });
 }
 
 // Tester la connexion
 async function testConnection() {
-  const url = elements.ollamaUrl.value.trim();
+  const provider = elements.providerSelect?.value || 'ollama';
+  const url = elements.apiUrl?.value.trim();
+  const apiKey = elements.apiKey?.value.trim();
   const status = elements.connectionStatus;
-  
+
   if (!url) {
     showStatus(status, 'Veuillez entrer une URL', 'error');
     return;
   }
 
   try {
-    const response = await fetch(`${url}/api/tags`, {
+    let testUrl, headers = {};
+
+    if (provider === 'ollama') {
+      testUrl = `${url}/api/tags`;
+    } else if (provider === 'anthropic') {
+      // Anthropic n'a pas d'endpoint de test simple
+      showStatus(status, 'Cle API enregistree. Test lors de la premiere requete.', 'success');
+      return;
+    } else {
+      testUrl = `${url}/models`;
+      headers['Authorization'] = `Bearer ${apiKey}`;
+    }
+
+    const response = await fetch(testUrl, {
       method: 'GET',
+      headers,
       signal: AbortSignal.timeout(5000)
     });
-    
+
     if (response.ok) {
       const data = await response.json();
-      const modelCount = data.models?.length || 0;
+      const modelCount = data.models?.length || data.data?.length || 0;
       showStatus(status, `Connexion reussie ! ${modelCount} modele(s) disponible(s)`, 'success');
       await refreshModels();
     } else {
@@ -159,25 +301,53 @@ async function testConnection() {
 
 // Rafraichir la liste des modeles
 async function refreshModels() {
-  const url = elements.ollamaUrl.value.trim();
-  
+  const provider = elements.providerSelect?.value || 'ollama';
+  const url = elements.apiUrl?.value.trim();
+  const apiKey = elements.apiKey?.value.trim();
+  const providerConfig = PROVIDERS[provider];
+
+  elements.modelSelect.innerHTML = '<option value="">Selectionnez un modele</option>';
+
+  // Si le provider a des modeles par defaut, les utiliser
+  if (providerConfig?.defaultModels && provider !== 'ollama') {
+    providerConfig.defaultModels.forEach(model => {
+      const option = document.createElement('option');
+      option.value = model;
+      option.textContent = model;
+      if (model === config.selectedModel) option.selected = true;
+      elements.modelSelect.appendChild(option);
+    });
+    return;
+  }
+
   try {
-    const response = await fetch(`${url}/api/tags`);
-    const data = await response.json();
-    
-    elements.modelSelect.innerHTML = '<option value="">Selectionnez un modele</option>';
-    
-    if (data.models && data.models.length > 0) {
-      data.models.forEach(model => {
-        const option = document.createElement('option');
-        option.value = model.name;
-        option.textContent = `${model.name} (${formatSize(model.size)})`;
-        if (model.name === config.selectedModel) {
-          option.selected = true;
-        }
-        elements.modelSelect.appendChild(option);
-      });
+    let headers = {};
+    let modelsUrl = url;
+
+    if (provider === 'ollama') {
+      modelsUrl = `${url}/api/tags`;
+    } else {
+      modelsUrl = `${url}/models`;
+      headers['Authorization'] = `Bearer ${apiKey}`;
     }
+
+    const response = await fetch(modelsUrl, { headers });
+    const data = await response.json();
+
+    let models = [];
+    if (provider === 'ollama') {
+      models = data.models || [];
+    } else {
+      models = (data.data || []).map(m => ({ name: m.id }));
+    }
+
+    models.forEach(model => {
+      const option = document.createElement('option');
+      option.value = model.name || model.id;
+      option.textContent = model.size ? `${model.name} (${formatSize(model.size)})` : model.name;
+      if ((model.name || model.id) === config.selectedModel) option.selected = true;
+      elements.modelSelect.appendChild(option);
+    });
   } catch (error) {
     console.error('Erreur lors du chargement des modeles:', error);
   }
@@ -199,11 +369,13 @@ function showStatus(element, message, type) {
 async function saveConnectionSettings() {
   const previousLang = config.interfaceLanguage;
 
-  config.ollamaUrl = elements.ollamaUrl.value.trim();
-  config.selectedModel = elements.modelSelect.value;
-  config.streamingEnabled = elements.streamingEnabled.checked;
-  config.interfaceLanguage = elements.interfaceLanguage.value;
-  config.responseLanguage = elements.responseLanguage.value;
+  config.provider = elements.providerSelect?.value || 'ollama';
+  config.apiUrl = elements.apiUrl?.value.trim() || '';
+  config.apiKey = elements.apiKey?.value.trim() || '';
+  config.selectedModel = elements.modelSelect?.value || '';
+  config.streamingEnabled = elements.streamingEnabled?.checked !== false;
+  config.interfaceLanguage = elements.interfaceLanguage?.value || 'fr';
+  config.responseLanguage = elements.responseLanguage?.value || 'auto';
 
   await saveConfig();
 
@@ -211,10 +383,10 @@ async function saveConnectionSettings() {
   if (previousLang !== config.interfaceLanguage) {
     currentLang = config.interfaceLanguage;
     applyTranslations();
-    renderAllPresetsGrid();
-    showNotification(t('languageChanged', currentLang) + ' ' + t('settingsSaved', currentLang), 'success');
+    renderActionsGrid();
+    showNotification('Langue changee. Parametres sauvegardes.', 'success');
   } else {
-    showNotification(t('settingsSaved', currentLang), 'success');
+    showNotification('Parametres sauvegardes.', 'success');
   }
 }
 
@@ -295,160 +467,504 @@ function showNotification(message, type = 'info') {
   }, 3000);
 }
 
-// ========== PRESETS PROFESSIONNELS ==========
+// ========== ACTIONS INDIVIDUELLES ==========
 
-// Charger les presets actifs
-async function loadActivePresets() {
+// Charger les actions activees
+async function loadEnabledActions() {
   return new Promise((resolve) => {
-    chrome.storage.local.get(['activePresets'], (result) => {
-      activePresets = result.activePresets || [];
+    chrome.storage.local.get(['enabledActions'], (result) => {
+      enabledActions = result.enabledActions || [...DEFAULT_ENABLED_ACTIONS];
       resolve();
     });
   });
 }
 
-// Sauvegarder les presets actifs
-async function saveActivePresets() {
+// Sauvegarder les actions activees
+async function saveEnabledActions() {
   return new Promise((resolve) => {
-    chrome.storage.local.set({ activePresets }, resolve);
+    chrome.storage.local.set({ enabledActions }, () => {
+      chrome.runtime.sendMessage({ type: 'RELOAD_MENUS' });
+      resolve();
+    });
   });
 }
 
-// Rendre la grille unifiee de tous les presets (personnalises + integres)
-function renderAllPresetsGrid() {
-  const grid = document.getElementById('all-presets-grid');
-  if (!grid) return;
+// Rendre la grille des actions par categorie
+function renderActionsGrid() {
+  const categories = ['essential', 'practical', 'technical', 'analysis'];
 
-  grid.innerHTML = '';
+  for (const category of categories) {
+    const container = document.getElementById(`actions-${category}`);
+    if (!container) continue;
 
-  const icons = {
-    'support_it': 'IT',
-    'customer_service': 'SC',
-    'sales': 'CO',
-    'developer': 'DEV',
-    'writer': 'RED',
-    'student': 'ETU',
-    'researcher': 'REC',
-    'hr_recruiter': 'RH',
-    'manager': 'MGR',
-    'legal': 'JUR',
-    'marketing': 'MKT',
-    'product_manager': 'PM',
-    'ux_designer': 'UX',
-    'data_analyst': 'DA',
-    'community_manager': 'CM',
-    'trainer': 'FOR',
-    'translator': 'TRA',
-    'journalist': 'JOU',
-    'freelance': 'FRE',
-    'healthcare': 'MED',
-    'ecommerce': 'ECO',
-    'copywriter': 'CPY',
-    'content_creator': 'YT',
-    'personal_assistant': 'PA'
-  };
+    container.innerHTML = '';
 
-  // D'abord les presets personnalises
-  for (const preset of customPresets) {
-    const card = document.createElement('div');
-    card.className = `preset-card custom-preset-card ${preset.enabled ? 'active' : ''}`;
-    card.innerHTML = `
-      <div class="preset-toggle">
-        <label class="toggle-label">
-          <input type="checkbox" ${preset.enabled ? 'checked' : ''} data-custom-preset="${preset.id}">
-          <span class="toggle-switch"></span>
-        </label>
-      </div>
-      <div class="preset-icon custom-icon">${t('custom', currentLang).charAt(0)}</div>
-      <h4>${preset.name}</h4>
-      <p>${preset.description || ''}</p>
-      <span class="preset-badge">${preset.actions.length} ${t('actions', currentLang)}</span>
-      <div class="preset-card-actions">
-        <button class="btn btn-sm edit-preset-btn" data-id="${preset.id}">${t('edit', currentLang)}</button>
-        <button class="btn btn-sm btn-danger delete-preset-btn" data-id="${preset.id}">${t('delete', currentLang)}</button>
-      </div>
-    `;
+    const actionsInCategory = Object.values(BASE_ACTIONS).filter(a => a.category === category);
 
-    // Toggle
-    const checkbox = card.querySelector('input[type="checkbox"]');
-    checkbox.addEventListener('change', async (e) => {
-      e.stopPropagation();
-      preset.enabled = e.target.checked;
-      card.classList.toggle('active', e.target.checked);
-      await saveCustomPresets();
-      chrome.runtime.sendMessage({ type: 'RELOAD_MENUS' });
-      showNotification(e.target.checked ? t('presetActivated', currentLang) : t('presetDeactivated', currentLang), 'success');
-    });
-
-    // Clic sur la carte
-    card.addEventListener('click', (e) => {
-      if (e.target.type !== 'checkbox' && !e.target.classList.contains('edit-preset-btn') && !e.target.classList.contains('delete-preset-btn')) {
-        showPresetActions(preset.id, true);
-      }
-    });
-
-    // Modifier
-    card.querySelector('.edit-preset-btn').addEventListener('click', (e) => {
-      e.stopPropagation();
-      editCustomPreset(preset.id);
-    });
-
-    // Supprimer
-    card.querySelector('.delete-preset-btn').addEventListener('click', (e) => {
-      e.stopPropagation();
-      deleteCustomPreset(preset.id);
-    });
-
-    grid.appendChild(card);
+    for (const action of actionsInCategory) {
+      const isEnabled = enabledActions.includes(action.id);
+      container.appendChild(createActionToggle(action, isEnabled));
+    }
   }
 
-  // Ensuite les presets integres
-  for (const preset of PRESET_LIST) {
-    const isActive = activePresets.includes(preset.id);
-    const card = document.createElement('div');
-    card.className = `preset-card ${isActive ? 'active' : ''}`;
-    card.innerHTML = `
-      <div class="preset-toggle">
-        <label class="toggle-label">
-          <input type="checkbox" ${isActive ? 'checked' : ''} data-preset="${preset.id}">
-          <span class="toggle-switch"></span>
-        </label>
-      </div>
-      <div class="preset-icon">${icons[preset.id] || preset.name.charAt(0)}</div>
-      <h4>${preset.name}</h4>
-      <p>${preset.description}</p>
-      <span class="preset-badge integrated-badge">${t('integrated', currentLang)} - ${preset.actionCount} ${t('actions', currentLang)}</span>
-      <div class="preset-card-actions">
-        <button class="btn btn-sm customize-preset-btn" data-id="${preset.id}">${t('customize', currentLang)}</button>
-      </div>
+  // Traductions
+  renderTranslationsGrid();
+
+  // Actions personnalisees
+  renderCustomActionsGrid();
+}
+
+// Creer un toggle d'action
+function createActionToggle(action, isEnabled, isCustom = false) {
+  const toggle = document.createElement('label');
+  toggle.className = `action-toggle ${isEnabled ? 'active' : ''}`;
+  toggle.innerHTML = `
+    <input type="checkbox" ${isEnabled ? 'checked' : ''} data-action-id="${action.id}">
+    <span class="toggle-indicator"></span>
+    <span class="action-info">
+      <span class="action-name">${action.name}</span>
+      <span class="action-desc">${action.description || ''}</span>
+    </span>
+    ${isCustom ? '<button class="btn-delete-action" data-id="' + action.id + '">X</button>' : ''}
+  `;
+
+  toggle.querySelector('input').addEventListener('change', (e) => {
+    toggleAction(action.id, e.target.checked, isCustom);
+    toggle.classList.toggle('active', e.target.checked);
+  });
+
+  if (isCustom) {
+    toggle.querySelector('.btn-delete-action')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      deleteCustomAction(action.id);
+    });
+  }
+
+  return toggle;
+}
+
+// Rendre les traductions
+function renderTranslationsGrid() {
+  const container = document.getElementById('actions-translate');
+  if (!container) return;
+
+  container.innerHTML = '';
+
+  for (const lang of TRANSLATE_LANGUAGES) {
+    const actionId = `translate_${lang.code}`;
+    const isEnabled = enabledTranslations.includes(lang.code);
+    const action = { id: actionId, name: `Traduire en ${lang.name}`, description: lang.code.toUpperCase() };
+
+    const toggle = document.createElement('label');
+    toggle.className = `action-toggle ${isEnabled ? 'active' : ''}`;
+    toggle.innerHTML = `
+      <input type="checkbox" ${isEnabled ? 'checked' : ''} data-lang="${lang.code}">
+      <span class="toggle-indicator"></span>
+      <span class="action-info">
+        <span class="action-name">${action.name}</span>
+        <span class="action-desc">${action.description}</span>
+      </span>
     `;
 
-    // Toggle du preset
-    const checkbox = card.querySelector('input[type="checkbox"]');
-    checkbox.addEventListener('change', async (e) => {
-      e.stopPropagation();
-      await togglePreset(preset.id, e.target.checked);
-      card.classList.toggle('active', e.target.checked);
+    toggle.querySelector('input').addEventListener('change', (e) => {
+      toggleTranslation(lang.code, e.target.checked);
+      toggle.classList.toggle('active', e.target.checked);
     });
 
-    // Clic sur la carte pour voir les actions
-    card.addEventListener('click', (e) => {
-      if (e.target.type !== 'checkbox' && !e.target.classList.contains('customize-preset-btn')) {
-        showPresetActions(preset.id, false);
-      }
-    });
-
-    // Personnaliser le preset integre
-    card.querySelector('.customize-preset-btn').addEventListener('click', (e) => {
-      e.stopPropagation();
-      customizeIntegratedPreset(preset.id);
-    });
-
-    grid.appendChild(card);
+    container.appendChild(toggle);
   }
 }
 
-// Activer/desactiver un preset
+// Activer/desactiver une traduction
+function toggleTranslation(langCode, enabled) {
+  if (enabled && !enabledTranslations.includes(langCode)) {
+    enabledTranslations.push(langCode);
+  } else if (!enabled) {
+    enabledTranslations = enabledTranslations.filter(c => c !== langCode);
+  }
+  saveEnabledTranslations();
+}
+
+// Sauvegarder les traductions activees
+async function saveEnabledTranslations() {
+  return new Promise((resolve) => {
+    chrome.storage.local.set({ enabledTranslations }, resolve);
+  });
+}
+
+// Rendre les actions personnalisees
+function renderCustomActionsGrid() {
+  const container = document.getElementById('actions-custom');
+  if (!container) return;
+
+  container.innerHTML = '';
+
+  if (customActions.length === 0) {
+    container.innerHTML = '<p class="empty-message">Aucune action personnalisee. Cliquez sur le bouton ci-dessous pour en creer une.</p>';
+    return;
+  }
+
+  for (const action of customActions) {
+    const isEnabled = enabledActions.includes(action.id);
+    container.appendChild(createActionToggle(action, isEnabled, true));
+  }
+}
+
+// Activer/desactiver toutes les actions
+function toggleAllActions(enable) {
+  if (enable) {
+    enabledActions = [...Object.keys(BASE_ACTIONS), ...customActions.map(a => a.id)];
+    enabledTranslations = TRANSLATE_LANGUAGES.map(l => l.code);
+  } else {
+    enabledActions = [];
+    enabledTranslations = [];
+  }
+  saveEnabledActions();
+  saveEnabledTranslations();
+  renderActionsGrid();
+  showNotification(enable ? 'Toutes les actions activees' : 'Toutes les actions desactivees', 'success');
+}
+
+// Reset actions par defaut
+function resetActionsToDefault() {
+  enabledActions = [...DEFAULT_ENABLED_ACTIONS];
+  enabledTranslations = ['fr', 'en', 'es', 'de'];
+  saveEnabledActions();
+  saveEnabledTranslations();
+  renderActionsGrid();
+  showNotification('Actions par defaut restaurees', 'success');
+}
+
+// Activer/desactiver une action
+function toggleAction(actionId, enabled, isCustom = false) {
+  if (enabled && !enabledActions.includes(actionId)) {
+    enabledActions.push(actionId);
+  } else if (!enabled) {
+    enabledActions = enabledActions.filter(id => id !== actionId);
+  }
+  saveEnabledActions();
+}
+
+// ========== ACTIONS PERSONNALISEES ==========
+
+// Afficher le modal pour ajouter une action personnalisee
+function showAddCustomActionModal() {
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay active';
+  modal.id = 'custom-action-modal';
+  modal.innerHTML = `
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Nouvelle action personnalisee</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="custom-action-name">Nom de l'action</label>
+          <input type="text" id="custom-action-name" placeholder="Ex: Reformuler en langage juridique">
+        </div>
+        <div class="form-group">
+          <label for="custom-action-prompt">Prompt</label>
+          <textarea id="custom-action-prompt" rows="5" placeholder="Ex: Reformule ce texte en utilisant un langage juridique precis et formel."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary modal-cancel">Annuler</button>
+        <button class="btn btn-primary modal-save">Creer</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  modal.querySelector('.modal-close').addEventListener('click', () => modal.remove());
+  modal.querySelector('.modal-cancel').addEventListener('click', () => modal.remove());
+  modal.querySelector('.modal-save').addEventListener('click', () => {
+    const name = document.getElementById('custom-action-name').value.trim();
+    const prompt = document.getElementById('custom-action-prompt').value.trim();
+
+    if (!name || !prompt) {
+      showNotification('Veuillez remplir tous les champs', 'error');
+      return;
+    }
+
+    const newAction = {
+      id: 'custom_' + Date.now(),
+      name,
+      prompt,
+      description: prompt.substring(0, 50) + '...',
+      category: 'custom'
+    };
+
+    customActions.push(newAction);
+    enabledActions.push(newAction.id);
+    saveCustomActions();
+    saveEnabledActions();
+    renderActionsGrid();
+    modal.remove();
+    showNotification('Action personnalisee creee !', 'success');
+  });
+
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) modal.remove();
+  });
+}
+
+// Supprimer une action personnalisee
+function deleteCustomAction(actionId) {
+  if (!confirm('Supprimer cette action personnalisee ?')) return;
+
+  customActions = customActions.filter(a => a.id !== actionId);
+  enabledActions = enabledActions.filter(id => id !== actionId);
+
+  // Supprimer aussi les raccourcis associes
+  delete shortcuts[actionId];
+
+  saveCustomActions();
+  saveEnabledActions();
+  saveShortcuts();
+  renderActionsGrid();
+  renderShortcutsList();
+  showNotification('Action supprimee', 'success');
+}
+
+// Sauvegarder les actions personnalisees
+async function saveCustomActions() {
+  return new Promise((resolve) => {
+    chrome.storage.local.set({ customActions }, resolve);
+  });
+}
+
+// ========== RACCOURCIS ==========
+
+// Charger les raccourcis
+async function loadShortcuts() {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(['shortcuts', 'shortcutsEnabled', 'defaultTranslateLang', 'enabledTranslations'], (result) => {
+      shortcuts = result.shortcuts || { ...DEFAULT_SHORTCUTS };
+      shortcutsEnabled = result.shortcutsEnabled !== false;
+      defaultTranslateLang = result.defaultTranslateLang || 'en';
+      enabledTranslations = result.enabledTranslations || ['fr', 'en', 'es', 'de'];
+
+      document.getElementById('shortcuts-enabled').checked = shortcutsEnabled;
+      document.getElementById('default-translate-lang').value = defaultTranslateLang;
+
+      resolve();
+    });
+  });
+}
+
+// Rendre la liste des raccourcis
+function renderShortcutsList() {
+  const container = document.getElementById('shortcuts-list');
+  if (!container) return;
+
+  container.innerHTML = '';
+
+  // Raccourcis existants
+  for (const [actionId, shortcut] of Object.entries(shortcuts)) {
+    const actionName = getActionName(actionId);
+    const keyDisplay = formatShortcut(shortcut);
+
+    const item = document.createElement('div');
+    item.className = 'shortcut-item';
+    item.innerHTML = `
+      <div class="shortcut-info">
+        <span class="shortcut-name">${actionName}</span>
+      </div>
+      <div class="shortcut-key-wrapper">
+        <button class="shortcut-key-btn" data-action="${actionId}">
+          <span class="key-display">${keyDisplay}</span>
+        </button>
+        <button class="btn btn-small btn-secondary btn-delete-shortcut" data-action="${actionId}">X</button>
+      </div>
+    `;
+
+    item.querySelector('.shortcut-key-btn').addEventListener('click', (e) => {
+      startRecordingShortcut(e.currentTarget, actionId);
+    });
+
+    item.querySelector('.btn-delete-shortcut').addEventListener('click', () => {
+      delete shortcuts[actionId];
+      renderShortcutsList();
+    });
+
+    container.appendChild(item);
+  }
+
+  if (Object.keys(shortcuts).length === 0) {
+    container.innerHTML = '<p class="empty-message">Aucun raccourci configure. Cliquez sur le bouton ci-dessous pour en ajouter.</p>';
+  }
+}
+
+// Obtenir le nom d'une action
+function getActionName(actionId) {
+  if (actionId === 'quickPrompt') return 'Prompt rapide';
+  if (BASE_ACTIONS[actionId]) return BASE_ACTIONS[actionId].name;
+  const customAction = customActions.find(a => a.id === actionId);
+  if (customAction) return customAction.name;
+  if (actionId.startsWith('translate_')) {
+    const lang = TRANSLATE_LANGUAGES.find(l => l.code === actionId.replace('translate_', ''));
+    return lang ? `Traduire en ${lang.name}` : actionId;
+  }
+  return actionId;
+}
+
+// Formater un raccourci pour affichage
+function formatShortcut(shortcut) {
+  const parts = [];
+  if (shortcut.ctrl) parts.push('Ctrl');
+  if (shortcut.alt) parts.push('Alt');
+  if (shortcut.shift) parts.push('Shift');
+  parts.push(shortcut.key.toUpperCase());
+  return parts.join(' + ');
+}
+
+// Commencer l'enregistrement d'un raccourci
+function startRecordingShortcut(button, actionId) {
+  button.classList.add('recording');
+  button.querySelector('.key-display').textContent = 'Appuyez sur une touche...';
+
+  const handler = (e) => {
+    e.preventDefault();
+
+    if (['Control', 'Alt', 'Shift', 'Meta'].includes(e.key)) return;
+
+    shortcuts[actionId] = {
+      key: e.key.toLowerCase(),
+      ctrl: e.ctrlKey,
+      alt: e.altKey,
+      shift: e.shiftKey,
+      actionId,
+      actionName: getActionName(actionId)
+    };
+
+    button.classList.remove('recording');
+    button.querySelector('.key-display').textContent = formatShortcut(shortcuts[actionId]);
+    document.removeEventListener('keydown', handler);
+  };
+
+  document.addEventListener('keydown', handler);
+}
+
+// Afficher le modal pour ajouter un raccourci
+function showAddShortcutModal() {
+  // Collecter toutes les actions disponibles
+  const allActions = [
+    { id: 'quickPrompt', name: 'Prompt rapide' },
+    ...Object.values(BASE_ACTIONS).map(a => ({ id: a.id, name: a.name })),
+    ...TRANSLATE_LANGUAGES.map(l => ({ id: `translate_${l.code}`, name: `Traduire en ${l.name}` })),
+    ...customActions.map(a => ({ id: a.id, name: a.name }))
+  ].filter(a => !shortcuts[a.id]); // Exclure ceux qui ont deja un raccourci
+
+  if (allActions.length === 0) {
+    showNotification('Toutes les actions ont deja un raccourci', 'info');
+    return;
+  }
+
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay active';
+  modal.id = 'shortcut-modal';
+  modal.innerHTML = `
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Ajouter un raccourci</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="shortcut-action">Action</label>
+          <select id="shortcut-action">
+            ${allActions.map(a => `<option value="${a.id}">${a.name}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Raccourci</label>
+          <button class="shortcut-key-btn recording" id="new-shortcut-btn">
+            <span class="key-display">Appuyez sur une touche...</span>
+          </button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary modal-cancel">Annuler</button>
+        <button class="btn btn-primary modal-save" disabled>Ajouter</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  let newShortcut = null;
+  const shortcutBtn = modal.querySelector('#new-shortcut-btn');
+  const saveBtn = modal.querySelector('.modal-save');
+
+  const keyHandler = (e) => {
+    e.preventDefault();
+    if (['Control', 'Alt', 'Shift', 'Meta'].includes(e.key)) return;
+
+    newShortcut = {
+      key: e.key.toLowerCase(),
+      ctrl: e.ctrlKey,
+      alt: e.altKey,
+      shift: e.shiftKey
+    };
+
+    shortcutBtn.classList.remove('recording');
+    shortcutBtn.querySelector('.key-display').textContent = formatShortcut(newShortcut);
+    saveBtn.disabled = false;
+  };
+
+  document.addEventListener('keydown', keyHandler);
+
+  modal.querySelector('.modal-close').addEventListener('click', () => {
+    document.removeEventListener('keydown', keyHandler);
+    modal.remove();
+  });
+  modal.querySelector('.modal-cancel').addEventListener('click', () => {
+    document.removeEventListener('keydown', keyHandler);
+    modal.remove();
+  });
+
+  saveBtn.addEventListener('click', () => {
+    const actionId = document.getElementById('shortcut-action').value;
+    shortcuts[actionId] = {
+      ...newShortcut,
+      actionId,
+      actionName: getActionName(actionId)
+    };
+    document.removeEventListener('keydown', keyHandler);
+    modal.remove();
+    renderShortcutsList();
+    showNotification('Raccourci ajoute !', 'success');
+  });
+
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      document.removeEventListener('keydown', keyHandler);
+      modal.remove();
+    }
+  });
+}
+
+// Sauvegarder les raccourcis
+async function saveShortcuts() {
+  shortcutsEnabled = document.getElementById('shortcuts-enabled')?.checked !== false;
+  defaultTranslateLang = document.getElementById('default-translate-lang')?.value || 'en';
+
+  await new Promise((resolve) => {
+    chrome.storage.local.set({ shortcuts, shortcutsEnabled, defaultTranslateLang }, resolve);
+  });
+
+  showNotification('Raccourcis sauvegardes !', 'success');
+}
+
+// Ancienne fonction - garder pour compatibilite
+function setupShortcutListeners() {
+  // Les listeners sont maintenant geres dans setupEventListeners
+}
+
+// Activer/desactiver un preset (legacy)
 async function togglePreset(presetId, active) {
   if (active) {
     if (!activePresets.includes(presetId)) {

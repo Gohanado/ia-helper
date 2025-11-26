@@ -1070,6 +1070,107 @@ textarea {
   cursor: pointer;
 }
 
+/* === SECTION ACTIONS === */
+.actions-category {
+  margin-bottom: 32px;
+}
+
+.category-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.category-desc {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.action-toggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.action-toggle:hover {
+  border-color: var(--accent-start);
+  background: rgba(102, 126, 234, 0.05);
+}
+
+.action-toggle.active {
+  border-color: var(--accent-start);
+  background: rgba(102, 126, 234, 0.1);
+}
+
+.action-toggle input[type="checkbox"] {
+  display: none;
+}
+
+.action-toggle .toggle-indicator {
+  width: 44px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  position: relative;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.action-toggle .toggle-indicator::after {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  background: white;
+  border-radius: 50%;
+  top: 3px;
+  left: 3px;
+  transition: all 0.2s;
+}
+
+.action-toggle.active .toggle-indicator {
+  background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+}
+
+.action-toggle.active .toggle-indicator::after {
+  left: 23px;
+}
+
+.action-toggle .action-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.action-toggle .action-name {
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--text-primary);
+  display: block;
+  margin-bottom: 2px;
+}
+
+.action-toggle .action-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* === SECTION RACCOURCIS === */
 .shortcuts-list {
   display: flex;
@@ -1182,4 +1283,60 @@ textarea {
   font-size: 13px;
   color: var(--text-secondary);
   line-height: 1.6;
+}
+
+/* Bouton supprimer dans action toggle */
+.btn-delete-action,
+.btn-delete-shortcut {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(231, 76, 60, 0.2);
+  border: 1px solid rgba(231, 76, 60, 0.3);
+  border-radius: 6px;
+  color: #e74c3c;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  opacity: 0;
+}
+
+.action-toggle:hover .btn-delete-action,
+.shortcut-item:hover .btn-delete-shortcut {
+  opacity: 1;
+}
+
+.btn-delete-action:hover,
+.btn-delete-shortcut:hover {
+  background: rgba(231, 76, 60, 0.4);
+  transform: scale(1.1);
+}
+
+.action-toggle {
+  position: relative;
+}
+
+/* Message vide */
+.empty-message {
+  color: var(--text-muted);
+  font-style: italic;
+  padding: 20px;
+  text-align: center;
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px dashed var(--border-color);
+}
+
+/* Form hint */
+.form-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 6px;
 }

@@ -12,12 +12,15 @@
   if (window !== window.top) return;
 
   // Configuration par defaut
-  const DEFAULT_OLLAMA_URL = 'http://localhost:11434';
-  let config = {
-    ollamaUrl: DEFAULT_OLLAMA_URL,
+  const DEFAULT_CONFIG = {
+    provider: 'ollama',
+    apiUrl: 'http://localhost:11434',
+    apiKey: '',
     selectedModel: '',
     streamingEnabled: true
   };
+
+  let config = { ...DEFAULT_CONFIG };
 
   // Element actif actuel
   let activeElement = null;
@@ -28,7 +31,11 @@
     return new Promise((resolve) => {
       chrome.storage.local.get(['config'], (result) => {
         if (result.config) {
-          config = { ...config, ...result.config };
+          config = { ...DEFAULT_CONFIG, ...result.config };
+          // Migration: ollamaUrl -> apiUrl
+          if (result.config.ollamaUrl && !result.config.apiUrl) {
+            config.apiUrl = result.config.ollamaUrl;
+          }
         }
         resolve(config);
       });
@@ -159,26 +166,65 @@
     }
   }
 
-  // Generer avec streaming dans un champ
+  // Generer avec streaming dans un champ (multi-provider)
   async function generateWithStreaming(element, prompt, systemPrompt) {
     const indicator = showLoadingIndicator(element);
-    
-    try {
-      const response = await fetch(`${config.ollamaUrl}/api/generate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: config.selectedModel,
-          prompt: prompt,
-          system: systemPrompt,
-          stream: true
-        })
-      });
+    const provider = config.provider || 'ollama';
 
-      if (!response.ok) throw new Error(`Erreur: ${response.status}`);
+    try {
+      let response;
+      let headers = { 'Content-Type': 'application/json' };
+
+      if (provider === 'ollama') {
+        response = await fetch(`${config.apiUrl}/api/generate`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            model: config.selectedModel,
+            prompt: prompt,
+            system: systemPrompt,
+            stream: true
+          })
+        });
+      } else if (provider === 'anthropic') {
+        headers['x-api-key'] = config.apiKey;
+        headers['anthropic-version'] = '2023-06-01';
+        headers['anthropic-dangerous-direct-browser-access'] = 'true';
+        response = await fetch(`${config.apiUrl}/messages`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            model: config.selectedModel,
+            max_tokens: 4096,
+            system: systemPrompt,
+            messages: [{ role: 'user', content: prompt }],
+            stream: true
+          })
+        });
+      } else {
+        // OpenAI, Groq, OpenRouter, Custom (format OpenAI)
+        headers['Authorization'] = `Bearer ${config.apiKey}`;
+        response = await fetch(`${config.apiUrl}/chat/completions`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            model: config.selectedModel,
+            messages: [
+              { role: 'system', content: systemPrompt },
+              { role: 'user', content: prompt }
+            ],
+            stream: true
+          })
+        });
+      }
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Erreur ${response.status}: ${errorText.substring(0, 100)}`);
+      }
 
       hideLoadingIndicator();
-      
+
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let fullResponse = '';
@@ -195,11 +241,27 @@
 
         for (const line of lines) {
           try {
-            const json = JSON.parse(line);
-            if (json.response) {
-              fullResponse += json.response;
+            // Enlever le prefixe "data: " pour SSE
+            const cleanLine = line.startsWith('data: ') ? line.slice(6) : line;
+            if (cleanLine === '[DONE]') continue;
+
+            const json = JSON.parse(cleanLine);
+            let content = '';
+
+            if (provider === 'ollama') {
+              content = json.response || '';
+            } else if (provider === 'anthropic') {
+              if (json.type === 'content_block_delta') {
+                content = json.delta?.text || '';
+              }
+            } else {
+              // Format OpenAI
+              content = json.choices?.[0]?.delta?.content || '';
+            }
+
+            if (content) {
+              fullResponse += content;
               setEditableContent(element, fullResponse);
-              // Scroll vers le bas si necessaire
               if (element.scrollHeight > element.clientHeight) {
                 element.scrollTop = element.scrollHeight;
               }
@@ -444,25 +506,22 @@
 
   // Raccourcis par defaut
   const DEFAULT_SHORTCUTS = {
-    quickPrompt: { key: 'i', alt: true, ctrl: false, shift: false },
-    correct: { key: 'c', alt: true, ctrl: false, shift: false },
-    translate: { key: 't', alt: true, ctrl: false, shift: false },
-    summarize: { key: 's', alt: true, ctrl: false, shift: false }
+    quickPrompt: { key: 'i', alt: true, ctrl: false, shift: false, actionId: 'quickPrompt', actionName: 'Prompt rapide' }
   };
 
   let shortcuts = { ...DEFAULT_SHORTCUTS };
   let shortcutsEnabled = true;
   let defaultTranslateLang = 'en';
+  let customActions = [];
 
   // Charger les raccourcis
   async function loadShortcuts() {
     return new Promise((resolve) => {
-      chrome.storage.local.get(['shortcuts', 'shortcutsEnabled', 'defaultTranslateLang'], (result) => {
-        if (result.shortcuts) {
-          shortcuts = { ...DEFAULT_SHORTCUTS, ...result.shortcuts };
-        }
+      chrome.storage.local.get(['shortcuts', 'shortcutsEnabled', 'defaultTranslateLang', 'customActions'], (result) => {
+        shortcuts = result.shortcuts || { ...DEFAULT_SHORTCUTS };
         shortcutsEnabled = result.shortcutsEnabled !== false;
         defaultTranslateLang = result.defaultTranslateLang || 'en';
+        customActions = result.customActions || [];
         resolve();
       });
     });
@@ -470,10 +529,11 @@
 
   // Verifier si un raccourci correspond
   function matchShortcut(e, shortcut) {
+    if (!shortcut) return false;
     return e.key.toLowerCase() === shortcut.key.toLowerCase() &&
-           e.altKey === shortcut.alt &&
-           e.ctrlKey === shortcut.ctrl &&
-           e.shiftKey === shortcut.shift;
+           e.altKey === (shortcut.alt || false) &&
+           e.ctrlKey === (shortcut.ctrl || false) &&
+           e.shiftKey === (shortcut.shift || false);
   }
 
   // Listener de raccourcis
@@ -488,32 +548,37 @@
       return;
     }
 
-    // Prompt rapide (Alt+I par defaut)
-    if (matchShortcut(e, shortcuts.quickPrompt)) {
-      e.preventDefault();
-      openQuickPromptModal();
-      return;
-    }
+    // Parcourir tous les raccourcis configures
+    for (const [actionId, shortcut] of Object.entries(shortcuts)) {
+      if (matchShortcut(e, shortcut)) {
+        e.preventDefault();
 
-    // Corriger (Alt+C par defaut)
-    if (matchShortcut(e, shortcuts.correct)) {
-      e.preventDefault();
-      executeShortcutAction('correct_errors');
-      return;
-    }
+        // Prompt rapide
+        if (actionId === 'quickPrompt') {
+          openQuickPromptModal();
+          return;
+        }
 
-    // Traduire (Alt+T par defaut)
-    if (matchShortcut(e, shortcuts.translate)) {
-      e.preventDefault();
-      executeShortcutAction('translate', defaultTranslateLang);
-      return;
-    }
+        // Traduction
+        if (actionId.startsWith('translate_')) {
+          const lang = actionId.replace('translate_', '');
+          executeShortcutAction('translate', lang);
+          return;
+        }
 
-    // Resumer (Alt+S par defaut)
-    if (matchShortcut(e, shortcuts.summarize)) {
-      e.preventDefault();
-      executeShortcutAction('summarize');
-      return;
+        // Action personnalisee
+        if (actionId.startsWith('custom_')) {
+          const customAction = customActions.find(a => a.id === actionId);
+          if (customAction) {
+            executeCustomAction(customAction);
+          }
+          return;
+        }
+
+        // Action standard
+        executeShortcutAction(actionId);
+        return;
+      }
     }
   });
 
@@ -533,6 +598,26 @@
       actionType: targetLang ? 'translate' : 'selection',
       selectedText: selectedText,
       targetLanguage: targetLang,
+      isEditable: false
+    });
+  }
+
+  // Executer une action personnalisee
+  function executeCustomAction(customAction) {
+    const selection = window.getSelection();
+    const selectedText = selection ? selection.toString().trim() : '';
+
+    if (!selectedText) {
+      showNotification('Selectionnez du texte d\'abord', 'error');
+      return;
+    }
+
+    // Envoyer au handler d'action avec le prompt personnalise
+    handleAction({
+      actionId: customAction.id,
+      actionType: 'custom',
+      selectedText: selectedText,
+      presetPrompt: customAction.prompt,
       isEditable: false
     });
   }
