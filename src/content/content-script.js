@@ -4,6 +4,13 @@
 (function() {
   'use strict';
 
+  // Eviter les injections multiples (iframes, etc.)
+  if (window.__iaHelperLoaded) return;
+  window.__iaHelperLoaded = true;
+
+  // Ne s'executer que dans le top frame
+  if (window !== window.top) return;
+
   // Configuration par defaut
   const DEFAULT_OLLAMA_URL = 'http://localhost:11434';
   let config = {
