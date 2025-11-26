@@ -87,21 +87,59 @@
 
   // Afficher l'indicateur de chargement
   function showLoadingIndicator(element) {
+    // Injecter les styles si pas deja fait
+    if (!document.getElementById('ia-helper-styles')) {
+      const style = document.createElement('style');
+      style.id = 'ia-helper-styles';
+      style.textContent = `
+        @keyframes ia-helper-spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        @keyframes ia-helper-pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
+        }
+        .ia-helper-loading {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 12px 20px;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          border-radius: 8px;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          font-size: 14px;
+          box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+          animation: ia-helper-pulse 1.5s ease-in-out infinite;
+        }
+        .ia-helper-loading-spinner {
+          width: 18px;
+          height: 18px;
+          border: 2px solid rgba(255,255,255,0.3);
+          border-top-color: white;
+          border-radius: 50%;
+          animation: ia-helper-spin 0.8s linear infinite;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
     const indicator = document.createElement('div');
     indicator.id = 'ia-helper-loading';
     indicator.className = 'ia-helper-loading';
     indicator.innerHTML = `
       <div class="ia-helper-loading-spinner"></div>
-      <span>IA Helper en cours...</span>
+      <span>IA Helper genere...</span>
     `;
-    
+
     // Positionner pres de l'element
     const rect = element.getBoundingClientRect();
     indicator.style.position = 'fixed';
     indicator.style.top = `${rect.bottom + 10}px`;
     indicator.style.left = `${rect.left}px`;
     indicator.style.zIndex = '999999';
-    
+
     document.body.appendChild(indicator);
     return indicator;
   }
@@ -223,7 +261,19 @@
   };
 
   // Noms des langues
-  const LANG_NAMES = { fr: 'francais', en: 'anglais', it: 'italien', es: 'espagnol' };
+  const LANG_NAMES = {
+    fr: 'francais',
+    en: 'anglais',
+    it: 'italien',
+    es: 'espagnol',
+    pt: 'portugais',
+    de: 'allemand',
+    nl: 'neerlandais',
+    ru: 'russe',
+    zh: 'chinois',
+    ja: 'japonais',
+    ar: 'arabe'
+  };
 
   // Ecouter les messages du background script
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -264,7 +314,15 @@
       content = selectedText || window.getSelection().toString();
     } else if (actionType === 'pro' || actionType === 'quick') {
       content = document.body.innerText.substring(0, 15000);
-    } else if (actionType === 'custom' || actionType === 'preset') {
+    } else if (actionType === 'translate') {
+      // Traduction: utiliser la selection, le champ editable ou la page
+      if (isEditable) {
+        targetElement = document.activeElement;
+        content = getEditableContent(targetElement) || selectedText;
+      } else {
+        content = selectedText || window.getSelection().toString() || document.body.innerText.substring(0, 15000);
+      }
+    } else if (actionType === 'custom' || actionType === 'preset' || actionType === 'custompreset') {
       // Pour les actions custom et preset, utiliser la selection ou la page
       content = selectedText || window.getSelection().toString() || document.body.innerText.substring(0, 15000);
     }
@@ -281,19 +339,11 @@
 
     if (actionType === 'quick') {
       systemPrompt = QUICK_PROMPTS[actionId] || '';
-    } else if (actionType === 'custom') {
-      // Charger le prompt custom depuis le storage
-      const customData = await new Promise(resolve => {
-        chrome.storage.local.get(['customPrompts', 'customActions'], resolve);
-      });
-      console.log('IA Helper: Donnees custom', customData);
-      console.log('IA Helper: Recherche actionId', actionId);
-      const customAction = customData.customActions?.find(a => a.id === actionId);
-      console.log('IA Helper: Action trouvee', customAction);
-      // Le prompt peut etre dans customPrompts ou directement dans l'action
-      systemPrompt = customData.customPrompts?.[actionId] || customAction?.prompt || '';
-      console.log('IA Helper: Prompt custom', systemPrompt);
-    } else if (actionType === 'preset') {
+    } else if (actionType === 'translate') {
+      // Traduction globale
+      const langName = LANG_NAMES[targetLanguage] || targetLanguage;
+      systemPrompt = `Tu es un traducteur professionnel. Traduis le texte suivant en ${langName}. Conserve le ton et le style. Retourne uniquement la traduction.`;
+    } else if (actionType === 'preset' || actionType === 'custompreset') {
       // Le prompt est fourni par le service worker
       systemPrompt = message.presetPrompt || '';
       console.log('IA Helper: Action preset avec prompt', systemPrompt);

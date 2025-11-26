@@ -1,16 +1,23 @@
 // Options Page Script - IA Helper
 
-import { DEFAULT_CONFIG, INPUT_ACTIONS, SELECTION_ACTIONS, PRO_ACTIONS } from '../config/default-config.js';
-import { SYSTEM_PROMPTS } from '../config/prompts.js';
 import { PROFESSIONAL_PRESETS, PRESET_LIST } from '../config/presets.js';
+import { t } from '../i18n/translations.js';
+
+// Configuration par defaut (inline)
+const DEFAULT_CONFIG = {
+  ollamaUrl: 'http://localhost:11434',
+  selectedModel: '',
+  streamingEnabled: true,
+  interfaceLanguage: 'fr',
+  responseLanguage: 'fr'
+};
 
 // Configuration actuelle
 let config = { ...DEFAULT_CONFIG };
-let inputActions = [...INPUT_ACTIONS];
-let selectionActions = [...SELECTION_ACTIONS];
-let proActions = [...PRO_ACTIONS];
 let customPrompts = {};
 let activePresets = [];
+let customPresets = [];
+let currentLang = 'fr';
 
 // Elements DOM
 const elements = {
@@ -19,42 +26,43 @@ const elements = {
   streamingEnabled: document.getElementById('streaming-enabled'),
   interfaceLanguage: document.getElementById('interface-language'),
   responseLanguage: document.getElementById('response-language'),
-  connectionStatus: document.getElementById('connection-status'),
-  inputActionsList: document.getElementById('input-actions-list'),
-  selectionActionsList: document.getElementById('selection-actions-list'),
-  proActionsList: document.getElementById('pro-actions-list'),
-  promptsEditor: document.getElementById('prompts-editor')
+  connectionStatus: document.getElementById('connection-status')
 };
 
 // Initialisation
 document.addEventListener('DOMContentLoaded', async () => {
   await loadAllSettings();
-  await loadCustomActions();
   await loadActivePresets();
+  await loadCustomPresets();
+  applyTranslations();
   setupNavigation();
   setupEventListeners();
   setupModalListeners();
-  renderAllSections();
-  renderCustomActionsList();
-  renderPresetsGrid();
+  setupPresetModalListeners();
+  renderAllPresetsGrid();
+  // Charger les modeles au demarrage pour restaurer la selection
+  refreshModels();
 });
+
+// Appliquer les traductions a l'interface
+function applyTranslations() {
+  currentLang = config.interfaceLanguage || 'fr';
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    const translation = t(key, currentLang);
+    if (translation && translation !== key) {
+      el.textContent = translation;
+    }
+  });
+}
 
 // Charger tous les parametres
 async function loadAllSettings() {
   return new Promise((resolve) => {
-    chrome.storage.local.get([
-      'config',
-      'inputActions',
-      'selectionActions',
-      'proActions',
-      'customPrompts'
-    ], (result) => {
+    chrome.storage.local.get(['config', 'customPrompts'], (result) => {
       config = result.config || DEFAULT_CONFIG;
-      inputActions = result.inputActions || INPUT_ACTIONS;
-      selectionActions = result.selectionActions || SELECTION_ACTIONS;
-      proActions = result.proActions || PRO_ACTIONS;
       customPrompts = result.customPrompts || {};
-      
+
       // Remplir les champs
       elements.ollamaUrl.value = config.ollamaUrl || '';
       elements.streamingEnabled.checked = config.streamingEnabled !== false;
@@ -87,18 +95,21 @@ function setupNavigation() {
 function setupEventListeners() {
   // Test connexion
   document.getElementById('btn-test-connection').addEventListener('click', testConnection);
-  
+
   // Rafraichir modeles
   document.getElementById('btn-refresh-models').addEventListener('click', refreshModels);
-  
+
   // Sauvegarder connexion
   document.getElementById('btn-save-connection').addEventListener('click', saveConnectionSettings);
-  
+
   // Reset
   document.getElementById('btn-reset').addEventListener('click', resetToDefaults);
-  
-  // Ajouter action personnalisee
-  document.getElementById('btn-add-custom').addEventListener('click', showAddCustomActionModal);
+
+  // Creer preset
+  const btnAddPreset = document.getElementById('btn-add-preset');
+  if (btnAddPreset) {
+    btnAddPreset.addEventListener('click', showAddPresetModal);
+  }
 }
 
 // Tester la connexion
@@ -180,11 +191,14 @@ async function saveConnectionSettings() {
 
   await saveConfig();
 
-  // Si la langue a change, afficher un message et proposer de recharger
+  // Si la langue a change, appliquer les traductions
   if (previousLang !== config.interfaceLanguage) {
-    showNotification('Langue modifiee - L\'interface sera traduite dans une prochaine version. Parametres sauvegardes !', 'success');
+    currentLang = config.interfaceLanguage;
+    applyTranslations();
+    renderAllPresetsGrid();
+    showNotification(t('languageChanged', currentLang) + ' ' + t('settingsSaved', currentLang), 'success');
   } else {
-    showNotification('Parametres sauvegardes !', 'success');
+    showNotification(t('settingsSaved', currentLang), 'success');
   }
 }
 
@@ -195,180 +209,7 @@ async function saveConfig() {
   });
 }
 
-// Render toutes les sections
-function renderAllSections() {
-  renderActionsList(elements.inputActionsList, inputActions, 'input');
-  renderActionsList(elements.selectionActionsList, selectionActions, 'selection');
-  renderActionsList(elements.proActionsList, proActions, 'pro');
-  renderPromptsEditor();
-}
 
-// Rendre une liste d'actions
-function renderActionsList(container, actions, type) {
-  container.innerHTML = '';
-
-  actions.forEach((action, index) => {
-    const item = document.createElement('div');
-    item.className = 'action-item';
-    item.innerHTML = `
-      <div class="action-info" data-action-id="${action.id}" title="Cliquer pour editer le prompt">
-        <div class="action-icon">${action.name.charAt(0)}</div>
-        <div>
-          <div class="action-name">${action.name}</div>
-          <div class="action-category">${action.category || 'General'}</div>
-        </div>
-        <span class="edit-hint">Editer</span>
-      </div>
-      <label class="toggle-label" onclick="event.stopPropagation()">
-        <input type="checkbox" ${action.enabled ? 'checked' : ''} data-type="${type}" data-index="${index}">
-        <span class="toggle-switch"></span>
-      </label>
-    `;
-
-    // Event listener pour le toggle
-    item.querySelector('input').addEventListener('change', (e) => {
-      e.stopPropagation();
-      toggleAction(type, index, e.target.checked);
-    });
-
-    // Event listener pour naviguer vers l'editeur de prompt
-    item.querySelector('.action-info').addEventListener('click', () => {
-      navigateToPrompt(action.id);
-    });
-
-    container.appendChild(item);
-  });
-}
-
-// Naviguer vers l'editeur de prompt d'une action
-function navigateToPrompt(actionId) {
-  // Activer l'onglet Prompts
-  document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-  document.querySelector('[data-section="prompts"]').classList.add('active');
-
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.getElementById('section-prompts').classList.add('active');
-
-  // Ouvrir l'accordeon correspondant et scroller
-  setTimeout(() => {
-    const promptItem = document.getElementById(`prompt-item-${actionId}`);
-    if (promptItem) {
-      // Ouvrir l'accordeon
-      promptItem.classList.add('open');
-      // Scroller vers l'element
-      promptItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      // Effet de highlight
-      promptItem.classList.add('highlight');
-      setTimeout(() => promptItem.classList.remove('highlight'), 1500);
-    }
-  }, 100);
-}
-
-// Toggle une action
-async function toggleAction(type, index, enabled) {
-  let actions;
-  let storageKey;
-
-  switch (type) {
-    case 'input':
-      actions = inputActions;
-      storageKey = 'inputActions';
-      break;
-    case 'selection':
-      actions = selectionActions;
-      storageKey = 'selectionActions';
-      break;
-    case 'pro':
-      actions = proActions;
-      storageKey = 'proActions';
-      break;
-  }
-
-  actions[index].enabled = enabled;
-
-  await new Promise((resolve) => {
-    chrome.storage.local.set({ [storageKey]: actions }, resolve);
-  });
-}
-
-// Render l'editeur de prompts en accordeon
-function renderPromptsEditor() {
-  const container = elements.promptsEditor;
-  container.innerHTML = '';
-
-  // Grouper par type
-  const groups = [
-    { type: 'input', title: 'Actions d\'edition', actions: inputActions },
-    { type: 'selection', title: 'Actions de selection', actions: selectionActions },
-    { type: 'pro', title: 'Actions Pro', actions: proActions }
-  ];
-
-  groups.forEach(group => {
-    const groupDiv = document.createElement('div');
-    groupDiv.className = 'prompt-group';
-    groupDiv.innerHTML = `<h3 class="prompt-group-title">${group.title}</h3>`;
-
-    group.actions.forEach(action => {
-      const defaultPrompt = SYSTEM_PROMPTS[action.id] || '';
-      const customPrompt = customPrompts[action.id] || '';
-      const isCustomized = customPrompt && customPrompt !== defaultPrompt;
-
-      const item = document.createElement('div');
-      item.className = 'prompt-item accordion';
-      item.id = `prompt-item-${action.id}`;
-      item.innerHTML = `
-        <div class="prompt-header accordion-header">
-          <div class="prompt-header-left">
-            <span class="accordion-icon">+</span>
-            <span class="prompt-title">${action.name}</span>
-            ${isCustomized ? '<span class="prompt-badge">Personnalise</span>' : ''}
-          </div>
-          <div class="prompt-actions" onclick="event.stopPropagation()">
-            <button class="btn btn-secondary btn-sm" onclick="resetPrompt('${action.id}')">Reset</button>
-            <button class="btn btn-primary btn-sm" onclick="savePrompt('${action.id}')">Sauvegarder</button>
-          </div>
-        </div>
-        <div class="accordion-content">
-          <textarea id="prompt-${action.id}" placeholder="Prompt systeme...">${customPrompt || defaultPrompt}</textarea>
-        </div>
-      `;
-
-      // Toggle accordeon
-      item.querySelector('.accordion-header').addEventListener('click', () => {
-        item.classList.toggle('open');
-      });
-
-      groupDiv.appendChild(item);
-    });
-
-    container.appendChild(groupDiv);
-  });
-}
-
-// Sauvegarder un prompt
-window.savePrompt = async function(actionId) {
-  const textarea = document.getElementById(`prompt-${actionId}`);
-  if (textarea) {
-    customPrompts[actionId] = textarea.value;
-    await new Promise((resolve) => {
-      chrome.storage.local.set({ customPrompts }, resolve);
-    });
-    showNotification('Prompt sauvegarde !', 'success');
-  }
-};
-
-// Reset un prompt
-window.resetPrompt = async function(actionId) {
-  const textarea = document.getElementById(`prompt-${actionId}`);
-  if (textarea) {
-    textarea.value = SYSTEM_PROMPTS[actionId] || '';
-    delete customPrompts[actionId];
-    await new Promise((resolve) => {
-      chrome.storage.local.set({ customPrompts }, resolve);
-    });
-    showNotification('Prompt reinitialise', 'success');
-  }
-};
 
 // Reset aux valeurs par defaut
 async function resetToDefaults() {
@@ -380,147 +221,28 @@ async function resetToDefaults() {
   }
 }
 
-// Variables pour actions personnalisees
-let customActions = [];
-
-// Modal pour ajouter une action personnalisee
-function showAddCustomActionModal() {
-  const overlay = document.getElementById('modal-overlay');
-  overlay.classList.add('active');
-
-  // Reset form
-  document.getElementById('custom-action-name').value = '';
-  document.getElementById('custom-action-context').value = 'selection';
-  document.getElementById('custom-action-prompt').value = '';
-}
-
-// Fermer le modal
-function closeModal() {
-  document.getElementById('modal-overlay').classList.remove('active');
-}
-
-// Sauvegarder une action personnalisee
-async function saveCustomAction() {
-  const name = document.getElementById('custom-action-name').value.trim();
-  const context = document.getElementById('custom-action-context').value;
-  const prompt = document.getElementById('custom-action-prompt').value.trim();
-
-  if (!name) {
-    showNotification('Veuillez entrer un nom pour l\'action', 'error');
-    return;
-  }
-
-  if (!prompt) {
-    showNotification('Veuillez entrer un prompt', 'error');
-    return;
-  }
-
-  // Creer l'ID unique
-  const id = 'custom_' + Date.now();
-
-  const newAction = {
-    id,
-    name,
-    context,
-    prompt,
-    enabled: true,
-    icon: name.charAt(0).toUpperCase(),
-    category: 'custom'
-  };
-
-  customActions.push(newAction);
-
-  // Sauvegarder
-  await new Promise((resolve) => {
-    chrome.storage.local.set({ customActions }, resolve);
-  });
-
-  // Sauvegarder aussi le prompt
-  customPrompts[id] = prompt;
-  await new Promise((resolve) => {
-    chrome.storage.local.set({ customPrompts }, resolve);
-  });
-
-  closeModal();
-  renderCustomActionsList();
-  showNotification('Action personnalisee creee !', 'success');
-
-  // Notifier le background pour reconstruire les menus
-  chrome.runtime.sendMessage({ type: 'RELOAD_MENUS' });
-}
-
-// Supprimer une action personnalisee
-async function deleteCustomAction(actionId) {
-  if (!confirm('Supprimer cette action personnalisee ?')) return;
-
-  customActions = customActions.filter(a => a.id !== actionId);
-  delete customPrompts[actionId];
-
-  await new Promise((resolve) => {
-    chrome.storage.local.set({ customActions, customPrompts }, resolve);
-  });
-
-  renderCustomActionsList();
-  showNotification('Action supprimee', 'success');
-
-  chrome.runtime.sendMessage({ type: 'RELOAD_MENUS' });
-}
-
-// Rendre la liste des actions personnalisees
-function renderCustomActionsList() {
-  const container = document.getElementById('custom-actions-list');
-  container.innerHTML = '';
-
-  if (customActions.length === 0) {
-    container.innerHTML = '<p class="empty-state">Aucune action personnalisee. Cliquez sur "Ajouter une action" pour commencer.</p>';
-    return;
-  }
-
-  customActions.forEach(action => {
-    const item = document.createElement('div');
-    item.className = 'custom-action-item';
-    item.innerHTML = `
-      <div class="custom-action-info">
-        <h4>${action.name}</h4>
-        <span>${action.context === 'input' ? 'Champs de saisie' : action.context === 'selection' ? 'Selection' : 'Tous contextes'}</span>
-      </div>
-      <div class="custom-action-actions">
-        <button class="btn btn-secondary btn-sm" onclick="editCustomAction('${action.id}')">Modifier</button>
-        <button class="btn btn-danger btn-sm" onclick="deleteCustomAction('${action.id}')">Supprimer</button>
-      </div>
-    `;
-    container.appendChild(item);
-  });
-}
-
-// Charger les actions personnalisees
-async function loadCustomActions() {
-  return new Promise((resolve) => {
-    chrome.storage.local.get(['customActions'], (result) => {
-      customActions = result.customActions || [];
-      resolve();
-    });
-  });
-}
-
-// Initialiser les event listeners du modal
+// Initialiser les event listeners du modal action (pour ajouter action dans preset)
 function setupModalListeners() {
-  document.getElementById('modal-close').addEventListener('click', closeModal);
-  document.getElementById('modal-cancel').addEventListener('click', closeModal);
-  document.getElementById('modal-save').addEventListener('click', saveCustomAction);
+  const modalClose = document.getElementById('modal-close');
+  const modalCancel = document.getElementById('modal-cancel');
+  const modalSave = document.getElementById('modal-save');
+  const modalOverlay = document.getElementById('modal-overlay');
 
-  // Fermer en cliquant sur l'overlay
-  document.getElementById('modal-overlay').addEventListener('click', (e) => {
-    if (e.target.id === 'modal-overlay') closeModal();
-  });
+  if (modalClose) modalClose.addEventListener('click', closeActionModal);
+  if (modalCancel) modalCancel.addEventListener('click', closeActionModal);
+  if (modalSave) modalSave.addEventListener('click', saveActionToPreset);
+  if (modalOverlay) {
+    modalOverlay.addEventListener('click', (e) => {
+      if (e.target.id === 'modal-overlay') closeActionModal();
+    });
+  }
 }
 
-// Exposer les fonctions globalement
-window.deleteCustomAction = deleteCustomAction;
-window.editCustomAction = function(actionId) {
-  // TODO: Implementer l'edition
-  showNotification('Edition en cours de developpement', 'info');
-};
+// Fermer le modal action
+function closeActionModal() {
+  const modal = document.getElementById('modal-overlay');
+  if (modal) modal.classList.remove('active');
+}
 
 // Afficher une notification
 function showNotification(message, type = 'info') {
@@ -576,9 +298,9 @@ async function saveActivePresets() {
   });
 }
 
-// Rendre la grille des presets
-function renderPresetsGrid() {
-  const grid = document.getElementById('presets-grid');
+// Rendre la grille unifiee de tous les presets (personnalises + integres)
+function renderAllPresetsGrid() {
+  const grid = document.getElementById('all-presets-grid');
   if (!grid) return;
 
   grid.innerHTML = '';
@@ -587,12 +309,67 @@ function renderPresetsGrid() {
     'support_it': 'H',
     'customer_service': 'C',
     'sales': 'V',
-    'developer': '</>',
+    'developer': 'D',
     'writer': 'W',
     'student': 'E',
     'researcher': 'R'
   };
 
+  // D'abord les presets personnalises
+  for (const preset of customPresets) {
+    const card = document.createElement('div');
+    card.className = `preset-card custom-preset-card ${preset.enabled ? 'active' : ''}`;
+    card.innerHTML = `
+      <div class="preset-toggle">
+        <label class="toggle-label">
+          <input type="checkbox" ${preset.enabled ? 'checked' : ''} data-custom-preset="${preset.id}">
+          <span class="toggle-switch"></span>
+        </label>
+      </div>
+      <div class="preset-icon custom-icon">${t('custom', currentLang).charAt(0)}</div>
+      <h4>${preset.name}</h4>
+      <p>${preset.description || ''}</p>
+      <span class="preset-badge">${preset.actions.length} ${t('actions', currentLang)}</span>
+      <div class="preset-card-actions">
+        <button class="btn btn-sm edit-preset-btn" data-id="${preset.id}">${t('edit', currentLang)}</button>
+        <button class="btn btn-sm btn-danger delete-preset-btn" data-id="${preset.id}">${t('delete', currentLang)}</button>
+      </div>
+    `;
+
+    // Toggle
+    const checkbox = card.querySelector('input[type="checkbox"]');
+    checkbox.addEventListener('change', async (e) => {
+      e.stopPropagation();
+      preset.enabled = e.target.checked;
+      card.classList.toggle('active', e.target.checked);
+      await saveCustomPresets();
+      chrome.runtime.sendMessage({ type: 'RELOAD_MENUS' });
+      showNotification(e.target.checked ? t('presetActivated', currentLang) : t('presetDeactivated', currentLang), 'success');
+    });
+
+    // Clic sur la carte
+    card.addEventListener('click', (e) => {
+      if (e.target.type !== 'checkbox' && !e.target.classList.contains('edit-preset-btn') && !e.target.classList.contains('delete-preset-btn')) {
+        showPresetActions(preset.id, true);
+      }
+    });
+
+    // Modifier
+    card.querySelector('.edit-preset-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      editCustomPreset(preset.id);
+    });
+
+    // Supprimer
+    card.querySelector('.delete-preset-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      deleteCustomPreset(preset.id);
+    });
+
+    grid.appendChild(card);
+  }
+
+  // Ensuite les presets integres
   for (const preset of PRESET_LIST) {
     const isActive = activePresets.includes(preset.id);
     const card = document.createElement('div');
@@ -607,7 +384,10 @@ function renderPresetsGrid() {
       <div class="preset-icon">${icons[preset.id] || preset.name.charAt(0)}</div>
       <h4>${preset.name}</h4>
       <p>${preset.description}</p>
-      <span class="preset-badge">${preset.actionCount} actions</span>
+      <span class="preset-badge integrated-badge">${t('integrated', currentLang)} - ${preset.actionCount} ${t('actions', currentLang)}</span>
+      <div class="preset-card-actions">
+        <button class="btn btn-sm customize-preset-btn" data-id="${preset.id}">${t('customize', currentLang)}</button>
+      </div>
     `;
 
     // Toggle du preset
@@ -620,9 +400,15 @@ function renderPresetsGrid() {
 
     // Clic sur la carte pour voir les actions
     card.addEventListener('click', (e) => {
-      if (e.target.type !== 'checkbox') {
-        showPresetActions(preset.id);
+      if (e.target.type !== 'checkbox' && !e.target.classList.contains('customize-preset-btn')) {
+        showPresetActions(preset.id, false);
       }
+    });
+
+    // Personnaliser le preset integre
+    card.querySelector('.customize-preset-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      customizeIntegratedPreset(preset.id);
     });
 
     grid.appendChild(card);
@@ -644,38 +430,386 @@ async function togglePreset(presetId, active) {
   showNotification(active ? 'Preset active !' : 'Preset desactive', 'success');
 }
 
-// Afficher les actions d'un preset
-function showPresetActions(presetId) {
-  const container = document.getElementById('active-preset-actions');
-  const preset = PROFESSIONAL_PRESETS[presetId];
+// Afficher les actions d'un preset (integre ou personnalise)
+function showPresetActions(presetId, isCustom = false) {
+  const container = document.getElementById('preset-actions-display');
+  if (!container) return;
+
+  let preset, actions;
+
+  if (isCustom) {
+    preset = customPresets.find(p => p.id === presetId);
+    actions = preset?.actions || [];
+  } else {
+    preset = PROFESSIONAL_PRESETS[presetId];
+    actions = preset?.actions || [];
+  }
 
   if (!preset) {
-    container.innerHTML = '<h3>Actions du preset</h3><p class="empty-state">Preset non trouve.</p>';
+    container.innerHTML = `<h3>${t('presetActions', currentLang)}</h3><p class="empty-state">Preset non trouve.</p>`;
     return;
   }
 
-  let html = `<h3>Actions: ${preset.name}</h3>`;
+  let html = `<h3>${t('presetActions', currentLang)}: ${preset.name}</h3>`;
   html += '<div class="preset-actions-list">';
 
-  for (const action of preset.actions) {
+  for (const action of actions) {
     html += `
       <div class="preset-action-item">
         <span>${action.name}</span>
-        <button class="btn btn-secondary btn-sm" onclick="viewPresetPrompt('${presetId}', '${action.id}')">Voir prompt</button>
+        <button class="btn btn-secondary btn-sm view-prompt-btn" data-preset="${presetId}" data-action="${action.id}" data-custom="${isCustom}">${t('viewPrompt', currentLang)}</button>
+        <button class="btn btn-secondary btn-sm edit-prompt-btn" data-preset="${presetId}" data-action="${action.id}" data-custom="${isCustom}">${t('editPrompt', currentLang)}</button>
       </div>
     `;
   }
 
   html += '</div>';
   container.innerHTML = html;
+
+  // Voir prompt
+  container.querySelectorAll('.view-prompt-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const pId = btn.dataset.preset;
+      const aId = btn.dataset.action;
+      const custom = btn.dataset.custom === 'true';
+      if (custom) {
+        const cPreset = customPresets.find(p => p.id === pId);
+        const action = cPreset?.actions.find(a => a.id === aId);
+        if (action) showPromptModal(action.name, action.prompt);
+      } else {
+        viewPresetPrompt(pId, aId);
+      }
+    });
+  });
+
+  // Editer prompt
+  container.querySelectorAll('.edit-prompt-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const pId = btn.dataset.preset;
+      const aId = btn.dataset.action;
+      const custom = btn.dataset.custom === 'true';
+      if (custom) {
+        editCustomPresetPrompt(pId, aId);
+      } else {
+        editIntegratedPresetPrompt(pId, aId);
+      }
+    });
+  });
+}
+
+// Editer le prompt d'un preset integre (sauvegarde dans customPrompts)
+async function editIntegratedPresetPrompt(presetId, actionId) {
+  const preset = PROFESSIONAL_PRESETS[presetId];
+  const action = preset?.actions.find(a => a.id === actionId);
+  if (!action) return;
+
+  // Charger les prompts personnalises
+  const stored = await new Promise(resolve => {
+    chrome.storage.local.get(['customPrompts'], resolve);
+  });
+  const customPrompts = stored.customPrompts || {};
+  const currentPrompt = customPrompts[`${presetId}_${actionId}`] || action.prompt;
+
+  showEditPromptModal(action.name, currentPrompt, async (newPrompt) => {
+    customPrompts[`${presetId}_${actionId}`] = newPrompt;
+    await new Promise(resolve => {
+      chrome.storage.local.set({ customPrompts }, resolve);
+    });
+    showNotification(t('promptSaved', currentLang), 'success');
+  });
 }
 
 // Voir le prompt d'une action de preset
-window.viewPresetPrompt = function(presetId, actionId) {
+function viewPresetPrompt(presetId, actionId) {
   const preset = PROFESSIONAL_PRESETS[presetId];
   const action = preset?.actions.find(a => a.id === actionId);
 
   if (action) {
-    alert(`Prompt pour "${action.name}":\n\n${action.prompt}`);
+    // Afficher dans une modal stylisee
+    showPromptModal(action.name, action.prompt);
   }
-};
+}
+
+// Modal pour afficher un prompt
+function showPromptModal(title, prompt) {
+  const existingModal = document.querySelector('.prompt-view-modal');
+  if (existingModal) existingModal.remove();
+
+  const modal = document.createElement('div');
+  modal.className = 'prompt-view-modal';
+  modal.innerHTML = `
+    <div class="prompt-view-content">
+      <h3>${title}</h3>
+      <pre>${prompt}</pre>
+      <button class="btn btn-primary close-modal">Fermer</button>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  modal.querySelector('.close-modal').addEventListener('click', () => modal.remove());
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) modal.remove();
+  });
+}
+
+// ========== PRESETS PERSONNALISES ==========
+
+// Charger les presets personnalises
+async function loadCustomPresets() {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(['customPresets'], (result) => {
+      customPresets = result.customPresets || [];
+      resolve();
+    });
+  });
+}
+
+// Sauvegarder les presets personnalises
+async function saveCustomPresets() {
+  return new Promise((resolve) => {
+    chrome.storage.local.set({ customPresets }, resolve);
+  });
+}
+
+// Variables temporaires pour l'edition de preset
+let currentPresetActions = [];
+let editingPresetId = null;
+
+// Afficher le modal pour creer un preset
+function showAddPresetModal() {
+  currentPresetActions = [];
+  editingPresetId = null;
+
+  document.getElementById('preset-name').value = '';
+  document.getElementById('preset-description').value = '';
+  document.getElementById('preset-actions-items').innerHTML = '<p class="empty-state">Aucune action. Cliquez sur "+ Ajouter action".</p>';
+  document.querySelector('#modal-preset-overlay .modal-title').textContent = 'Creer un preset';
+
+  document.getElementById('modal-preset-overlay').classList.add('active');
+}
+
+// Fermer le modal preset
+function closePresetModal() {
+  document.getElementById('modal-preset-overlay').classList.remove('active');
+  currentPresetActions = [];
+  editingPresetId = null;
+}
+
+// Setup des listeners pour le modal preset
+function setupPresetModalListeners() {
+  const closeBtn = document.getElementById('modal-preset-close');
+  const cancelBtn = document.getElementById('modal-preset-cancel');
+  const saveBtn = document.getElementById('modal-preset-save');
+  const addActionBtn = document.getElementById('btn-add-preset-action');
+  const overlay = document.getElementById('modal-preset-overlay');
+
+  if (closeBtn) closeBtn.addEventListener('click', closePresetModal);
+  if (cancelBtn) cancelBtn.addEventListener('click', closePresetModal);
+  if (saveBtn) saveBtn.addEventListener('click', saveCustomPreset);
+  if (addActionBtn) addActionBtn.addEventListener('click', addActionToPresetEditor);
+  if (overlay) {
+    overlay.addEventListener('click', (e) => {
+      if (e.target.id === 'modal-preset-overlay') closePresetModal();
+    });
+  }
+}
+
+// Ajouter une action dans l'editeur de preset
+function addActionToPresetEditor() {
+  const actionId = 'action_' + Date.now();
+  currentPresetActions.push({ id: actionId, name: '', prompt: '', context: 'selection' });
+  renderPresetActionsEditor();
+}
+
+// Rendre l'editeur d'actions du preset
+function renderPresetActionsEditor() {
+  const container = document.getElementById('preset-actions-items');
+
+  if (currentPresetActions.length === 0) {
+    container.innerHTML = '<p class="empty-state">Aucune action. Cliquez sur "+ Ajouter action".</p>';
+    return;
+  }
+
+  container.innerHTML = currentPresetActions.map((action, index) => `
+    <div class="preset-action-edit-item" data-index="${index}">
+      <input type="text" placeholder="Nom de l'action" value="${action.name}" class="action-name-input">
+      <textarea placeholder="Prompt systeme..." class="action-prompt-input">${action.prompt}</textarea>
+      <button class="btn-remove" data-index="${index}">X</button>
+    </div>
+  `).join('');
+
+  // Event listeners pour les inputs
+  container.querySelectorAll('.preset-action-edit-item').forEach((item, index) => {
+    item.querySelector('.action-name-input').addEventListener('input', (e) => {
+      currentPresetActions[index].name = e.target.value;
+    });
+    item.querySelector('.action-prompt-input').addEventListener('input', (e) => {
+      currentPresetActions[index].prompt = e.target.value;
+    });
+    item.querySelector('.btn-remove').addEventListener('click', () => {
+      currentPresetActions.splice(index, 1);
+      renderPresetActionsEditor();
+    });
+  });
+}
+
+// Sauvegarder un preset personnalise
+async function saveCustomPreset() {
+  const name = document.getElementById('preset-name').value.trim();
+  const description = document.getElementById('preset-description').value.trim();
+
+  if (!name) {
+    showNotification('Veuillez entrer un nom pour le preset', 'error');
+    return;
+  }
+
+  if (currentPresetActions.length === 0) {
+    showNotification('Ajoutez au moins une action', 'error');
+    return;
+  }
+
+  // Valider les actions
+  for (const action of currentPresetActions) {
+    if (!action.name.trim() || !action.prompt.trim()) {
+      showNotification('Toutes les actions doivent avoir un nom et un prompt', 'error');
+      return;
+    }
+  }
+
+  const presetId = editingPresetId || 'custom_preset_' + Date.now();
+
+  const preset = {
+    id: presetId,
+    name,
+    description,
+    actions: currentPresetActions.map(a => ({
+      id: a.id,
+      name: a.name.trim(),
+      prompt: a.prompt.trim(),
+      context: a.context || 'selection'
+    })),
+    enabled: true
+  };
+
+  if (editingPresetId) {
+    const index = customPresets.findIndex(p => p.id === editingPresetId);
+    if (index !== -1) customPresets[index] = preset;
+  } else {
+    customPresets.push(preset);
+  }
+
+  await saveCustomPresets();
+  closePresetModal();
+  renderAllPresetsGrid();
+  showNotification(editingPresetId ? t('presetModified', currentLang) : t('presetCreated', currentLang), 'success');
+  chrome.runtime.sendMessage({ type: 'RELOAD_MENUS' });
+}
+
+// Editer un preset personnalise
+function editCustomPreset(presetId) {
+  const preset = customPresets.find(p => p.id === presetId);
+  if (!preset) return;
+
+  editingPresetId = presetId;
+  currentPresetActions = preset.actions.map(a => ({ ...a }));
+
+  document.getElementById('preset-name').value = preset.name;
+  document.getElementById('preset-description').value = preset.description || '';
+  document.querySelector('#modal-preset-overlay .modal-title').textContent = t('editPreset', currentLang);
+
+  renderPresetActionsEditor();
+  document.getElementById('modal-preset-overlay').classList.add('active');
+}
+
+// Personnaliser un preset integre (copie comme preset personnalise)
+function customizeIntegratedPreset(presetId) {
+  const preset = PROFESSIONAL_PRESETS[presetId];
+  if (!preset) return;
+
+  // Creer un nouveau preset personnalise base sur l'integre
+  editingPresetId = null; // Nouveau preset
+  currentPresetActions = preset.actions.map(a => ({
+    id: a.id + '_custom_' + Date.now(),
+    name: a.name,
+    prompt: a.prompt,
+    context: a.context || 'selection'
+  }));
+
+  document.getElementById('preset-name').value = preset.name + ' (perso)';
+  document.getElementById('preset-description').value = preset.description || '';
+  document.querySelector('#modal-preset-overlay .modal-title').textContent = t('customizePreset', currentLang);
+
+  renderPresetActionsEditor();
+  document.getElementById('modal-preset-overlay').classList.add('active');
+}
+
+// Editer le prompt d'une action de preset personnalise
+function editCustomPresetPrompt(presetId, actionId) {
+  const preset = customPresets.find(p => p.id === presetId);
+  const action = preset?.actions.find(a => a.id === actionId);
+  if (!action) return;
+
+  showEditPromptModal(action.name, action.prompt, async (newPrompt) => {
+    action.prompt = newPrompt;
+    await saveCustomPresets();
+    showNotification(t('promptSaved', currentLang), 'success');
+    showCustomPresetActions(presetId);
+  });
+}
+
+// Modal pour editer un prompt
+function showEditPromptModal(title, prompt, onSave) {
+  const existingModal = document.querySelector('.prompt-edit-modal');
+  if (existingModal) existingModal.remove();
+
+  const modal = document.createElement('div');
+  modal.className = 'prompt-edit-modal prompt-view-modal';
+  modal.innerHTML = `
+    <div class="prompt-view-content">
+      <h3>${t('editPrompt', currentLang)}: ${title}</h3>
+      <textarea id="edit-prompt-textarea" rows="10" style="width:100%; font-family: monospace; resize: vertical;">${prompt}</textarea>
+      <div style="display: flex; gap: 10px; margin-top: 15px;">
+        <button class="btn btn-secondary cancel-edit">${t('cancel', currentLang)}</button>
+        <button class="btn btn-primary save-edit">${t('save', currentLang)}</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  modal.querySelector('.cancel-edit').addEventListener('click', () => modal.remove());
+  modal.querySelector('.save-edit').addEventListener('click', () => {
+    const newPrompt = document.getElementById('edit-prompt-textarea').value;
+    onSave(newPrompt);
+    modal.remove();
+  });
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) modal.remove();
+  });
+}
+
+// Supprimer un preset personnalise
+async function deleteCustomPreset(presetId) {
+  if (!confirm('Supprimer ce preset ?')) return;
+
+  customPresets = customPresets.filter(p => p.id !== presetId);
+  await saveCustomPresets();
+
+  // Vider l'affichage des actions
+  const container = document.getElementById('preset-actions-display');
+  if (container) {
+    container.innerHTML = `<h3>${t('presetActions', currentLang)}</h3><p class="empty-state">${t('clickPresetToSee', currentLang)}</p>`;
+  }
+
+  renderAllPresetsGrid();
+  showNotification(t('presetDeleted', currentLang), 'success');
+  chrome.runtime.sendMessage({ type: 'RELOAD_MENUS' });
+}
+
+// Fonction placeholder pour sauvegarder action dans preset (depuis modal action)
+function saveActionToPreset() {
+  // Cette fonction est utilisee quand on ajoute une action depuis le modal simple
+  // Pour l'instant on ferme juste le modal
+  closeActionModal();
+}

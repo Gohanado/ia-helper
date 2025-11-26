@@ -111,212 +111,202 @@ async function loadConfig() {
 
 // Creer les menus contextuels
 async function createContextMenus() {
-  // Supprimer les menus existants
-  await chrome.contextMenus.removeAll();
+  try {
+    // Supprimer les menus existants
+    await chrome.contextMenus.removeAll();
 
-  // Menu parent principal
-  chrome.contextMenus.create({
-    id: 'ia-helper-main',
-    title: 'IA Helper',
-    contexts: ['all']
-  });
+    const ctx = ['page', 'selection', 'editable', 'link', 'image'];
 
-  // Separateur
-  chrome.contextMenus.create({
-    id: 'separator-1',
-    type: 'separator',
-    parentId: 'ia-helper-main',
-    contexts: ['all']
-  });
+    // Menu parent principal
+    chrome.contextMenus.create({
+      id: 'ia-helper-main',
+      title: 'IA Helper',
+      contexts: ctx
+    });
 
-  // === ACTIONS POUR CHAMPS DE SAISIE ===
-  chrome.contextMenus.create({
-    id: 'input-section',
-    title: 'Edition de texte',
-    parentId: 'ia-helper-main',
-    contexts: ['editable']
-  });
+    // === OPTIONS (toujours visible) ===
+    chrome.contextMenus.create({
+      id: 'open-options',
+      title: 'Ouvrir les options',
+      parentId: 'ia-helper-main',
+      contexts: ctx
+    });
 
-  // Charger les actions input
-  const inputActions = await getStoredActions('inputActions', INPUT_ACTIONS);
-  for (const action of inputActions.filter(a => a.enabled)) {
-    if (action.hasSubmenu && action.id === 'translate') {
-      // Sous-menu traduction
+    // === MENU TRADUCTION (toujours visible) ===
+    chrome.contextMenus.create({
+      id: 'translation-section',
+      title: 'Traduction',
+      parentId: 'ia-helper-main',
+      contexts: ctx
+    });
+
+    const translationLanguages = [
+      { code: 'fr', name: 'Francais', flag: 'FR' },
+      { code: 'en', name: 'English', flag: 'GB' },
+      { code: 'es', name: 'Espanol', flag: 'ES' },
+      { code: 'it', name: 'Italiano', flag: 'IT' },
+      { code: 'pt', name: 'Portugues', flag: 'PT' },
+      { code: 'de', name: 'Deutsch', flag: 'DE' },
+      { code: 'nl', name: 'Nederlands', flag: 'NL' },
+      { code: 'ru', name: 'Russkiy', flag: 'RU' },
+      { code: 'zh', name: 'Zhongwen', flag: 'CN' },
+      { code: 'ja', name: 'Nihongo', flag: 'JP' },
+      { code: 'ar', name: 'Arabi', flag: 'SA' }
+    ];
+
+    for (const lang of translationLanguages) {
       chrome.contextMenus.create({
-        id: `input-${action.id}`,
-        title: action.name,
-        parentId: 'input-section',
-        contexts: ['editable']
+        id: `translate-to-${lang.code}`,
+        title: `${lang.flag} ${lang.name}`,
+        parentId: 'translation-section',
+        contexts: ctx
       });
-      // Ajouter les langues
-      for (const lang of config.languages) {
+    }
+
+    // === ACTIONS RAPIDES (toujours visible) ===
+    chrome.contextMenus.create({
+      id: 'quick-section',
+      title: 'Actions rapides',
+      parentId: 'ia-helper-main',
+      contexts: ctx
+    });
+
+    chrome.contextMenus.create({
+      id: 'quick_summarize_page',
+      title: 'Resumer cette page',
+      parentId: 'quick-section',
+      contexts: ctx
+    });
+
+    chrome.contextMenus.create({
+      id: 'quick_extract_main',
+      title: 'Extraire les points essentiels',
+      parentId: 'quick-section',
+      contexts: ctx
+    });
+
+    // === ACTIONS POUR CHAMPS DE SAISIE ===
+    chrome.contextMenus.create({
+      id: 'input-section',
+      title: 'Edition de texte',
+      parentId: 'ia-helper-main',
+      contexts: ['editable']
+    });
+
+    for (const action of INPUT_ACTIONS.filter(a => a.enabled)) {
+      if (action.hasSubmenu && action.id === 'translate') {
         chrome.contextMenus.create({
-          id: `input-translate-${lang.code}`,
-          title: `${lang.flag} ${lang.name}`,
-          parentId: `input-${action.id}`,
+          id: `input-${action.id}`,
+          title: action.name,
+          parentId: 'input-section',
+          contexts: ['editable']
+        });
+        for (const lang of config.languages) {
+          chrome.contextMenus.create({
+            id: `input-translate-${lang.code}`,
+            title: `${lang.flag} ${lang.name}`,
+            parentId: `input-${action.id}`,
+            contexts: ['editable']
+          });
+        }
+      } else {
+        chrome.contextMenus.create({
+          id: `input-${action.id}`,
+          title: action.name,
+          parentId: 'input-section',
           contexts: ['editable']
         });
       }
-    } else {
-      chrome.contextMenus.create({
-        id: `input-${action.id}`,
-        title: action.name,
-        parentId: 'input-section',
-        contexts: ['editable']
-      });
     }
-  }
 
-  // === ACTIONS POUR SELECTION DE TEXTE ===
-  chrome.contextMenus.create({
-    id: 'selection-section',
-    title: 'Analyser la selection',
-    parentId: 'ia-helper-main',
-    contexts: ['selection']
-  });
+    // === ACTIONS POUR SELECTION DE TEXTE ===
+    chrome.contextMenus.create({
+      id: 'selection-section',
+      title: 'Analyser la selection',
+      parentId: 'ia-helper-main',
+      contexts: ['selection']
+    });
 
-  const selectionActions = await getStoredActions('selectionActions', SELECTION_ACTIONS);
-  for (const action of selectionActions.filter(a => a.enabled)) {
-    if (action.hasSubmenu && action.id === 'translate_selection') {
-      chrome.contextMenus.create({
-        id: `selection-${action.id}`,
-        title: action.name,
-        parentId: 'selection-section',
-        contexts: ['selection']
-      });
-      for (const lang of config.languages) {
+    for (const action of SELECTION_ACTIONS.filter(a => a.enabled)) {
+      if (action.hasSubmenu && action.id === 'translate_selection') {
         chrome.contextMenus.create({
-          id: `selection-translate-${lang.code}`,
-          title: `${lang.flag} ${lang.name}`,
-          parentId: `selection-${action.id}`,
+          id: `selection-${action.id}`,
+          title: action.name,
+          parentId: 'selection-section',
+          contexts: ['selection']
+        });
+        for (const lang of config.languages) {
+          chrome.contextMenus.create({
+            id: `selection-translate-${lang.code}`,
+            title: `${lang.flag} ${lang.name}`,
+            parentId: `selection-${action.id}`,
+            contexts: ['selection']
+          });
+        }
+      } else {
+        chrome.contextMenus.create({
+          id: `selection-${action.id}`,
+          title: action.name,
+          parentId: 'selection-section',
           contexts: ['selection']
         });
       }
-    } else {
-      chrome.contextMenus.create({
-        id: `selection-${action.id}`,
-        title: action.name,
-        parentId: 'selection-section',
-        contexts: ['selection']
-      });
     }
-  }
 
-  // === ACTIONS RAPIDES PAGE ===
-  chrome.contextMenus.create({
-    id: 'separator-2',
-    type: 'separator',
-    parentId: 'ia-helper-main',
-    contexts: ['page']
-  });
+    // === PRESETS INTEGRES ===
+    const activePresets = await getStoredActions('activePresets', []);
 
-  chrome.contextMenus.create({
-    id: 'quick-section',
-    title: 'Actions rapides',
-    parentId: 'ia-helper-main',
-    contexts: ['page']
-  });
+    if (activePresets.length > 0) {
+      for (const presetId of activePresets) {
+        const preset = PROFESSIONAL_PRESETS[presetId];
+        if (!preset) continue;
 
-  // Actions rapides pour analyser la page
-  const quickActions = [
-    { id: 'quick_summarize_page', name: 'Resumer cette page' },
-    { id: 'quick_extract_main', name: 'Extraire les points essentiels' },
-    { id: 'quick_translate_page', name: 'Traduire cette page' }
-  ];
-
-  for (const action of quickActions) {
-    chrome.contextMenus.create({
-      id: action.id,
-      title: action.name,
-      parentId: 'quick-section',
-      contexts: ['page']
-    });
-  }
-
-  // === PRESETS PROFESSIONNELS ===
-  const activePresets = await getStoredActions('activePresets', []);
-
-  if (activePresets.length > 0) {
-    chrome.contextMenus.create({
-      id: 'separator-3',
-      type: 'separator',
-      parentId: 'ia-helper-main',
-      contexts: ['all']
-    });
-
-    // Ajouter les actions de chaque preset actif
-    for (const presetId of activePresets) {
-      const preset = PROFESSIONAL_PRESETS[presetId];
-      if (!preset) continue;
-
-      chrome.contextMenus.create({
-        id: `preset-${presetId}`,
-        title: preset.name,
-        parentId: 'ia-helper-main',
-        contexts: ['all']
-      });
-
-      for (const action of preset.actions) {
         chrome.contextMenus.create({
-          id: `preset-${presetId}-${action.id}`,
-          title: action.name,
-          parentId: `preset-${presetId}`,
-          contexts: ['all']
+          id: `preset-${presetId}`,
+          title: preset.name,
+          parentId: 'ia-helper-main',
+          contexts: ctx
         });
+
+        for (const action of preset.actions) {
+          chrome.contextMenus.create({
+            id: `preset-${presetId}-${action.id}`,
+            title: action.name,
+            parentId: `preset-${presetId}`,
+            contexts: ctx
+          });
+        }
       }
     }
-  }
 
-  // === ACTIONS PERSONNALISEES ===
-  const customActions = await getStoredActions('customActions', []);
-  if (customActions.length > 0) {
-    chrome.contextMenus.create({
-      id: 'separator-4',
-      type: 'separator',
-      parentId: 'ia-helper-main',
-      contexts: ['all']
-    });
+    // === PRESETS PERSONNALISES ===
+    const customPresets = await getStoredActions('customPresets', []);
+    const enabledCustomPresets = customPresets.filter(p => p.enabled);
 
-    chrome.contextMenus.create({
-      id: 'custom-section',
-      title: 'Mes actions',
-      parentId: 'ia-helper-main',
-      contexts: ['all']
-    });
+    if (enabledCustomPresets.length > 0) {
+      for (const preset of enabledCustomPresets) {
+        chrome.contextMenus.create({
+          id: `custompreset-${preset.id}`,
+          title: preset.name,
+          parentId: 'ia-helper-main',
+          contexts: ctx
+        });
 
-    for (const action of customActions.filter(a => a.enabled)) {
-      let contexts;
-      if (action.context === 'input') {
-        contexts = ['editable'];
-      } else if (action.context === 'selection') {
-        contexts = ['selection'];
-      } else {
-        // 'all' ou 'both' - apparait partout
-        contexts = ['page', 'selection', 'editable'];
+        for (const action of preset.actions) {
+          chrome.contextMenus.create({
+            id: `custompreset-${preset.id}-${action.id}`,
+            title: action.name,
+            parentId: `custompreset-${preset.id}`,
+            contexts: ctx
+          });
+        }
       }
-      chrome.contextMenus.create({
-        id: `custom-${action.id}`,
-        title: action.name,
-        parentId: 'custom-section',
-        contexts
-      });
     }
+
+    console.log('IA Helper: Menus crees avec succes');
+  } catch (error) {
+    console.error('IA Helper: Erreur creation menus', error);
   }
-
-  // === OPTIONS ===
-  chrome.contextMenus.create({
-    id: 'separator-5',
-    type: 'separator',
-    parentId: 'ia-helper-main',
-    contexts: ['all']
-  });
-
-  chrome.contextMenus.create({
-    id: 'open-options',
-    title: 'Options',
-    parentId: 'ia-helper-main',
-    contexts: ['all']
-  });
 }
 
 // Obtenir les actions stockees
@@ -342,11 +332,45 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   let actionType = '';
   let actionId = '';
   let targetLanguage = '';
+  let presetPrompt = '';
 
-  // Parser les presets (format: preset-{presetId}-{actionId})
-  const presetMatch = menuId.match(/^preset-([^-]+)-(.+)$/);
-
-  if (menuId.startsWith('input-translate-')) {
+  // Menu de traduction global
+  if (menuId.startsWith('translate-to-')) {
+    actionType = 'translate';
+    targetLanguage = menuId.replace('translate-to-', '');
+    actionId = 'translate';
+  }
+  // Parser les presets integres (format: preset-{presetId}-{actionId})
+  else if (menuId.match(/^preset-([^-]+)-(.+)$/)) {
+    actionType = 'preset';
+    actionId = menuId;
+    const match = menuId.match(/^preset-([^-]+)-(.+)$/);
+    if (match) {
+      const presetId = match[1];
+      const presetActionId = match[2];
+      const preset = PROFESSIONAL_PRESETS[presetId];
+      const action = preset?.actions.find(a => a.id === presetActionId);
+      // Verifier si un prompt personnalise existe
+      const customPrompts = await getStoredActions('customPrompts', {});
+      const customKey = `${presetId}_${presetActionId}`;
+      presetPrompt = customPrompts[customKey] || action?.prompt || '';
+    }
+  }
+  // Parser les presets personnalises (format: custompreset-{presetId}-{actionId})
+  else if (menuId.match(/^custompreset-([^-]+)-(.+)$/)) {
+    actionType = 'custompreset';
+    actionId = menuId;
+    const match = menuId.match(/^custompreset-([^-]+)-(.+)$/);
+    if (match) {
+      const presetId = match[1];
+      const presetActionId = match[2];
+      const customPresets = await getStoredActions('customPresets', []);
+      const preset = customPresets.find(p => p.id === presetId);
+      const action = preset?.actions.find(a => a.id === presetActionId);
+      presetPrompt = action?.prompt || '';
+    }
+  }
+  else if (menuId.startsWith('input-translate-')) {
     actionType = 'input';
     actionId = 'translate';
     targetLanguage = menuId.replace('input-translate-', '');
@@ -360,42 +384,60 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   } else if (menuId.startsWith('selection-')) {
     actionType = 'selection';
     actionId = menuId.replace('selection-', '');
-  } else if (presetMatch) {
-    actionType = 'preset';
-    actionId = menuId; // On garde le format complet pour retrouver le prompt
   } else if (menuId.startsWith('quick_')) {
     actionType = 'quick';
     actionId = menuId;
-  } else if (menuId.startsWith('custom-')) {
-    actionType = 'custom';
-    actionId = menuId.replace('custom-', '');
   }
 
-  if (!actionId) return;
-
-  // Obtenir le prompt pour les presets
-  let presetPrompt = '';
-  if (actionType === 'preset') {
-    const match = actionId.match(/^preset-([^-]+)-(.+)$/);
-    if (match) {
-      const presetId = match[1];
-      const presetActionId = match[2];
-      const preset = PROFESSIONAL_PRESETS[presetId];
-      const action = preset?.actions.find(a => a.id === presetActionId);
-      presetPrompt = action?.prompt || '';
-    }
+  if (!actionId) {
+    console.log('IA Helper: Aucune action trouvee pour', menuId);
+    return;
   }
 
-  // Envoyer la commande au content script
-  chrome.tabs.sendMessage(tab.id, {
-    type: 'EXECUTE_ACTION',
-    actionType,
-    actionId,
-    targetLanguage,
-    presetPrompt,
-    selectedText: info.selectionText || '',
-    isEditable: info.editable
-  });
+  console.log('IA Helper: Envoi action', { actionType, actionId, targetLanguage });
+
+  // Verifier que l'onglet est valide
+  if (!tab || !tab.id) {
+    console.error('IA Helper: Onglet invalide');
+    return;
+  }
+
+  // Fonction pour envoyer le message
+  const sendAction = () => {
+    chrome.tabs.sendMessage(tab.id, {
+      type: 'EXECUTE_ACTION',
+      actionType,
+      actionId,
+      targetLanguage,
+      presetPrompt,
+      selectedText: info.selectionText || '',
+      isEditable: info.editable
+    }, (response) => {
+      if (chrome.runtime.lastError) {
+        console.error('IA Helper: Erreur envoi message', chrome.runtime.lastError.message);
+      } else {
+        console.log('IA Helper: Reponse content script', response);
+      }
+    });
+  };
+
+  // Injecter le content script si necessaire puis envoyer l'action
+  try {
+    chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      files: ['src/content/content-script.js']
+    }).then(() => {
+      console.log('IA Helper: Content script injecte');
+      setTimeout(sendAction, 100);
+    }).catch((err) => {
+      // Le script est peut-etre deja charge, essayer d'envoyer quand meme
+      console.log('IA Helper: Script deja charge ou erreur injection', err.message);
+      sendAction();
+    });
+  } catch (error) {
+    console.error('IA Helper: Exception', error);
+    sendAction();
+  }
 });
 
 // Initialisation a l'installation

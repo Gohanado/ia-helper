@@ -15,39 +15,19 @@
         <h1>IA Helper</h1>
         <span class="version">v1.0.0</span>
       </div>
-      
+
       <nav class="sidebar-nav">
         <button class="nav-item active" data-section="connection">
           <span class="nav-icon">S</span>
-          <span>Connexion</span>
+          <span data-i18n="connection">Connexion</span>
         </button>
-        <button class="nav-item" data-section="actions-input">
-          <span class="nav-icon">E</span>
-          <span>Actions Edition</span>
-        </button>
-        <button class="nav-item" data-section="actions-selection">
-          <span class="nav-icon">A</span>
-          <span>Actions Selection</span>
-        </button>
-        <button class="nav-item" data-section="actions-pro">
+        <button class="nav-item" data-section="presets">
           <span class="nav-icon">P</span>
-          <span>Actions Pro</span>
-        </button>
-        <button class="nav-item" data-section="prompts">
-          <span class="nav-icon">T</span>
-          <span>Prompts</span>
-        </button>
-        <button class="nav-item" data-section="custom">
-          <span class="nav-icon">+</span>
-          <span>Personnalisation</span>
-        </button>
-        <button class="nav-item" data-section="professional">
-          <span class="nav-icon">B</span>
-          <span>Presets Pro</span>
+          <span data-i18n="presets">Presets</span>
         </button>
         <button class="nav-item" data-section="about">
           <span class="nav-icon">i</span>
-          <span>A propos</span>
+          <span data-i18n="about">A propos</span>
         </button>
       </nav>
     </aside>
@@ -56,24 +36,24 @@
     <main class="main-content">
       <!-- Section Connexion -->
       <section class="section active" id="section-connection">
-        <h2>Configuration du serveur</h2>
-        
+        <h2 data-i18n="serverConfig">Configuration du serveur</h2>
+
         <div class="form-group">
-          <label for="ollama-url">URL du serveur Ollama</label>
+          <label for="ollama-url" data-i18n="serverUrl">URL du serveur Ollama</label>
           <div class="input-with-btn">
             <input type="text" id="ollama-url" placeholder="http://localhost:11434">
-            <button id="btn-test-connection" class="btn btn-secondary">Tester</button>
+            <button id="btn-test-connection" class="btn btn-secondary" data-i18n="testConnection">Tester</button>
           </div>
           <div class="connection-status" id="connection-status"></div>
         </div>
 
         <div class="form-group">
-          <label for="model-select">Modele</label>
+          <label for="model-select" data-i18n="model">Modele</label>
           <div class="input-with-btn">
             <select id="model-select">
-              <option value="">Selectionnez un modele</option>
+              <option value="" data-i18n="selectModel">Selectionnez un modele</option>
             </select>
-            <button id="btn-refresh-models" class="btn btn-secondary">Actualiser</button>
+            <button id="btn-refresh-models" class="btn btn-secondary" data-i18n="refreshModels">Actualiser</button>
           </div>
         </div>
 
@@ -81,12 +61,12 @@
           <label class="toggle-label">
             <input type="checkbox" id="streaming-enabled" checked>
             <span class="toggle-switch"></span>
-            <span class="toggle-text">Activer le streaming (reponse en temps reel)</span>
+            <span class="toggle-text" data-i18n="enableStreaming">Activer le streaming (reponse en temps reel)</span>
           </label>
         </div>
 
         <div class="form-group">
-          <label for="interface-language">Langue de l'interface</label>
+          <label for="interface-language" data-i18n="interfaceLanguage">Langue de l'interface</label>
           <select id="interface-language">
             <option value="fr">FR Francais</option>
             <option value="en">GB English</option>
@@ -97,119 +77,124 @@
         </div>
 
         <div class="form-group">
-          <label for="response-language">Langue de reponse de l'IA (generale)</label>
+          <label for="response-language" data-i18n="responseLanguage">Langue de reponse de l'IA (generale)</label>
           <select id="response-language">
-            <option value="auto">Automatique (selon le texte)</option>
+            <option value="auto" data-i18n="auto">Automatique (selon le texte)</option>
             <option value="fr">Francais</option>
             <option value="en">English</option>
             <option value="es">Espanol</option>
             <option value="it">Italiano</option>
             <option value="pt">Portugues</option>
           </select>
-          <p class="form-hint">Cette option ne s'applique pas aux traductions specifiques.</p>
+          <p class="form-hint" data-i18n="responseLanguageHint">Cette option ne s'applique pas aux traductions specifiques.</p>
         </div>
 
         <div class="form-actions">
-          <button id="btn-save-connection" class="btn btn-primary">Sauvegarder</button>
+          <button id="btn-save-connection" class="btn btn-primary" data-i18n="save">Sauvegarder</button>
         </div>
       </section>
 
-      <!-- Section Actions Edition -->
-      <section class="section" id="section-actions-input">
-        <h2>Actions pour les champs de saisie</h2>
-        <p class="section-desc">Activez ou desactivez les actions disponibles dans le menu contextuel pour les champs editables.</p>
-        <div class="actions-list" id="input-actions-list"></div>
-      </section>
+      <!-- Section Presets -->
+      <section class="section" id="section-presets">
+        <h2 data-i18n="presets">Presets</h2>
+        <p class="section-desc" data-i18n="presetsDesc">Activez des ensembles d'actions pour le menu contextuel. Chaque preset ajoute un sous-menu dans IA Helper.</p>
 
-      <!-- Section Actions Selection -->
-      <section class="section" id="section-actions-selection">
-        <h2>Actions pour la selection de texte</h2>
-        <p class="section-desc">Activez ou desactivez les actions disponibles lorsque vous selectionnez du texte sur une page.</p>
-        <div class="actions-list" id="selection-actions-list"></div>
-      </section>
-
-      <!-- Section Actions Pro -->
-      <section class="section" id="section-actions-pro">
-        <h2>Actions IA Helper Pro</h2>
-        <p class="section-desc">Actions avancees pour l'analyse de pages completes (tickets, conversations, etc.).</p>
-        <div class="actions-list" id="pro-actions-list"></div>
-      </section>
-
-      <!-- Section Prompts -->
-      <section class="section" id="section-prompts">
-        <h2>Personnalisation des prompts</h2>
-        <p class="section-desc">Modifiez les instructions envoyees a l'IA pour chaque action.</p>
-        <div class="prompts-editor" id="prompts-editor"></div>
-      </section>
-
-      <!-- Section Personnalisation -->
-      <section class="section" id="section-custom">
-        <h2>Actions personnalisees</h2>
-        <p class="section-desc">Creez vos propres actions avec des prompts personnalises.</p>
-        <button id="btn-add-custom" class="btn btn-primary">Ajouter une action</button>
-        <div class="custom-actions-list" id="custom-actions-list"></div>
-      </section>
-
-      <!-- Section Presets Professionnels -->
-      <section class="section" id="section-professional">
-        <h2>Presets Professionnels</h2>
-        <p class="section-desc">Activez des ensembles d'actions specialisees pour votre metier ou domaine d'activite.</p>
-
-        <div class="presets-grid" id="presets-grid">
-          <!-- Presets seront injectes ici -->
+        <div class="presets-section-header">
+          <h3 data-i18n="allPresets">Tous les presets</h3>
+          <button id="btn-add-preset" class="btn btn-primary" data-i18n="createPreset">Creer un preset</button>
         </div>
 
-        <div class="active-preset-actions" id="active-preset-actions">
-          <h3>Actions du preset actif</h3>
-          <p class="empty-state">Selectionnez un preset pour voir ses actions.</p>
+        <div class="presets-grid" id="all-presets-grid">
+          <!-- Tous les presets (personnalises + integres) -->
+        </div>
+
+        <div class="active-preset-actions" id="preset-actions-display">
+          <h3 data-i18n="presetActions">Actions du preset</h3>
+          <p class="empty-state" data-i18n="clickPresetToSee">Cliquez sur un preset pour voir ses actions.</p>
         </div>
       </section>
 
       <!-- Section A propos -->
       <section class="section" id="section-about">
-        <h2>A propos de IA Helper</h2>
+        <h2 data-i18n="aboutTitle">A propos de IA Helper</h2>
         <div class="about-content">
-          <p><strong>Version:</strong> 1.0.0</p>
-          <p><strong>Description:</strong> Assistant IA intelligent pour Chrome connecte a Ollama.</p>
-          <p>IA Helper vous permet d'utiliser des modeles d'IA locaux pour corriger, traduire, reformuler et analyser du texte directement dans votre navigateur.</p>
+          <p><strong data-i18n="version">Version:</strong> 1.0.0</p>
+          <p><strong>Description:</strong> <span data-i18n="description">Assistant IA intelligent pour Chrome connecte a Ollama.</span></p>
+          <p data-i18n="aboutText">IA Helper vous permet d'utiliser des modeles d'IA locaux pour corriger, traduire, reformuler et analyser du texte directement dans votre navigateur.</p>
           <div class="about-links">
-            <a href="../docs/docs.html" target="_blank" class="btn btn-secondary">Documentation</a>
-            <a href="https://github.com/Gohanado/ragnarok/issues/new" target="_blank" class="btn btn-secondary">Signaler un bug</a>
+            <a href="https://github.com/Gohanado/ia-helper/blob/main/docs/README.md" target="_blank" class="btn btn-secondary" data-i18n="documentation">Documentation</a>
+            <a href="https://github.com/Gohanado/ia-helper/issues/new?template=bug_report.md&title=%5BBUG%5D+&labels=bug&body=%23%23%20Description%20du%20bug%0A%0A%23%23%20Etapes%20pour%20reproduire%0A1.%20%0A2.%20%0A3.%20%0A%0A%23%23%20Comportement%20attendu%0A%0A%23%23%20Captures%20d%27ecran%20(si%20applicable)%0A%0A%23%23%20Environnement%0A-%20Navigateur%3A%20Chrome%0A-%20Version%20extension%3A%201.0.0%0A-%20Modele%20Ollama%3A%20" target="_blank" class="btn btn-secondary" data-i18n="reportBug">Signaler un bug</a>
+            <a href="https://github.com/Gohanado/ia-helper/issues/new?template=feature_request.md&title=%5BFEATURE%5D+&labels=enhancement&body=%23%23%20Description%20de%20la%20fonctionnalite%0A%0A%23%23%20Cas%20d%27utilisation%0A%0A%23%23%20Solution%20proposee%0A%0A%23%23%20Alternatives%20considerees%0A" target="_blank" class="btn btn-secondary" data-i18n="requestFeature">Demander une feature</a>
           </div>
-          <button id="btn-reset" class="btn btn-danger">Reinitialiser les options</button>
+          <button id="btn-reset" class="btn btn-danger" data-i18n="resetOptions">Reinitialiser les options</button>
         </div>
       </section>
     </main>
   </div>
 
-  <!-- Modal Ajouter Action -->
+  <!-- Modal Ajouter Action/Preset -->
   <div class="modal-overlay" id="modal-overlay">
     <div class="modal" id="modal-add-action">
       <div class="modal-header">
-        <h3>Nouvelle action personnalisee</h3>
+        <h3 class="modal-title">Nouvelle action</h3>
         <button class="modal-close" id="modal-close">&times;</button>
       </div>
       <div class="modal-body">
         <div class="form-group">
-          <label for="custom-action-name">Nom de l'action</label>
+          <label for="custom-action-name">Nom</label>
           <input type="text" id="custom-action-name" placeholder="Ex: Reformuler en poesie">
         </div>
         <div class="form-group">
-          <label for="custom-action-context">Contexte d'utilisation</label>
+          <label for="custom-action-context">Contexte</label>
           <select id="custom-action-context">
-            <option value="input">Champs de saisie</option>
             <option value="selection">Selection de texte</option>
-            <option value="both">Les deux</option>
+            <option value="input">Champs de saisie</option>
+            <option value="page">Page entiere</option>
+            <option value="both">Tous</option>
           </select>
         </div>
         <div class="form-group">
           <label for="custom-action-prompt">Prompt systeme</label>
-          <textarea id="custom-action-prompt" rows="6" placeholder="Decrivez ce que l'IA doit faire avec le texte..."></textarea>
+          <textarea id="custom-action-prompt" rows="6" placeholder="Instructions pour l'IA..."></textarea>
         </div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" id="modal-cancel">Annuler</button>
-        <button class="btn btn-primary" id="modal-save">Creer l'action</button>
+        <button class="btn btn-primary" id="modal-save">Sauvegarder</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Creer Preset -->
+  <div class="modal-overlay" id="modal-preset-overlay">
+    <div class="modal modal-large" id="modal-add-preset">
+      <div class="modal-header">
+        <h3 class="modal-title">Creer un preset</h3>
+        <button class="modal-close" id="modal-preset-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="preset-name">Nom du preset</label>
+          <input type="text" id="preset-name" placeholder="Ex: Mon workflow">
+          <p class="form-hint">Ce nom apparaitra dans le menu contextuel</p>
+        </div>
+        <div class="form-group">
+          <label for="preset-description">Description</label>
+          <input type="text" id="preset-description" placeholder="Description courte">
+        </div>
+        <div class="preset-actions-editor">
+          <div class="preset-actions-header">
+            <label>Actions du preset</label>
+            <button class="btn btn-secondary btn-sm" id="btn-add-preset-action">+ Ajouter action</button>
+          </div>
+          <div class="preset-actions-items" id="preset-actions-items">
+            <p class="empty-state">Aucune action. Cliquez sur "+ Ajouter action".</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="modal-preset-cancel">Annuler</button>
+        <button class="btn btn-primary" id="modal-preset-save">Creer le preset</button>
       </div>
     </div>
   </div>
