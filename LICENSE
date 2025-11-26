@@ -1,22 +1,72 @@
-MIT License
+IA Helper License
+Copyright (c) 2024-2025 Gohanado (https://github.com/Gohanado)
 
-Copyright (c) 2024 Gohanado
+================================================================================
+                          LICENCE D'UTILISATION
+================================================================================
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+Ce logiciel et son code source sont mis a disposition selon les termes suivants:
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+1. UTILISATION PERSONNELLE (GRATUIT)
+--------------------------------------------------------------------------------
+Vous etes autorise a:
+- Utiliser ce logiciel gratuitement a des fins personnelles
+- Copier et modifier le code pour votre usage personnel
+- Etudier le fonctionnement du code
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+2. UTILISATION COMMERCIALE ET PROFESSIONNELLE (SOUMISE A AUTORISATION)
+--------------------------------------------------------------------------------
+Toute utilisation a des fins commerciales ou professionnelles necessite:
+- Une autorisation ecrite prealable de l'auteur
+- Un accord de licence commerciale
+- Le paiement des droits correspondants
+
+Pour obtenir une licence commerciale, contactez: contact@badom.ch
+
+3. CONTRIBUTIONS
+--------------------------------------------------------------------------------
+- Les contributions via Pull Request sont les bienvenues
+- En soumettant une contribution, vous acceptez que celle-ci soit integree
+  au projet sous les memes termes que cette licence
+- L'equipe IA Helper se reserve le droit d'accepter ou refuser les contributions
+- Les contributeurs sont credites dans le fichier CONTRIBUTORS.md
+
+4. RESTRICTIONS
+--------------------------------------------------------------------------------
+Vous n'etes PAS autorise a:
+- Redistribuer ce logiciel a des fins commerciales sans autorisation
+- Utiliser ce logiciel dans un produit commercial sans licence
+- Supprimer ou modifier les mentions de copyright
+- Sous-licencier ce logiciel
+
+5. PROPRIETE INTELLECTUELLE
+--------------------------------------------------------------------------------
+- Le nom "IA Helper", les logos et la marque restent la propriete de Gohanado
+- Le code source reste la propriete de Gohanado et des contributeurs
+- Seuls Gohanado et son equipe peuvent modifier le code du depot officiel
+
+6. CLAUSE DE NON-GARANTIE
+--------------------------------------------------------------------------------
+CE LOGICIEL EST FOURNI "TEL QUEL", SANS GARANTIE D'AUCUNE SORTE, EXPLICITE
+OU IMPLICITE. EN AUCUN CAS L'AUTEUR NE POURRA ETRE TENU RESPONSABLE DE TOUT
+DOMMAGE DIRECT, INDIRECT, ACCESSOIRE OU CONSEQUENT RESULTANT DE L'UTILISATION
+DE CE LOGICIEL.
+
+7. SIGNALEMENT DE BUGS ET DEMANDES DE FONCTIONNALITES
+--------------------------------------------------------------------------------
+- Les bugs peuvent etre signales via GitHub Issues
+- Les demandes de fonctionnalites sont les bienvenues via GitHub Issues
+- Aucune garantie de correction ou d'implementation n'est donnee
+
+================================================================================
+                            RESUME
+================================================================================
+- Usage personnel: GRATUIT et LIBRE
+- Usage commercial/professionnel: AUTORISATION REQUISE + PAYANT
+- Contributions: BIENVENUES via Pull Request
+- Redistribution commerciale: INTERDITE sans accord
+
+Pour toute question: contact@badom.ch
+GitHub: https://github.com/Gohanado/ia-helper
+================================================================================
 

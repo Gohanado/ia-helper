@@ -16,7 +16,7 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 
 ---
 
-## [1.0.0] - 2024-11-26
+## [1.0.0] - 2025-11-26
 
 ### Ajoute
 - **Menu contextuel intelligent**
@@ -29,14 +29,20 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
   - Traduction depuis le menu contextuel ou les champs de saisie
   - Detection automatique de la langue source
 
-- **Presets professionnels**
-  - Support IT: diagnostic, solutions, tickets
-  - Service Client: reponses empathiques, reclamations
-  - Commercial: emails persuasifs, propositions
-  - Developpeur: review code, documentation, debug
-  - Redacteur: style, ton, structure
-  - Etudiant: fiches revision, explications
-  - Chercheur: analyse articles, synthese
+- **24 Presets professionnels (140+ actions)**
+  - Support IT, Service Client, Commercial, Developpeur
+  - Redacteur, Etudiant, Chercheur, RH/Recruteur
+  - Manager, Juriste, Marketing, Product Manager
+  - Designer UX, Data Analyst, Community Manager
+  - Formateur, Traducteur, Journaliste, Freelance
+  - Sante, E-commerce, Copywriter, Createur Contenu
+  - Assistant Personnel
+
+- **Rendu Markdown complet**
+  - Titres, gras, italique, code
+  - Listes a puces et numerotees
+  - Blocs de code avec coloration
+  - Citations, liens, tableaux
 
 - **Presets personnalises**
   - Creation de presets avec actions personnalisees

@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   document.getElementById('btn-help').addEventListener('click', () => {
-    chrome.tabs.create({ url: 'https://github.com/ia-helper/docs' });
+    chrome.tabs.create({ url: 'https://github.com/Gohanado/ia-helper/blob/main/docs/README.md' });
   });
 
   // Fonctions

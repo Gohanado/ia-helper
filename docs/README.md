@@ -118,49 +118,19 @@ Le menu contextuel s'adapte automatiquement au contexte:
 | Resumer la page | Resume du contenu principal |
 | Extraire les points essentiels | Liste des informations cles |
 
-### Presets professionnels
+### 24 Presets Professionnels (140+ actions)
 
-#### Support IT
-- Resume de ticket technique
-- Suggestion de solutions
-- Redaction de reponse professionnelle
-- Diagnostic de probleme
+| Categorie | Presets |
+|-----------|---------|
+| **Tech** | Support IT, Developpeur, Data Analyst |
+| **Business** | Commercial, Marketing, Product Manager, Freelance |
+| **Communication** | Service Client, Community Manager, Copywriter |
+| **Creatif** | Redacteur, Designer UX, Createur Contenu, Journaliste |
+| **Education** | Etudiant, Formateur, Chercheur |
+| **Specialise** | RH/Recruteur, Manager, Juriste, Traducteur, Sante, E-commerce |
+| **Personnel** | Assistant Personnel |
 
-#### Service Client
-- Analyse du sentiment client
-- Reponse empathique
-- Gestion de reclamation
-- Suivi de demande
-
-#### Commercial
-- Analyse de prospect
-- Argumentaire personnalise
-- Email de relance
-- Proposition commerciale
-
-#### Developpeur
-- Explication de code
-- Revue de code (code review)
-- Debug et correction
-- Documentation
-
-#### Redacteur
-- Amelioration du style
-- Optimisation SEO
-- Titres accrocheurs
-- Reformulation
-
-#### Etudiant
-- Explication simple
-- Fiche de revision
-- Resume structure
-- Questions de comprehension
-
-#### Chercheur
-- Extraction des points cles
-- Identification des biais
-- Resume d'article scientifique
-- Synthese de sources
+Chaque preset contient 4 a 6 actions specialisees avec des prompts optimises.
 
 ---
 

@@ -1,9 +1,14 @@
 {
   "name": "ia-helper",
   "version": "1.0.0",
-  "description": "Extension Chrome d'assistant IA intelligent connectee a Ollama",
-  "author": "Gohanado",
-  "license": "MIT",
+  "description": "Extension Chrome d'assistant IA intelligent connectee a Ollama - 100% local et prive",
+  "author": {
+    "name": "Gohanado",
+    "email": "contact@badom.ch",
+    "url": "https://github.com/Gohanado"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "private": true,
   "repository": {
     "type": "git",
     "url": "https://github.com/Gohanado/ia-helper.git"
@@ -12,19 +17,34 @@
     "url": "https://github.com/Gohanado/ia-helper/issues"
   },
   "homepage": "https://github.com/Gohanado/ia-helper#readme",
+  "funding": [
+    {
+      "type": "ko-fi",
+      "url": "https://ko-fi.com/gohanado"
+    },
+    {
+      "type": "paypal",
+      "url": "https://paypal.me/gohanado"
+    }
+  ],
   "keywords": [
     "chrome-extension",
     "ollama",
     "ai-assistant",
     "translation",
     "text-processing",
-    "local-ai"
+    "local-ai",
+    "privacy",
+    "offline",
+    "llm"
   ],
   "engines": {
     "node": ">=16.0.0"
   },
   "scripts": {
-    "icons": "node scripts/create-icons.js"
+    "icons": "node scripts/create-icons.js",
+    "build": "echo 'No build needed - native JS'",
+    "zip": "powershell Compress-Archive -Path manifest.json,src,assets -DestinationPath ia-helper.zip -Force"
   },
   "devDependencies": {},
   "dependencies": {
