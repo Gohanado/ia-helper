@@ -14,6 +14,8 @@ const DEFAULT_CONFIG = {
   selectedModel: '',
   streamingEnabled: true,
   inlinePopupEnabled: true,
+  directInputEnabled: false,
+  directInputMode: 'replace',
   interfaceLanguage: 'fr',
   responseLanguage: 'fr'
 };
@@ -106,7 +108,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     inlinePopupEnabled: document.getElementById('inline-popup-enabled'),
     interfaceLanguage: document.getElementById('interface-language'),
     responseLanguage: document.getElementById('response-language'),
-    connectionStatus: document.getElementById('connection-status')
+    connectionStatus: document.getElementById('connection-status'),
+    directInputEnabled: document.getElementById('direct-input-enabled'),
+    directInputMode: document.getElementById('direct-input-mode'),
+    directInputModeGroup: document.getElementById('direct-input-mode-group')
   };
 
   try {
@@ -173,13 +178,25 @@ async function loadAllSettings() {
       if (elements.apiKey) elements.apiKey.value = config.apiKey || '';
       if (elements.streamingEnabled) elements.streamingEnabled.checked = config.streamingEnabled !== false;
       if (elements.inlinePopupEnabled) elements.inlinePopupEnabled.checked = config.inlinePopupEnabled !== false;
+      if (elements.directInputEnabled) elements.directInputEnabled.checked = config.directInputEnabled === true;
+      if (elements.directInputMode) elements.directInputMode.value = config.directInputMode || 'replace';
       if (elements.interfaceLanguage) elements.interfaceLanguage.value = config.interfaceLanguage || 'fr';
       if (elements.responseLanguage) elements.responseLanguage.value = config.responseLanguage || 'auto';
+
+      // Afficher/masquer le mode d'insertion selon l'etat du toggle
+      updateDirectInputModeVisibility();
 
       updateProviderUI(config.provider);
       resolve();
     });
   });
+}
+
+// Afficher/masquer le selecteur de mode d'insertion
+function updateDirectInputModeVisibility() {
+  if (elements.directInputModeGroup && elements.directInputEnabled) {
+    elements.directInputModeGroup.style.display = elements.directInputEnabled.checked ? 'block' : 'none';
+  }
 }
 
 // Charger les actions personnalisees
@@ -291,6 +308,11 @@ function setupEventListeners() {
   });
   document.getElementById('default-translate-lang')?.addEventListener('change', (e) => {
     defaultTranslateLang = e.target.value;
+  });
+
+  // Direct input toggle - afficher/masquer le mode d'insertion
+  elements.directInputEnabled?.addEventListener('change', () => {
+    updateDirectInputModeVisibility();
   });
 }
 
@@ -415,6 +437,8 @@ async function saveConnectionSettings() {
   config.selectedModel = elements.modelSelect?.value || '';
   config.streamingEnabled = elements.streamingEnabled?.checked !== false;
   config.inlinePopupEnabled = elements.inlinePopupEnabled?.checked !== false;
+  config.directInputEnabled = elements.directInputEnabled?.checked === true;
+  config.directInputMode = elements.directInputMode?.value || 'replace';
   config.interfaceLanguage = elements.interfaceLanguage?.value || 'fr';
   config.responseLanguage = elements.responseLanguage?.value || 'auto';
 

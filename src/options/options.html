@@ -123,6 +123,23 @@
         </div>
 
         <div class="form-group">
+          <label class="toggle-label">
+            <input type="checkbox" id="direct-input-enabled">
+            <span class="toggle-switch"></span>
+            <span class="toggle-text" data-i18n="directInputResponse">Reponse directe dans le champ de saisie</span>
+          </label>
+          <p class="form-hint" data-i18n="directInputResponseHint">Si active, l'IA repond directement dans le champ de saisie actif (streaming).</p>
+        </div>
+
+        <div class="form-group" id="direct-input-mode-group" style="display:none; margin-left: 20px;">
+          <label for="direct-input-mode" data-i18n="directInputMode">Mode d'insertion</label>
+          <select id="direct-input-mode">
+            <option value="replace" data-i18n="directInputReplace">Remplacer le contenu</option>
+            <option value="append" data-i18n="directInputAppend">Ajouter a la suite</option>
+          </select>
+        </div>
+
+        <div class="form-group">
           <label for="interface-language" data-i18n="interfaceLanguage">Langue de l'interface</label>
           <select id="interface-language">
             <option value="fr">FR Francais</option>

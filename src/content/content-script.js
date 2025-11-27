@@ -19,6 +19,8 @@
     selectedModel: '',
     streamingEnabled: true,
     inlinePopupEnabled: true,
+    directInputEnabled: false,
+    directInputMode: 'replace',
     interfaceLanguage: 'fr'
   };
 
@@ -456,10 +458,15 @@
 
   // Gerer une action
   async function handleAction(message) {
-    console.log('IA Helper: Traitement action', message.actionId);
+    console.log('IA Helper: Traitement action', message.actionId || message.actionType);
     await loadConfig();
 
-    const { actionType, actionId, targetLanguage, selectedText, isEditable } = message;
+    let { actionType, actionId, targetLanguage, selectedText, isEditable } = message;
+
+    // Pour custom_prompt, definir un actionId par defaut
+    if (actionType === 'custom_prompt' && !actionId) {
+      actionId = 'custom_prompt';
+    }
 
     // Obtenir le contenu a traiter
     let content = '';
@@ -498,11 +505,19 @@
 
     // Obtenir le prompt systeme
     let systemPrompt = '';
+    let userPrompt = '';
 
     if (actionType === 'custom_prompt') {
-      // Prompt personnalise depuis le popup - le prompt est directement le message.customPrompt
-      systemPrompt = message.customPrompt || '';
-      console.log('IA Helper: Custom prompt', systemPrompt);
+      // Prompt personnalise depuis le popup - combiner la question avec le contexte
+      userPrompt = message.customPrompt || '';
+      if (content.trim()) {
+        systemPrompt = `L'utilisateur te demande: "${userPrompt}"\n\nVoici le contexte (texte selectionne ou contenu de la page):\n\n${content}`;
+      } else {
+        systemPrompt = userPrompt;
+      }
+      // Utiliser le contenu comme contexte, pas comme contenu a traiter
+      content = userPrompt;
+      console.log('IA Helper: Custom prompt', userPrompt);
     } else if (actionType === 'quick') {
       systemPrompt = QUICK_PROMPTS[actionId] || '';
     } else if (actionType === 'translate') {
@@ -543,8 +558,24 @@
 
     console.log('IA Helper: Modele utilise', config.selectedModel);
 
+    // Detecter si on est dans un champ de saisie editable
+    const activeEl = document.activeElement;
+    const isInEditableField = activeEl && (
+      activeEl.tagName === 'INPUT' ||
+      activeEl.tagName === 'TEXTAREA' ||
+      activeEl.isContentEditable ||
+      activeEl.getAttribute('contenteditable') === 'true'
+    );
+
     try {
-      if (actionType === 'input' && isEditable && config.streamingEnabled) {
+      // Option 1: Reponse directe dans le champ de saisie (si active et dans un champ)
+      if (config.directInputEnabled && isInEditableField && config.streamingEnabled) {
+        console.log('IA Helper: Reponse directe dans le champ de saisie');
+        await generateDirectInField(activeEl, content, systemPrompt, config.directInputMode);
+        showNotification('Traitement termine', 'success');
+      }
+      // Option 2: Ancien mode - streaming dans le champ (depuis menu contextuel sur input)
+      else if (actionType === 'input' && isEditable && config.streamingEnabled) {
         // Streaming dans le champ de saisie
         await generateWithStreaming(targetElement, content, systemPrompt);
         showNotification('Traitement termine', 'success');
@@ -560,6 +591,130 @@
     } catch (error) {
       console.error('IA Helper: Erreur', error);
       showNotification('Erreur: ' + error.message, 'error');
+    }
+  }
+
+  // Generer directement dans le champ de saisie (nouvelle option)
+  async function generateDirectInField(element, originalContent, systemPrompt, mode = 'replace') {
+    const provider = config.provider || 'ollama';
+    const indicator = showLoadingIndicator(element);
+
+    try {
+      // Determiner le contenu initial selon le mode
+      let currentContent = '';
+      if (mode === 'append') {
+        currentContent = getEditableContent(element) || '';
+        if (currentContent && !currentContent.endsWith('\n')) {
+          currentContent += '\n\n';
+        }
+      }
+
+      // Vider ou preparer le champ selon le mode
+      if (mode === 'replace') {
+        setEditableContent(element, '');
+      } else {
+        setEditableContent(element, currentContent);
+      }
+
+      let requestBody, headers = { 'Content-Type': 'application/json' };
+      let apiUrl = config.apiUrl;
+
+      if (provider === 'ollama') {
+        requestBody = {
+          model: config.selectedModel,
+          prompt: `${systemPrompt}\n\nContenu:\n${originalContent}`,
+          stream: true
+        };
+        apiUrl = `${config.apiUrl}/api/generate`;
+      } else if (provider === 'anthropic') {
+        requestBody = {
+          model: config.selectedModel,
+          max_tokens: 4096,
+          stream: true,
+          messages: [
+            { role: 'user', content: `${systemPrompt}\n\nContenu:\n${originalContent}` }
+          ]
+        };
+        apiUrl = `${config.apiUrl}/messages`;
+        headers['x-api-key'] = config.apiKey;
+        headers['anthropic-version'] = '2023-06-01';
+        headers['anthropic-dangerous-direct-browser-access'] = 'true';
+      } else {
+        requestBody = {
+          model: config.selectedModel,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: originalContent }
+          ],
+          stream: true
+        };
+        apiUrl = `${config.apiUrl}/chat/completions`;
+        headers['Authorization'] = `Bearer ${config.apiKey}`;
+      }
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(requestBody)
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erreur API: ${response.status}`);
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let fullResponse = mode === 'append' ? currentContent : '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n').filter(line => line.trim());
+
+        for (const line of lines) {
+          let text = '';
+
+          if (provider === 'ollama') {
+            try {
+              const data = JSON.parse(line);
+              text = data.response || '';
+            } catch (e) { continue; }
+          } else if (provider === 'anthropic') {
+            if (line.startsWith('data: ')) {
+              try {
+                const data = JSON.parse(line.slice(6));
+                if (data.type === 'content_block_delta') {
+                  text = data.delta?.text || '';
+                }
+              } catch (e) { continue; }
+            }
+          } else {
+            if (line.startsWith('data: ')) {
+              if (line === 'data: [DONE]') continue;
+              try {
+                const data = JSON.parse(line.slice(6));
+                text = data.choices?.[0]?.delta?.content || '';
+              } catch (e) { continue; }
+            }
+          }
+
+          if (text) {
+            fullResponse += text;
+            setEditableContent(element, fullResponse);
+            // Garder le curseur a la fin
+            if (element.setSelectionRange) {
+              element.setSelectionRange(fullResponse.length, fullResponse.length);
+            }
+          }
+        }
+      }
+
+      hideLoadingIndicator(indicator);
+    } catch (error) {
+      hideLoadingIndicator(indicator);
+      throw error;
     }
   }
 

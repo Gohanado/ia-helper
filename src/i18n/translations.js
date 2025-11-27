@@ -40,6 +40,11 @@ export const TRANSLATIONS = {
     apiKeyHint: 'Votre cle API est stockee localement et jamais partagee.',
     inlinePopup: 'Afficher les reponses dans un popup',
     inlinePopupHint: 'Si active, les reponses du prompt rapide s\'affichent dans une popup flottante avec streaming.',
+    directInputResponse: 'Reponse directe dans le champ de saisie',
+    directInputResponseHint: 'Si active, l\'IA repond directement dans le champ de saisie actif (streaming).',
+    directInputMode: 'Mode d\'insertion',
+    directInputReplace: 'Remplacer le contenu',
+    directInputAppend: 'Ajouter a la suite',
 
     // Presets
     presets: 'Presets',
@@ -307,6 +312,11 @@ export const TRANSLATIONS = {
     apiKeyHint: 'Your API key is stored locally and never shared.',
     inlinePopup: 'Show responses in popup',
     inlinePopupHint: 'If enabled, quick prompt responses are displayed in a floating popup with streaming.',
+    directInputResponse: 'Direct response in input field',
+    directInputResponseHint: 'If enabled, AI responds directly in the active input field (streaming).',
+    directInputMode: 'Insertion mode',
+    directInputReplace: 'Replace content',
+    directInputAppend: 'Append to content',
     presets: 'Presets',
     presetsDesc: 'Enable action sets for the context menu. Each preset adds a submenu to IA Helper.',
     allPresets: 'All presets',
@@ -540,6 +550,8 @@ TRANSLATIONS.es = {
   iaProvider: 'Proveedor IA', apiKey: 'Clave API',
   apiKeyHint: 'Su clave API se almacena localmente y nunca se comparte.',
   inlinePopup: 'Mostrar respuestas en popup', inlinePopupHint: 'Si esta activado, las respuestas del prompt rapido se muestran en un popup flotante con streaming.',
+  directInputResponse: 'Respuesta directa en campo de entrada', directInputResponseHint: 'Si esta activado, la IA responde directamente en el campo de entrada activo (streaming).',
+  directInputMode: 'Modo de insercion', directInputReplace: 'Reemplazar contenido', directInputAppend: 'Agregar al final',
   // Presets
   presets: 'Presets', presetsDesc: 'Active conjuntos de acciones para el menu contextual.',
   integratedPresets: 'Presets integrados', myCustomPresets: 'Mis presets personalizados',
@@ -643,6 +655,8 @@ TRANSLATIONS.it = {
   iaProvider: 'Provider IA', apiKey: 'Chiave API',
   apiKeyHint: 'La tua chiave API e memorizzata localmente e mai condivisa.',
   inlinePopup: 'Mostra risposte in popup', inlinePopupHint: 'Se attivato, le risposte del prompt rapido vengono mostrate in un popup flottante con streaming.',
+  directInputResponse: 'Risposta diretta nel campo di input', directInputResponseHint: 'Se attivato, l\'IA risponde direttamente nel campo di input attivo (streaming).',
+  directInputMode: 'Modalita di inserimento', directInputReplace: 'Sostituisci contenuto', directInputAppend: 'Aggiungi alla fine',
   // Presets
   presets: 'Presets', presetsDesc: 'Attiva set di azioni per il menu contestuale.',
   integratedPresets: 'Presets integrati', myCustomPresets: 'I miei presets personalizzati',
@@ -746,6 +760,8 @@ TRANSLATIONS.pt = {
   iaProvider: 'Provedor IA', apiKey: 'Chave API',
   apiKeyHint: 'Sua chave API e armazenada localmente e nunca compartilhada.',
   inlinePopup: 'Mostrar respostas em popup', inlinePopupHint: 'Se ativado, as respostas do prompt rapido sao exibidas em um popup flutuante com streaming.',
+  directInputResponse: 'Resposta direta no campo de entrada', directInputResponseHint: 'Se ativado, a IA responde diretamente no campo de entrada ativo (streaming).',
+  directInputMode: 'Modo de insercao', directInputReplace: 'Substituir conteudo', directInputAppend: 'Adicionar ao final',
   // Presets
   presets: 'Presets', presetsDesc: 'Ative conjuntos de acoes para o menu contextual.',
   integratedPresets: 'Presets integrados', myCustomPresets: 'Meus presets personalizados',
