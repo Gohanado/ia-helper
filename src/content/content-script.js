@@ -314,19 +314,19 @@
     }, 3000);
   }
 
-  // Prompts systeme
+  // Prompts systeme - IMPORTANT: pas de tableaux, pas de formatage markdown excessif
   const PROMPTS = {
-    correct_errors: `Tu es un correcteur orthographique et grammatical expert. Corrige UNIQUEMENT les erreurs d'orthographe, de grammaire et de ponctuation. NE MODIFIE PAS le sens, le style ou la structure du texte. NE RAJOUTE AUCUN contenu. Retourne uniquement le texte corrige.`,
-    translate: `Tu es un traducteur professionnel. Traduis le texte suivant en {lang}. Conserve le ton et le style. Retourne uniquement la traduction.`,
-    reformat_mail_pro: `Tu es un expert en communication professionnelle. Reformule ce texte en email professionnel structure. CONSERVE ABSOLUMENT TOUT le contenu. NE RAJOUTE AUCUNE information inventee.`,
-    expand_content: `Tu es un redacteur professionnel. Developpe et enrichis le texte suivant tout en gardant l'idee principale.`,
-    summarize_input: `Tu es un expert en synthese. Resume le texte suivant de maniere concise. NE RAJOUTE AUCUNE information.`,
-    improve_style: `Tu es un expert en style redactionnel. Ameliore le style pour le rendre plus fluide. CONSERVE le sens exact.`,
-    summarize: `Tu es un expert en synthese. Resume le texte selectionne de maniere claire et concise.`,
-    explain_chronology: `Analyse le texte et presente les evenements dans l'ordre chronologique. Format: - [Date/Heure] : Evenement`,
-    explain_simple: `Explique le texte suivant de maniere simple et accessible.`,
-    extract_key_points: `Extrait les points cles du texte suivant. Format: Liste a puces.`,
-    analyze_sentiment: `Analyse le ton et le sentiment du texte. Indique: Sentiment general, mots cles emotionnels.`
+    correct_errors: `Tu es un correcteur orthographique. Corrige UNIQUEMENT les fautes d'orthographe et de grammaire. Retourne le texte corrige, rien d'autre. Pas de commentaires, pas d'explications.`,
+    translate: `Tu es un traducteur. Traduis le texte en {lang}. Retourne uniquement la traduction, sans commentaires ni explications.`,
+    reformat_mail_pro: `Reformule ce texte en email professionnel. Conserve tout le contenu. Pas de tableaux, pas de listes a puces sauf si necessaire. Texte fluide.`,
+    expand_content: `Developpe et enrichis ce texte. Garde un style fluide et naturel. Pas de tableaux ni de formatage excessif.`,
+    summarize_input: `Resume ce texte en quelques phrases. Pas de listes, pas de tableaux. Juste un resume clair et fluide.`,
+    improve_style: `Ameliore le style de ce texte pour le rendre plus fluide et agreable a lire. Conserve le sens. Pas de formatage special.`,
+    summarize: `Resume ce texte de maniere concise. Ecris un paragraphe fluide, pas de listes ni tableaux.`,
+    explain_chronology: `Presente les evenements du texte dans l'ordre chronologique. Utilise des tirets simples: - [Date] Evenement. Pas de tableaux.`,
+    explain_simple: `Explique ce texte simplement, comme si tu parlais a quelqu'un. Pas de listes, pas de tableaux. Un texte clair et accessible.`,
+    extract_key_points: `Donne les 3-5 points essentiels de ce texte. Utilise des tirets simples. Pas de tableaux.`,
+    analyze_sentiment: `Analyse brievement le ton de ce texte en 2-3 phrases. Pas de tableaux ni de formatage special.`
   };
 
   // Noms des langues
@@ -793,6 +793,7 @@
       }
       .ia-quick-input {
         width: 100%;
+        box-sizing: border-box;
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 12px;

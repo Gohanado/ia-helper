@@ -7,7 +7,7 @@ export const BASE_ACTIONS = {
     id: 'correct_errors',
     name: 'Corriger l\'orthographe',
     description: 'Corrige les fautes d\'orthographe et de grammaire',
-    prompt: 'Corrige uniquement les fautes d\'orthographe et de grammaire de ce texte. Garde le meme style et le meme sens. Renvoie uniquement le texte corrige.',
+    prompt: 'Corrige les fautes d\'orthographe et de grammaire. Retourne uniquement le texte corrige, rien d\'autre.',
     category: 'essential',
     defaultEnabled: true
   },
@@ -15,7 +15,7 @@ export const BASE_ACTIONS = {
     id: 'summarize',
     name: 'Resumer',
     description: 'Resume le texte en quelques phrases',
-    prompt: 'Resume ce texte de maniere concise en gardant les informations essentielles.',
+    prompt: 'Resume ce texte en un paragraphe fluide. Pas de listes, pas de tableaux. Juste un resume clair.',
     category: 'essential',
     defaultEnabled: true
   },
@@ -23,7 +23,7 @@ export const BASE_ACTIONS = {
     id: 'explain_simple',
     name: 'Expliquer simplement',
     description: 'Explique le texte de maniere simple',
-    prompt: 'Explique ce texte de maniere simple et accessible, comme si tu l\'expliquais a quelqu\'un qui ne connait pas le sujet.',
+    prompt: 'Explique ce texte simplement, comme si tu parlais a quelqu\'un. Texte fluide, pas de listes ni tableaux.',
     category: 'essential',
     defaultEnabled: true
   },
@@ -31,7 +31,7 @@ export const BASE_ACTIONS = {
     id: 'improve_style',
     name: 'Ameliorer le style',
     description: 'Ameliore la clarte et le style du texte',
-    prompt: 'Ameliore le style de ce texte pour le rendre plus clair, fluide et professionnel. Garde le meme sens.',
+    prompt: 'Ameliore le style pour le rendre plus fluide et agreable. Garde le sens. Pas de formatage special.',
     category: 'essential',
     defaultEnabled: true
   },
@@ -39,7 +39,7 @@ export const BASE_ACTIONS = {
     id: 'expand_content',
     name: 'Developper',
     description: 'Developpe et enrichit le texte',
-    prompt: 'Developpe ce texte en ajoutant des details, des exemples et des explications supplementaires.',
+    prompt: 'Developpe ce texte avec plus de details. Garde un style fluide et naturel. Pas de tableaux.',
     category: 'essential',
     defaultEnabled: true
   },
@@ -49,7 +49,7 @@ export const BASE_ACTIONS = {
     id: 'reformat_mail_pro',
     name: 'Email professionnel',
     description: 'Transforme en email professionnel',
-    prompt: 'Transforme ce texte en email professionnel bien structure avec formules de politesse appropriees.',
+    prompt: 'Transforme en email professionnel avec formules de politesse. Texte fluide, pas de tableaux.',
     category: 'practical',
     defaultEnabled: true
   },
@@ -57,7 +57,7 @@ export const BASE_ACTIONS = {
     id: 'bullet_points',
     name: 'Liste a puces',
     description: 'Convertit en liste a puces',
-    prompt: 'Convertis ce texte en une liste a puces claire et organisee.',
+    prompt: 'Convertis en liste a puces simple avec des tirets. Pas de tableaux.',
     category: 'practical',
     defaultEnabled: false
   },
@@ -65,7 +65,7 @@ export const BASE_ACTIONS = {
     id: 'extract_key_points',
     name: 'Points cles',
     description: 'Extrait les points essentiels',
-    prompt: 'Extrait les points cles et informations importantes de ce texte.',
+    prompt: 'Donne les 3-5 points essentiels avec des tirets simples. Pas de tableaux.',
     category: 'practical',
     defaultEnabled: false
   },
@@ -73,7 +73,7 @@ export const BASE_ACTIONS = {
     id: 'make_shorter',
     name: 'Raccourcir',
     description: 'Reduit la longueur du texte',
-    prompt: 'Raccourcis ce texte en gardant uniquement l\'essentiel. Reduis la longueur de moitie environ.',
+    prompt: 'Raccourcis ce texte de moitie en gardant l\'essentiel. Texte fluide.',
     category: 'practical',
     defaultEnabled: false
   },
@@ -81,7 +81,7 @@ export const BASE_ACTIONS = {
     id: 'make_formal',
     name: 'Ton formel',
     description: 'Rend le texte plus formel',
-    prompt: 'Reecris ce texte avec un ton plus formel et professionnel.',
+    prompt: 'Reecris avec un ton formel et professionnel. Pas de formatage special.',
     category: 'practical',
     defaultEnabled: false
   },
@@ -89,7 +89,7 @@ export const BASE_ACTIONS = {
     id: 'make_casual',
     name: 'Ton decontracte',
     description: 'Rend le texte plus decontracte',
-    prompt: 'Reecris ce texte avec un ton plus decontracte et amical.',
+    prompt: 'Reecris avec un ton decontracte et amical. Pas de formatage special.',
     category: 'practical',
     defaultEnabled: false
   },
@@ -99,7 +99,7 @@ export const BASE_ACTIONS = {
     id: 'explain_code',
     name: 'Expliquer le code',
     description: 'Explique ce que fait le code',
-    prompt: 'Explique ce code de maniere claire. Decris ce qu\'il fait, sa logique et comment il fonctionne.',
+    prompt: 'Explique ce code clairement. Decris ce qu\'il fait et comment. Pas de tableaux.',
     category: 'technical',
     defaultEnabled: false
   },
@@ -107,7 +107,7 @@ export const BASE_ACTIONS = {
     id: 'review_code',
     name: 'Revue de code',
     description: 'Analyse et suggere des ameliorations',
-    prompt: 'Fais une revue de ce code. Identifie les problemes potentiels et suggere des ameliorations.',
+    prompt: 'Fais une revue de ce code. Liste les problemes et ameliorations avec des tirets.',
     category: 'technical',
     defaultEnabled: false
   },
@@ -115,7 +115,7 @@ export const BASE_ACTIONS = {
     id: 'debug_help',
     name: 'Aide debug',
     description: 'Analyse une erreur et propose des solutions',
-    prompt: 'Analyse cette erreur ou ce probleme et suggere des solutions pour le resoudre.',
+    prompt: 'Analyse cette erreur et propose des solutions. Explications claires, pas de tableaux.',
     category: 'technical',
     defaultEnabled: false
   },
@@ -125,7 +125,7 @@ export const BASE_ACTIONS = {
     id: 'sentiment_analysis',
     name: 'Analyser le sentiment',
     description: 'Determine le ton du texte',
-    prompt: 'Analyse le sentiment de ce texte. Est-il positif, negatif ou neutre? Explique brievement.',
+    prompt: 'Analyse le sentiment en 2-3 phrases. Positif, negatif ou neutre? Pas de tableaux.',
     category: 'analysis',
     defaultEnabled: false
   },
@@ -133,7 +133,7 @@ export const BASE_ACTIONS = {
     id: 'identify_language',
     name: 'Identifier la langue',
     description: 'Detecte la langue du texte',
-    prompt: 'Identifie la langue de ce texte et confirme ta detection.',
+    prompt: 'Identifie la langue de ce texte en une phrase.',
     category: 'analysis',
     defaultEnabled: false
   }

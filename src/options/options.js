@@ -661,6 +661,10 @@ function toggleAction(actionId, enabled, isCustom = false) {
 
 // Afficher le modal pour ajouter une action personnalisee
 function showAddCustomActionModal() {
+  // Supprimer un eventuel modal existant
+  const existingModal = document.getElementById('custom-action-modal');
+  if (existingModal) existingModal.remove();
+
   const modal = document.createElement('div');
   modal.className = 'modal-overlay active';
   modal.id = 'custom-action-modal';
@@ -668,32 +672,37 @@ function showAddCustomActionModal() {
     <div class="modal">
       <div class="modal-header">
         <h3>Nouvelle action personnalisee</h3>
-        <button class="modal-close">&times;</button>
+        <button class="modal-close" type="button">&times;</button>
       </div>
       <div class="modal-body">
         <div class="form-group">
-          <label for="custom-action-name">Nom de l'action</label>
-          <input type="text" id="custom-action-name" placeholder="Ex: Reformuler en langage juridique">
+          <label>Nom de l'action</label>
+          <input type="text" class="custom-action-name-input" placeholder="Ex: Reformuler en langage juridique">
         </div>
         <div class="form-group">
-          <label for="custom-action-prompt">Prompt</label>
-          <textarea id="custom-action-prompt" rows="5" placeholder="Ex: Reformule ce texte en utilisant un langage juridique precis et formel."></textarea>
+          <label>Prompt</label>
+          <textarea class="custom-action-prompt-input" rows="5" placeholder="Ex: Reformule ce texte en utilisant un langage juridique precis et formel."></textarea>
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-secondary modal-cancel">Annuler</button>
-        <button class="btn btn-primary modal-save">Creer</button>
+        <button class="btn btn-secondary modal-cancel" type="button">Annuler</button>
+        <button class="btn btn-primary modal-save" type="button">Creer</button>
       </div>
     </div>
   `;
 
   document.body.appendChild(modal);
 
+  // Focus sur le premier champ
+  const nameInput = modal.querySelector('.custom-action-name-input');
+  const promptInput = modal.querySelector('.custom-action-prompt-input');
+  setTimeout(() => nameInput.focus(), 100);
+
   modal.querySelector('.modal-close').addEventListener('click', () => modal.remove());
   modal.querySelector('.modal-cancel').addEventListener('click', () => modal.remove());
   modal.querySelector('.modal-save').addEventListener('click', () => {
-    const name = document.getElementById('custom-action-name').value.trim();
-    const prompt = document.getElementById('custom-action-prompt').value.trim();
+    const name = nameInput.value.trim();
+    const prompt = promptInput.value.trim();
 
     if (!name || !prompt) {
       showNotification('Veuillez remplir tous les champs', 'error');

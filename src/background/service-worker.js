@@ -59,48 +59,48 @@ const PROVIDERS = {
   }
 };
 
-// Actions de base (inline pour le service worker)
+// Actions de base (inline pour le service worker) - SANS TABLEAUX
 const BASE_ACTIONS = {
   // === ESSENTIELS ===
   correct_errors: {
     id: 'correct_errors',
     name: 'Corriger l\'orthographe',
-    prompt: 'Corrige uniquement les fautes d\'orthographe et de grammaire. Renvoie le texte corrige.',
+    prompt: 'Corrige les fautes. Retourne uniquement le texte corrige.',
     category: 'essential',
     defaultEnabled: true
   },
   summarize: {
     id: 'summarize',
     name: 'Resumer',
-    prompt: 'Resume ce texte de maniere concise en gardant les informations essentielles.',
+    prompt: 'Resume en un paragraphe fluide. Pas de listes ni tableaux.',
     category: 'essential',
     defaultEnabled: true
   },
   explain_simple: {
     id: 'explain_simple',
     name: 'Expliquer simplement',
-    prompt: 'Explique ce texte de maniere simple et accessible.',
+    prompt: 'Explique simplement. Texte fluide, pas de listes ni tableaux.',
     category: 'essential',
     defaultEnabled: true
   },
   improve_style: {
     id: 'improve_style',
     name: 'Ameliorer le style',
-    prompt: 'Ameliore le style de ce texte pour le rendre plus clair et fluide.',
+    prompt: 'Ameliore le style. Pas de formatage special.',
     category: 'essential',
     defaultEnabled: true
   },
   expand_content: {
     id: 'expand_content',
     name: 'Developper',
-    prompt: 'Developpe ce texte en ajoutant des details et explications.',
+    prompt: 'Developpe avec plus de details. Style fluide, pas de tableaux.',
     category: 'essential',
     defaultEnabled: true
   },
   reformat_mail_pro: {
     id: 'reformat_mail_pro',
     name: 'Email professionnel',
-    prompt: 'Transforme ce texte en email professionnel avec formules de politesse.',
+    prompt: 'Transforme en email professionnel. Texte fluide, pas de tableaux.',
     category: 'essential',
     defaultEnabled: true
   },
@@ -109,35 +109,35 @@ const BASE_ACTIONS = {
   bullet_points: {
     id: 'bullet_points',
     name: 'Liste a puces',
-    prompt: 'Convertis ce texte en une liste a puces claire et organisee.',
+    prompt: 'Convertis en liste avec des tirets simples. Pas de tableaux.',
     category: 'practical',
     defaultEnabled: false
   },
   extract_key_points: {
     id: 'extract_key_points',
     name: 'Points cles',
-    prompt: 'Extrait les points cles et informations importantes de ce texte.',
+    prompt: 'Donne 3-5 points essentiels avec des tirets. Pas de tableaux.',
     category: 'practical',
     defaultEnabled: false
   },
   make_shorter: {
     id: 'make_shorter',
     name: 'Raccourcir',
-    prompt: 'Raccourcis ce texte en gardant uniquement l\'essentiel.',
+    prompt: 'Raccourcis de moitie. Texte fluide.',
     category: 'practical',
     defaultEnabled: false
   },
   make_formal: {
     id: 'make_formal',
     name: 'Ton formel',
-    prompt: 'Reecris ce texte avec un ton plus formel et professionnel.',
+    prompt: 'Reecris en ton formel. Pas de formatage special.',
     category: 'practical',
     defaultEnabled: false
   },
   make_casual: {
     id: 'make_casual',
     name: 'Ton decontracte',
-    prompt: 'Reecris ce texte avec un ton plus decontracte et amical.',
+    prompt: 'Reecris en ton decontracte. Pas de formatage special.',
     category: 'practical',
     defaultEnabled: false
   },
@@ -146,21 +146,21 @@ const BASE_ACTIONS = {
   explain_code: {
     id: 'explain_code',
     name: 'Expliquer le code',
-    prompt: 'Explique ce code de maniere claire.',
+    prompt: 'Explique ce code clairement. Pas de tableaux.',
     category: 'technical',
     defaultEnabled: false
   },
   review_code: {
     id: 'review_code',
     name: 'Revue de code',
-    prompt: 'Fais une revue de ce code et suggere des ameliorations.',
+    prompt: 'Revue de code avec tirets pour les points. Pas de tableaux.',
     category: 'technical',
     defaultEnabled: false
   },
   debug_help: {
     id: 'debug_help',
     name: 'Aide debug',
-    prompt: 'Analyse cette erreur et suggere des solutions.',
+    prompt: 'Analyse l\'erreur et propose des solutions. Pas de tableaux.',
     category: 'technical',
     defaultEnabled: false
   },
@@ -169,7 +169,7 @@ const BASE_ACTIONS = {
   sentiment_analysis: {
     id: 'sentiment_analysis',
     name: 'Analyser le sentiment',
-    prompt: 'Analyse le sentiment de ce texte. Positif, negatif ou neutre?',
+    prompt: 'Analyse le sentiment en 2-3 phrases. Pas de tableaux.',
     category: 'analysis',
     defaultEnabled: false
   }
