@@ -970,11 +970,6 @@ async function saveShortcuts() {
   showNotification('Raccourcis sauvegardes !', 'success');
 }
 
-// Ancienne fonction - garder pour compatibilite
-function setupShortcutListeners() {
-  // Les listeners sont maintenant geres dans setupEventListeners
-}
-
 // Activer/desactiver un preset (legacy)
 async function togglePreset(presetId, active) {
   if (active) {
