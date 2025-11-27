@@ -117,6 +117,30 @@ export const TRANSLATIONS = {
     addAtLeastOneAction: 'Ajoutez au moins une action',
     allActionsMustHaveNameAndPrompt: 'Toutes les actions doivent avoir un nom et un prompt',
 
+    // Shortcuts
+    shortcuts: 'Raccourcis',
+    shortcutsEnabled: 'Activer les raccourcis clavier',
+    defaultTranslateLang: 'Langue de traduction par defaut',
+    howToChange: 'Comment modifier un raccourci',
+    howToChangeDesc: 'Cliquez sur le bouton du raccourci, puis appuyez sur la nouvelle combinaison de touches (ex: Ctrl+Shift+K). Utilisez Alt, Ctrl ou Shift + une lettre.',
+    noShortcuts: 'Aucun raccourci configure. Ajoutez-en via le bouton ci-dessus.',
+    addShortcut: 'Ajouter un raccourci',
+    pressKey: 'Appuyez sur une touche...',
+    shortcutSaved: 'Raccourci sauvegarde !',
+    shortcutDeleted: 'Raccourci supprime',
+
+    // Custom actions
+    customActionsTitle: 'Mes actions personnalisees',
+    customActionsDesc: 'Creez vos propres actions avec des prompts personnalises',
+    noCustomActions: 'Aucune action personnalisee. Cliquez sur le bouton ci-dessous pour en creer une.',
+    addCustomAction: 'Ajouter une action',
+    actionCreated: 'Action creee !',
+    actionModified: 'Action modifiee !',
+    actionDeleted: 'Action supprimee',
+    restoreDefault: 'Restaurer le prompt par defaut',
+    promptEmpty: 'Le prompt ne peut pas etre vide',
+    modifyPrompt: 'Modifier le prompt',
+
     // Notifications
     settingsSaved: 'Parametres sauvegardes !',
     noContent: 'Aucun contenu a traiter',
@@ -222,6 +246,31 @@ export const TRANSLATIONS = {
     enterPresetName: 'Please enter a name for the preset',
     addAtLeastOneAction: 'Add at least one action',
     allActionsMustHaveNameAndPrompt: 'All actions must have a name and prompt',
+
+    // Shortcuts
+    shortcuts: 'Shortcuts',
+    shortcutsEnabled: 'Enable keyboard shortcuts',
+    defaultTranslateLang: 'Default translation language',
+    howToChange: 'How to change a shortcut',
+    howToChangeDesc: 'Click on the shortcut button, then press a new key combination (e.g. Ctrl+Shift+K). Use Alt, Ctrl or Shift + a letter.',
+    noShortcuts: 'No shortcuts configured. Add one using the button above.',
+    addShortcut: 'Add shortcut',
+    pressKey: 'Press a key...',
+    shortcutSaved: 'Shortcut saved!',
+    shortcutDeleted: 'Shortcut deleted',
+
+    // Custom actions
+    customActionsTitle: 'My custom actions',
+    customActionsDesc: 'Create your own actions with custom prompts',
+    noCustomActions: 'No custom actions. Click the button below to create one.',
+    addCustomAction: 'Add an action',
+    actionCreated: 'Action created!',
+    actionModified: 'Action modified!',
+    actionDeleted: 'Action deleted',
+    restoreDefault: 'Restore default prompt',
+    promptEmpty: 'Prompt cannot be empty',
+    modifyPrompt: 'Modify prompt',
+
     settingsSaved: 'Settings saved!',
     noContent: 'No content to process',
     noModel: 'Please configure a model in options',
@@ -260,6 +309,15 @@ TRANSLATIONS.es = {
   actionName: 'Nombre de la accion', actionPrompt: 'Prompt del sistema...', createThePreset: 'Crear preset',
   enterPresetName: 'Ingrese un nombre para el preset', addAtLeastOneAction: 'Agregue al menos una accion',
   allActionsMustHaveNameAndPrompt: 'Todas las acciones deben tener nombre y prompt',
+  shortcuts: 'Atajos', shortcutsEnabled: 'Activar atajos de teclado',
+  defaultTranslateLang: 'Idioma de traduccion predeterminado',
+  howToChange: 'Como cambiar un atajo', howToChangeDesc: 'Haga clic en el boton de atajo, luego presione una nueva combinacion de teclas.',
+  noShortcuts: 'Sin atajos configurados.', addShortcut: 'Agregar atajo', pressKey: 'Presione una tecla...',
+  shortcutSaved: 'Atajo guardado!', shortcutDeleted: 'Atajo eliminado',
+  customActionsTitle: 'Mis acciones personalizadas', customActionsDesc: 'Cree sus propias acciones con prompts personalizados',
+  noCustomActions: 'Sin acciones personalizadas.', addCustomAction: 'Agregar una accion',
+  actionCreated: 'Accion creada!', actionModified: 'Accion modificada!', actionDeleted: 'Accion eliminada',
+  restoreDefault: 'Restaurar prompt predeterminado', promptEmpty: 'El prompt no puede estar vacio', modifyPrompt: 'Modificar prompt',
   settingsSaved: 'Configuracion guardada!', languageChanged: 'Idioma cambiado!'
 };
 
@@ -293,6 +351,15 @@ TRANSLATIONS.it = {
   actionName: 'Nome dell\'azione', actionPrompt: 'Prompt di sistema...', createThePreset: 'Crea preset',
   enterPresetName: 'Inserisci un nome per il preset', addAtLeastOneAction: 'Aggiungi almeno un\'azione',
   allActionsMustHaveNameAndPrompt: 'Tutte le azioni devono avere nome e prompt',
+  shortcuts: 'Scorciatoie', shortcutsEnabled: 'Attiva scorciatoie da tastiera',
+  defaultTranslateLang: 'Lingua di traduzione predefinita',
+  howToChange: 'Come cambiare una scorciatoia', howToChangeDesc: 'Clicca sul pulsante della scorciatoia, poi premi una nuova combinazione di tasti.',
+  noShortcuts: 'Nessuna scorciatoia configurata.', addShortcut: 'Aggiungi scorciatoia', pressKey: 'Premi un tasto...',
+  shortcutSaved: 'Scorciatoia salvata!', shortcutDeleted: 'Scorciatoia eliminata',
+  customActionsTitle: 'Le mie azioni personalizzate', customActionsDesc: 'Crea le tue azioni con prompt personalizzati',
+  noCustomActions: 'Nessuna azione personalizzata.', addCustomAction: 'Aggiungi un\'azione',
+  actionCreated: 'Azione creata!', actionModified: 'Azione modificata!', actionDeleted: 'Azione eliminata',
+  restoreDefault: 'Ripristina prompt predefinito', promptEmpty: 'Il prompt non puo essere vuoto', modifyPrompt: 'Modifica prompt',
   settingsSaved: 'Impostazioni salvate!', languageChanged: 'Lingua cambiata!'
 };
 
@@ -326,6 +393,15 @@ TRANSLATIONS.pt = {
   actionName: 'Nome da acao', actionPrompt: 'Prompt do sistema...', createThePreset: 'Criar preset',
   enterPresetName: 'Insira um nome para o preset', addAtLeastOneAction: 'Adicione pelo menos uma acao',
   allActionsMustHaveNameAndPrompt: 'Todas as acoes devem ter nome e prompt',
+  shortcuts: 'Atalhos', shortcutsEnabled: 'Ativar atalhos de teclado',
+  defaultTranslateLang: 'Idioma de traducao padrao',
+  howToChange: 'Como alterar um atalho', howToChangeDesc: 'Clique no botao do atalho, depois pressione uma nova combinacao de teclas.',
+  noShortcuts: 'Nenhum atalho configurado.', addShortcut: 'Adicionar atalho', pressKey: 'Pressione uma tecla...',
+  shortcutSaved: 'Atalho salvo!', shortcutDeleted: 'Atalho excluido',
+  customActionsTitle: 'Minhas acoes personalizadas', customActionsDesc: 'Crie suas proprias acoes com prompts personalizados',
+  noCustomActions: 'Nenhuma acao personalizada.', addCustomAction: 'Adicionar uma acao',
+  actionCreated: 'Acao criada!', actionModified: 'Acao modificada!', actionDeleted: 'Acao excluida',
+  restoreDefault: 'Restaurar prompt padrao', promptEmpty: 'O prompt nao pode estar vazio', modifyPrompt: 'Modificar prompt',
   settingsSaved: 'Configuracoes salvas!', languageChanged: 'Idioma alterado!'
 };
 

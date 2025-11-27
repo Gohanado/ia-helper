@@ -14,6 +14,14 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 
 ---
 
+## [1.3.1] - 2025-11-27
+
+### Corrige
+- **CSS boutons actions**: Les boutons editer/supprimer ne se superposent plus pour les actions personnalisees
+- **Traductions completes**: Ajout de toutes les cles manquantes (shortcuts, custom actions) pour les 5 langues (FR, EN, ES, IT, PT)
+
+---
+
 ## [1.3.0] - 2025-11-27
 
 ### Ajoute
@@ -189,7 +197,8 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 
 ---
 
-[Non publie]: https://github.com/Gohanado/ia-helper/compare/v1.3.0...HEAD
+[Non publie]: https://github.com/Gohanado/ia-helper/compare/v1.3.1...HEAD
+[1.3.1]: https://github.com/Gohanado/ia-helper/releases/tag/v1.3.1
 [1.3.0]: https://github.com/Gohanado/ia-helper/releases/tag/v1.3.0
 [1.2.2]: https://github.com/Gohanado/ia-helper/releases/tag/v1.2.2
 [1.2.1]: https://github.com/Gohanado/ia-helper/releases/tag/v1.2.1
