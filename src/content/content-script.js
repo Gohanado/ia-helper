@@ -947,7 +947,7 @@
   }
 
   // Envoyer le prompt rapide
-  function sendQuickPrompt(modal) {
+  async function sendQuickPrompt(modal) {
     const input = modal.querySelector('.ia-quick-input').value.trim();
     const selectedText = modal.dataset.selectedText || '';
 
@@ -975,9 +975,12 @@
 
     console.log('IA Helper: Quick prompt envoi', { mode, content: content.substring(0, 50), systemPrompt });
 
+    // Recharger la config pour avoir les derniers parametres
+    await loadConfig();
+
     // Mode popup inline ou ouverture dans un nouvel onglet
     if (config.inlinePopupEnabled) {
-      showInlineResponse(modal, content, systemPrompt, input, selectedText);
+      showInlineResponse(modal, content, systemPrompt);
     } else {
       closeQuickModal();
       openResultsPage('quick_prompt', content, systemPrompt, null);
@@ -985,7 +988,7 @@
   }
 
   // Afficher la reponse en streaming dans le popup
-  async function showInlineResponse(modal, content, systemPrompt, userInput, selectedText) {
+  async function showInlineResponse(modal, content, systemPrompt) {
     const container = modal.querySelector('.ia-quick-container');
 
     // Transformer le modal en mode reponse
@@ -996,6 +999,7 @@
       </div>
       <div class="ia-quick-response-area">
         <div class="ia-quick-response-content">
+          <span class="ia-quick-waiting">Connexion a l'IA en cours...</span>
           <span class="ia-quick-cursor"></span>
         </div>
       </div>
@@ -1022,9 +1026,9 @@
       openResultsPage('quick_prompt', content, systemPrompt, null);
     });
 
-    // Lancer le streaming
+    // Lancer la generation
     const responseEl = container.querySelector('.ia-quick-response-content');
-    await streamResponse(responseEl, content, systemPrompt);
+    await generateResponse(responseEl, content, systemPrompt);
   }
 
   // Ajouter les styles pour le mode reponse
@@ -1069,132 +1073,42 @@
       }
       .ia-quick-error {
         color: #ff6b6b;
-        padding: 20px;
-        text-align: center;
+      }
+      .ia-quick-waiting {
+        color: rgba(255, 255, 255, 0.5);
+        font-style: italic;
       }
     `;
     document.head.appendChild(styles);
   }
 
-  // Stream la reponse depuis l'API
-  async function streamResponse(element, content, systemPrompt) {
-    const provider = config.provider || 'ollama';
-    let fullResponse = '';
-
+  // Generer la reponse via le background script (sans streaming pour le popup)
+  async function generateResponse(element, content, systemPrompt) {
     try {
-      let response;
-
-      if (provider === 'ollama') {
-        response = await fetch(`${config.apiUrl}/api/generate`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model: config.selectedModel,
-            prompt: content,
-            system: systemPrompt,
-            stream: true
-          })
-        });
-      } else if (provider === 'openai' || provider === 'openrouter' || provider === 'custom') {
-        const apiUrl = provider === 'openai' ? 'https://api.openai.com/v1' :
-                       provider === 'openrouter' ? 'https://openrouter.ai/api/v1' : config.apiUrl;
-        response = await fetch(`${apiUrl}/chat/completions`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${config.apiKey}`
-          },
-          body: JSON.stringify({
-            model: config.selectedModel,
-            messages: [
-              { role: 'system', content: systemPrompt },
-              { role: 'user', content: content }
-            ],
-            stream: true
-          })
-        });
-      } else if (provider === 'anthropic') {
-        response = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': config.apiKey,
-            'anthropic-version': '2023-06-01',
-            'anthropic-dangerous-direct-browser-access': 'true'
-          },
-          body: JSON.stringify({
-            model: config.selectedModel,
-            max_tokens: 4096,
-            system: systemPrompt,
-            messages: [{ role: 'user', content: content }],
-            stream: true
-          })
-        });
-      } else if (provider === 'groq') {
-        response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${config.apiKey}`
-          },
-          body: JSON.stringify({
-            model: config.selectedModel,
-            messages: [
-              { role: 'system', content: systemPrompt },
-              { role: 'user', content: content }
-            ],
-            stream: true
-          })
-        });
-      }
-
-      if (!response.ok) {
-        throw new Error(`Erreur API: ${response.status}`);
-      }
-
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        const chunk = decoder.decode(value, { stream: true });
-        const lines = chunk.split('\n').filter(line => line.trim());
-
-        for (const line of lines) {
-          try {
-            if (provider === 'ollama') {
-              const json = JSON.parse(line);
-              if (json.response) {
-                fullResponse += json.response;
-                element.textContent = fullResponse;
-              }
-            } else {
-              // OpenAI-compatible format
-              if (line.startsWith('data: ')) {
-                const data = line.slice(6);
-                if (data === '[DONE]') continue;
-                const json = JSON.parse(data);
-                const text = json.choices?.[0]?.delta?.content ||
-                             json.delta?.text || '';
-                if (text) {
-                  fullResponse += text;
-                  element.textContent = fullResponse;
-                }
-              }
-            }
-          } catch (e) {
-            // Ignorer les erreurs de parsing
+      // Demander au background script de generer la reponse
+      const response = await new Promise((resolve, reject) => {
+        chrome.runtime.sendMessage({
+          type: 'GENERATE_RESPONSE',
+          content: content,
+          systemPrompt: systemPrompt
+        }, (response) => {
+          if (chrome.runtime.lastError) {
+            reject(new Error(chrome.runtime.lastError.message));
+          } else if (response && response.error) {
+            reject(new Error(response.error));
+          } else {
+            resolve(response);
           }
-        }
+        });
+      });
+
+      if (response && response.result) {
+        element.textContent = response.result;
+      } else {
+        element.innerHTML = `<span class="ia-quick-error">Aucune reponse recue</span>`;
       }
-
-      // Fin du streaming - retirer le curseur
-      element.innerHTML = escapeHtml(fullResponse);
-
     } catch (error) {
-      console.error('IA Helper: Erreur streaming', error);
+      console.error('IA Helper: Erreur generation', error);
       element.innerHTML = `<span class="ia-quick-error">Erreur: ${error.message}</span>`;
     }
   }

@@ -14,6 +14,15 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 
 ---
 
+## [1.4.1] - 2025-11-27
+
+### Corrige
+- **Popup inline**: La generation IA passe maintenant par le background script pour eviter les erreurs CORS "Failed to fetch"
+- **Rechargement config**: La configuration est rechargee avant chaque appel pour prendre en compte les changements d'option
+- **Message d'attente**: Affichage "Connexion a l'IA en cours..." pendant l'attente de la reponse
+
+---
+
 ## [1.4.0] - 2025-11-27
 
 ### Ajoute
@@ -223,7 +232,8 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 
 ---
 
-[Non publie]: https://github.com/Gohanado/ia-helper/compare/v1.4.0...HEAD
+[Non publie]: https://github.com/Gohanado/ia-helper/compare/v1.4.1...HEAD
+[1.4.1]: https://github.com/Gohanado/ia-helper/releases/tag/v1.4.1
 [1.4.0]: https://github.com/Gohanado/ia-helper/releases/tag/v1.4.0
 [1.3.2]: https://github.com/Gohanado/ia-helper/releases/tag/v1.3.2
 [1.3.1]: https://github.com/Gohanado/ia-helper/releases/tag/v1.3.1

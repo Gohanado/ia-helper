@@ -528,26 +528,33 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       await createContextMenus();
       sendResponse({ success: true });
     })();
-    return true; // Keep channel open for async
+    return true;
+  } else if (message.type === 'GENERATE_RESPONSE') {
+    // Generer une reponse IA (pour le popup inline)
+    (async () => {
+      try {
+        const result = await generateAIResponse(message.content, message.systemPrompt);
+        sendResponse({ result: result });
+      } catch (error) {
+        sendResponse({ error: error.message });
+      }
+    })();
+    return true;
   } else if (message.type === 'GET_ACTION_PROMPT') {
-    // Retourner le prompt d'une action (pour les raccourcis)
     const actionId = message.actionId;
 
     (async () => {
-      // D'abord verifier les prompts personnalises
       const customPrompts = await getStoredActions('customPrompts', {});
       if (customPrompts[actionId]) {
         sendResponse({ prompt: customPrompts[actionId] });
         return;
       }
 
-      // Ensuite chercher dans BASE_ACTIONS
       if (BASE_ACTIONS[actionId]) {
         sendResponse({ prompt: BASE_ACTIONS[actionId].prompt });
         return;
       }
 
-      // Enfin chercher dans les actions personnalisees
       const customActions = await getStoredActions('customActions', []);
       const customAction = customActions.find(a => a.id === actionId);
       if (customAction) {
@@ -556,8 +563,94 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sendResponse({ prompt: '' });
       }
     })();
-    return true; // Keep channel open for async
+    return true;
   }
   return true;
 });
+
+// Generer une reponse IA (multi-provider)
+async function generateAIResponse(content, systemPrompt) {
+  const provider = currentConfig.provider || 'ollama';
+  const apiUrl = currentConfig.apiUrl || DEFAULT_CONFIG.apiUrl;
+  const apiKey = currentConfig.apiKey || '';
+  const model = currentConfig.selectedModel || '';
+
+  let response;
+  let result = '';
+
+  if (provider === 'ollama') {
+    response = await fetch(`${apiUrl}/api/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: model,
+        prompt: content,
+        system: systemPrompt,
+        stream: false
+      })
+    });
+    const data = await response.json();
+    result = data.response || '';
+  } else if (provider === 'openai' || provider === 'openrouter' || provider === 'custom') {
+    const baseUrl = provider === 'openai' ? 'https://api.openai.com/v1' :
+                    provider === 'openrouter' ? 'https://openrouter.ai/api/v1' : apiUrl;
+    response = await fetch(`${baseUrl}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: model,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: content }
+        ],
+        stream: false
+      })
+    });
+    const data = await response.json();
+    result = data.choices?.[0]?.message?.content || '';
+  } else if (provider === 'anthropic') {
+    response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: model,
+        max_tokens: 4096,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: content }]
+      })
+    });
+    const data = await response.json();
+    result = data.content?.[0]?.text || '';
+  } else if (provider === 'groq') {
+    response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: model,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: content }
+        ]
+      })
+    });
+    const data = await response.json();
+    result = data.choices?.[0]?.message?.content || '';
+  }
+
+  if (!response.ok) {
+    throw new Error(`Erreur API ${response.status}`);
+  }
+
+  return result;
+}
 
