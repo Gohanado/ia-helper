@@ -316,17 +316,34 @@
 
   // Prompts systeme - IMPORTANT: pas de tableaux, pas de formatage markdown excessif
   const PROMPTS = {
+    // Essentiels
     correct_errors: `Tu es un correcteur orthographique. Corrige UNIQUEMENT les fautes d'orthographe et de grammaire. Retourne le texte corrige, rien d'autre. Pas de commentaires, pas d'explications.`,
-    translate: `Tu es un traducteur. Traduis le texte en {lang}. Retourne uniquement la traduction, sans commentaires ni explications.`,
-    reformat_mail_pro: `Reformule ce texte en email professionnel. Conserve tout le contenu. Pas de tableaux, pas de listes a puces sauf si necessaire. Texte fluide.`,
-    expand_content: `Developpe et enrichis ce texte. Garde un style fluide et naturel. Pas de tableaux ni de formatage excessif.`,
-    summarize_input: `Resume ce texte en quelques phrases. Pas de listes, pas de tableaux. Juste un resume clair et fluide.`,
-    improve_style: `Ameliore le style de ce texte pour le rendre plus fluide et agreable a lire. Conserve le sens. Pas de formatage special.`,
     summarize: `Resume ce texte de maniere concise. Ecris un paragraphe fluide, pas de listes ni tableaux.`,
-    explain_chronology: `Presente les evenements du texte dans l'ordre chronologique. Utilise des tirets simples: - [Date] Evenement. Pas de tableaux.`,
     explain_simple: `Explique ce texte simplement, comme si tu parlais a quelqu'un. Pas de listes, pas de tableaux. Un texte clair et accessible.`,
+    improve_style: `Ameliore le style de ce texte pour le rendre plus fluide et agreable a lire. Conserve le sens. Pas de formatage special.`,
+    expand_content: `Developpe et enrichis ce texte. Garde un style fluide et naturel. Pas de tableaux ni de formatage excessif.`,
+    reformat_mail_pro: `Reformule ce texte en email professionnel. Conserve tout le contenu. Pas de tableaux, pas de listes a puces sauf si necessaire. Texte fluide.`,
+
+    // Pratiques
+    bullet_points: `Convertis ce texte en liste a puces claire. Utilise des tirets simples. Pas de tableaux.`,
     extract_key_points: `Donne les 3-5 points essentiels de ce texte. Utilise des tirets simples. Pas de tableaux.`,
-    analyze_sentiment: `Analyse brievement le ton de ce texte en 2-3 phrases. Pas de tableaux ni de formatage special.`
+    make_shorter: `Raccourcis ce texte en gardant l'essentiel. Texte fluide, pas de tableaux.`,
+    make_formal: `Reformule ce texte avec un ton plus formel et professionnel. Pas de tableaux.`,
+    make_casual: `Reformule ce texte avec un ton plus decontracte et amical. Pas de tableaux.`,
+
+    // Techniques
+    explain_code: `Explique ce code de maniere claire. Pas de tableaux. Texte fluide avec eventuellement des exemples.`,
+    review_code: `Fais une revue de ce code: qualite, bugs potentiels, ameliorations. Texte fluide, pas de tableaux.`,
+    debug_help: `Aide a debugger ce code. Identifie les problemes potentiels et propose des solutions. Pas de tableaux.`,
+
+    // Analyse
+    sentiment_analysis: `Analyse brievement le ton et le sentiment de ce texte en 2-3 phrases. Pas de tableaux.`,
+    analyze_sentiment: `Analyse brievement le ton de ce texte en 2-3 phrases. Pas de tableaux ni de formatage special.`,
+
+    // Autres
+    translate: `Tu es un traducteur. Traduis le texte en {lang}. Retourne uniquement la traduction, sans commentaires ni explications.`,
+    summarize_input: `Resume ce texte en quelques phrases. Pas de listes, pas de tableaux. Juste un resume clair et fluide.`,
+    explain_chronology: `Presente les evenements du texte dans l'ordre chronologique. Utilise des tirets simples: - [Date] Evenement. Pas de tableaux.`
   };
 
   // Noms des langues
@@ -476,6 +493,7 @@
 
     console.log('IA Helper: Stockage des donnees', resultData);
 
+    // Utiliser une Promise pour s'assurer que le stockage est termine avant d'ouvrir la page
     chrome.storage.local.set({ pendingResult: resultData }, () => {
       if (chrome.runtime.lastError) {
         console.error('IA Helper: Erreur stockage', chrome.runtime.lastError);
@@ -483,15 +501,26 @@
         return;
       }
 
-      console.log('IA Helper: Envoi message ouverture page');
-      chrome.runtime.sendMessage({ type: 'OPEN_RESULTS_PAGE' }, (response) => {
-        if (chrome.runtime.lastError) {
-          console.error('IA Helper: Erreur envoi message', chrome.runtime.lastError);
-          showNotification('Erreur: Extension non disponible', 'error');
-        } else {
-          console.log('IA Helper: Page ouverte', response);
-        }
-      });
+      console.log('IA Helper: Donnees stockees, ouverture page...');
+
+      // Ouvrir directement la page via chrome.tabs (via message au background)
+      try {
+        chrome.runtime.sendMessage({ type: 'OPEN_RESULTS_PAGE' }, (response) => {
+          if (chrome.runtime.lastError) {
+            console.error('IA Helper: Erreur envoi message', chrome.runtime.lastError);
+            // Fallback: ouvrir via window.open si le message echoue
+            const resultsUrl = chrome.runtime.getURL('src/results/results.html');
+            window.open(resultsUrl, '_blank');
+          } else {
+            console.log('IA Helper: Page ouverte', response);
+          }
+        });
+      } catch (e) {
+        console.error('IA Helper: Exception', e);
+        // Fallback: ouvrir via window.open
+        const resultsUrl = chrome.runtime.getURL('src/results/results.html');
+        window.open(resultsUrl, '_blank');
+      }
     });
   }
 

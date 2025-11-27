@@ -14,6 +14,16 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 
 ---
 
+## [1.2.1] - 2025-11-27
+
+### Corrige
+- **Version dynamique**: La version est maintenant lue depuis le manifest.json (plus de valeur hardcodee)
+- **Prompt rapide**: Ajout d'un fallback window.open si le message au background echoue
+- **Raccourcis clavier**: Tous les prompts manquants ajoutes (bullet_points, make_shorter, make_formal, make_casual, explain_code, review_code, debug_help)
+- **Actions personnalisees**: Section deplacee en haut de la page des options
+
+---
+
 ## [1.2.0] - 2025-11-27
 
 ### Corrige
@@ -157,7 +167,8 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 
 ---
 
-[Non publie]: https://github.com/Gohanado/ia-helper/compare/v1.2.0...HEAD
+[Non publie]: https://github.com/Gohanado/ia-helper/compare/v1.2.1...HEAD
+[1.2.1]: https://github.com/Gohanado/ia-helper/releases/tag/v1.2.1
 [1.2.0]: https://github.com/Gohanado/ia-helper/releases/tag/v1.2.0
 [1.1.0]: https://github.com/Gohanado/ia-helper/releases/tag/v1.1.0
 [1.0.0]: https://github.com/Gohanado/ia-helper/releases/tag/v1.0.0
