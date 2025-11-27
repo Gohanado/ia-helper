@@ -102,17 +102,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     connectionStatus: document.getElementById('connection-status')
   };
 
-  await loadAllSettings();
-  await loadEnabledActions();
-  await loadCustomActions();
-  await loadShortcuts();
-  applyTranslations();
-  setupNavigation();
-  setupEventListeners();
-  setupProviderListeners();
-  renderActionsGrid();
-  renderShortcutsList();
-  refreshModels();
+  try {
+    await loadAllSettings();
+    await loadEnabledActions();
+    await loadCustomActions();
+    await loadShortcuts();
+    applyTranslations();
+    setupNavigation();
+    setupEventListeners();
+    setupProviderListeners();
+    renderActionsGrid();
+    renderShortcutsList();
+    refreshModels();
+
+    // Initialiser le systeme de mise a jour (en dernier, non-bloquant)
+    initUpdateSystem();
+  } catch (error) {
+    console.error('IA Helper Options: Erreur initialisation', error);
+  }
 });
 
 // Appliquer les traductions a l'interface
@@ -1369,30 +1376,6 @@ function saveActionToPreset() {
 
 // === GESTION DES RACCOURCIS ===
 
-// Charger les raccourcis sauvegardes
-async function loadShortcuts() {
-  return new Promise((resolve) => {
-    chrome.storage.local.get(['shortcuts', 'shortcutsEnabled', 'defaultTranslateLang'], (result) => {
-      if (result.shortcuts) {
-        shortcuts = { ...DEFAULT_SHORTCUTS, ...result.shortcuts };
-      }
-      shortcutsEnabled = result.shortcutsEnabled !== false;
-      defaultTranslateLang = result.defaultTranslateLang || 'en';
-      resolve();
-    });
-  });
-}
-
-// Afficher un raccourci
-function formatShortcut(shortcut) {
-  const parts = [];
-  if (shortcut.ctrl) parts.push('Ctrl');
-  if (shortcut.alt) parts.push('Alt');
-  if (shortcut.shift) parts.push('Shift');
-  parts.push(shortcut.key.toUpperCase());
-  return parts.join(' + ');
-}
-
 // Mettre a jour l'affichage des raccourcis
 function updateShortcutDisplays() {
   Object.keys(shortcuts).forEach(name => {
@@ -1637,8 +1620,8 @@ async function loadUpdateStatus() {
   }
 }
 
-// Bouton verification manuelle
-document.addEventListener('DOMContentLoaded', () => {
+// Initialiser les mises a jour (appele depuis le DOMContentLoaded principal)
+function initUpdateSystem() {
   const btnCheckUpdate = document.getElementById('btn-check-update');
   if (btnCheckUpdate) {
     btnCheckUpdate.addEventListener('click', () => {
@@ -1648,4 +1631,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Charger le statut des mises a jour
   loadUpdateStatus();
-});
+}

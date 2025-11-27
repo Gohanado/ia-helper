@@ -200,8 +200,17 @@ async function loadConfig() {
   });
 }
 
+// Verrou pour eviter les creations multiples de menus
+let menuCreationInProgress = false;
+
 // Creer les menus contextuels
 async function createContextMenus() {
+  // Eviter les appels simultanes
+  if (menuCreationInProgress) {
+    return;
+  }
+  menuCreationInProgress = true;
+
   try {
     // Supprimer les menus existants
     await chrome.contextMenus.removeAll();
@@ -351,6 +360,8 @@ async function createContextMenus() {
     console.log('IA Helper: Menus crees avec succes');
   } catch (error) {
     console.error('IA Helper: Erreur creation menus', error);
+  } finally {
+    menuCreationInProgress = false;
   }
 }
 
