@@ -14,6 +14,18 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 
 ---
 
+## [1.4.7] - 2025-11-27
+
+### Ameliore
+- **Results.html traduit**: La page results.html utilise maintenant le systeme i18n complet
+- **Toggle Reduire/Agrandir traduit**: Les boutons changent de texte dans la bonne langue
+- **Notifications traduites dans results.js**: Copie, erreurs, statuts utilisent t()
+
+### Supprime
+- **Boutons inutiles retires**: Les boutons "Fermer" et "Appliquer" ont ete supprimes de results.html
+
+---
+
 ## [1.4.6] - 2025-11-27
 
 ### Ameliore

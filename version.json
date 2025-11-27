@@ -1,9 +1,9 @@
 {
-  "version": "1.4.6",
+  "version": "1.4.7",
   "releaseDate": "2025-11-27",
   "minChromeVersion": "88",
-  "downloadUrl": "https://github.com/Gohanado/ia-helper/archive/refs/tags/v1.4.6.zip",
+  "downloadUrl": "https://github.com/Gohanado/ia-helper/archive/refs/tags/v1.4.7.zip",
   "changelogUrl": "https://github.com/Gohanado/ia-helper/blob/main/CHANGELOG.md",
-  "releaseNotes": "Traductions 100% completes pour FR, EN, ES, IT, PT - Popup inline et notifications traduits"
+  "releaseNotes": "Results.html traduit - Boutons Close/Apply retires - Toggle reduce/expand traduit"
 }
 

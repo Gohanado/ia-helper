@@ -1,9 +1,14 @@
 // Results Page Script - IA Helper
+import { t, getCurrentLanguage } from '../i18n/translations.js';
+
+// Langue courante
+let currentLang = 'fr';
 
 // Configuration
 let config = {
   ollamaUrl: 'http://localhost:11434',
-  selectedModel: ''
+  selectedModel: '',
+  interfaceLanguage: 'fr'
 };
 
 let pendingResult = null;
@@ -46,6 +51,8 @@ const ACTION_NAMES = {
 // Initialisation
 document.addEventListener('DOMContentLoaded', async () => {
   await loadConfig();
+  currentLang = config.interfaceLanguage || 'fr';
+  applyTranslations();
   await loadPendingResult();
   setupEventListeners();
 
@@ -54,13 +61,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (pendingResult.preGeneratedResult) {
       currentResult = pendingResult.preGeneratedResult;
       renderMarkdown(currentResult, elements.resultContent, false);
-      setStatus('done', 'Termine');
+      setStatus('done', t('generating', currentLang).replace('...', ''));
       updateStats();
     } else {
       startGeneration();
     }
   }
 });
+
+// Appliquer les traductions
+function applyTranslations() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    el.textContent = t(key, currentLang);
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    el.placeholder = t(key, currentLang);
+  });
+  document.querySelectorAll('[data-i18n-title]').forEach(el => {
+    const key = el.getAttribute('data-i18n-title');
+    el.title = t(key, currentLang);
+  });
+}
 
 // Charger la configuration
 async function loadConfig() {
@@ -115,7 +138,7 @@ function setupEventListeners() {
   document.getElementById('btn-copy-markdown').addEventListener('click', () => {
     navigator.clipboard.writeText(currentResult);
     copyMenu.classList.remove('active');
-    showNotification('Copie en Markdown !');
+    showNotification(t('copied', currentLang) + ' (Markdown)');
   });
 
   // Copier en texte brut (sans formatage)
@@ -137,7 +160,7 @@ function setupEventListeners() {
       .trim();
     navigator.clipboard.writeText(plainText);
     copyMenu.classList.remove('active');
-    showNotification('Copie en texte brut !');
+    showNotification(t('copied', currentLang) + ' (' + t('copyText', currentLang).replace('Copier en ', '').replace('Copy as ', '') + ')');
   });
 
   // Copier en HTML
@@ -145,12 +168,7 @@ function setupEventListeners() {
     const html = convertMarkdownToHtml(currentResult);
     navigator.clipboard.writeText(html);
     copyMenu.classList.remove('active');
-    showNotification('Copie en HTML !');
-  });
-
-  // Fermer
-  document.getElementById('btn-close').addEventListener('click', () => {
-    window.close();
+    showNotification(t('copied', currentLang) + ' (HTML)');
   });
 
   // Options
@@ -158,13 +176,13 @@ function setupEventListeners() {
     chrome.runtime.openOptionsPage();
   });
 
-  // Refinement buttons
+  // Refinement buttons - prompts sont en anglais pour l'IA
   document.getElementById('btn-regenerate').addEventListener('click', () => regenerate());
-  document.getElementById('btn-shorter').addEventListener('click', () => refine('Fais une version plus courte et concise.'));
-  document.getElementById('btn-longer').addEventListener('click', () => refine('Developpe davantage avec plus de details.'));
-  document.getElementById('btn-formal').addEventListener('click', () => refine('Reformule de maniere plus formelle et professionnelle.'));
-  document.getElementById('btn-casual').addEventListener('click', () => refine('Reformule de maniere plus decontractee et accessible.'));
-  
+  document.getElementById('btn-shorter').addEventListener('click', () => refine('Make a shorter and more concise version.'));
+  document.getElementById('btn-longer').addEventListener('click', () => refine('Expand with more details.'));
+  document.getElementById('btn-formal').addEventListener('click', () => refine('Rephrase in a more formal and professional way.'));
+  document.getElementById('btn-casual').addEventListener('click', () => refine('Rephrase in a more casual and accessible way.'));
+
   // Custom prompt
   document.getElementById('btn-send-custom').addEventListener('click', () => {
     const customPrompt = elements.customPrompt.value.trim();
@@ -173,17 +191,16 @@ function setupEventListeners() {
       elements.customPrompt.value = '';
     }
   });
-  
+
   // Toggle original
   document.getElementById('btn-toggle-original').addEventListener('click', (e) => {
-    const panel = document.querySelector('.panel-original');
     const content = elements.originalContent;
     if (content.style.display === 'none') {
       content.style.display = 'block';
-      e.target.textContent = 'Reduire';
+      e.target.textContent = t('reduce', currentLang);
     } else {
       content.style.display = 'none';
-      e.target.textContent = 'Afficher';
+      e.target.textContent = t('expand', currentLang);
     }
   });
 }
@@ -191,11 +208,11 @@ function setupEventListeners() {
 // Demarrer la generation
 async function startGeneration() {
   if (!config.selectedModel) {
-    showError('Aucun modele configure. Veuillez configurer un modele dans les options.');
+    showError(t('connectionError', currentLang) || 'No model configured');
     return;
   }
-  
-  setStatus('generating', 'Generation en cours...');
+
+  setStatus('generating', t('generating', currentLang));
   startTime = Date.now();
   currentResult = '';
   elements.resultContent.innerHTML = '<span class="streaming-cursor"></span>';
@@ -236,7 +253,7 @@ async function startGeneration() {
     }
 
     renderMarkdown(currentResult, elements.resultContent, false);
-    setStatus('done', 'Termine');
+    setStatus('done', t('generating', currentLang).replace('...', ''));
     updateStats();
 
   } catch (error) {
@@ -254,11 +271,11 @@ async function regenerate() {
 // Affiner avec un prompt supplementaire
 async function refine(additionalPrompt) {
   if (!currentResult) {
-    showNotification('Aucun resultat a affiner', 'error');
+    showNotification(t('nothingToCopy', currentLang) || 'Nothing to refine', 'error');
     return;
   }
 
-  setStatus('generating', 'Affinage en cours...');
+  setStatus('generating', t('generating', currentLang));
   startTime = Date.now();
 
   try {
@@ -298,7 +315,7 @@ async function refine(additionalPrompt) {
     }
 
     renderMarkdown(currentResult, elements.resultContent, false);
-    setStatus('done', 'Affinage termine');
+    setStatus('done', t('generating', currentLang).replace('...', ''));
     updateStats();
 
   } catch (error) {
@@ -324,8 +341,8 @@ function updateStats() {
 
 // Afficher une erreur
 function showError(message) {
-  setStatus('error', 'Erreur');
-  elements.resultContent.innerHTML = `<p style="color: var(--error);">Erreur: ${message}</p>`;
+  setStatus('error', t('error', currentLang));
+  elements.resultContent.innerHTML = `<p style="color: var(--error);">${t('error', currentLang)}: ${message}</p>`;
 }
 
 // Afficher une notification
