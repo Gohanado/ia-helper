@@ -14,6 +14,15 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 
 ---
 
+## [1.2.2] - 2025-11-27
+
+### Corrige
+- **Bouton supprimer raccourci**: Position corrigee (etait en haut a droite de l'ecran, maintenant dans le bon conteneur)
+- **Prompts unifies**: Les raccourcis clavier utilisent maintenant les memes prompts que le menu contextuel
+- **Synchronisation prompts**: Si vous modifiez le prompt d'une action personnalisee, le raccourci associe utilise aussi le nouveau prompt
+
+---
+
 ## [1.2.1] - 2025-11-27
 
 ### Corrige
@@ -167,7 +176,8 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 
 ---
 
-[Non publie]: https://github.com/Gohanado/ia-helper/compare/v1.2.1...HEAD
+[Non publie]: https://github.com/Gohanado/ia-helper/compare/v1.2.2...HEAD
+[1.2.2]: https://github.com/Gohanado/ia-helper/releases/tag/v1.2.2
 [1.2.1]: https://github.com/Gohanado/ia-helper/releases/tag/v1.2.1
 [1.2.0]: https://github.com/Gohanado/ia-helper/releases/tag/v1.2.0
 [1.1.0]: https://github.com/Gohanado/ia-helper/releases/tag/v1.1.0

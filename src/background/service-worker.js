@@ -509,16 +509,40 @@ chrome.storage.onChanged.addListener(async (changes, area) => {
 });
 
 // Ecouter les messages pour ouvrir la page de resultats
-chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'OPEN_RESULTS_PAGE') {
     chrome.tabs.create({
       url: chrome.runtime.getURL('src/results/results.html')
     });
     sendResponse({ success: true });
   } else if (message.type === 'RELOAD_MENUS') {
-    await loadConfig();
-    await createContextMenus();
-    sendResponse({ success: true });
+    (async () => {
+      await loadConfig();
+      await createContextMenus();
+      sendResponse({ success: true });
+    })();
+    return true; // Keep channel open for async
+  } else if (message.type === 'GET_ACTION_PROMPT') {
+    // Retourner le prompt d'une action (pour les raccourcis)
+    const actionId = message.actionId;
+
+    // Chercher dans BASE_ACTIONS
+    if (BASE_ACTIONS[actionId]) {
+      sendResponse({ prompt: BASE_ACTIONS[actionId].prompt });
+      return;
+    }
+
+    // Chercher dans les actions personnalisees
+    (async () => {
+      const customActions = await getStoredActions('customActions', []);
+      const customAction = customActions.find(a => a.id === actionId);
+      if (customAction) {
+        sendResponse({ prompt: customAction.prompt });
+      } else {
+        sendResponse({ prompt: '' });
+      }
+    })();
+    return true; // Keep channel open for async
   }
   return true;
 });

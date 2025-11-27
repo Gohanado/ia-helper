@@ -1388,8 +1388,7 @@ textarea {
 }
 
 /* Bouton supprimer dans action toggle */
-.btn-delete-action,
-.btn-delete-shortcut {
+.btn-delete-action {
   position: absolute;
   top: 8px;
   right: 8px;
@@ -1410,19 +1409,40 @@ textarea {
   opacity: 0;
 }
 
-.action-toggle:hover .btn-delete-action,
-.shortcut-item:hover .btn-delete-shortcut {
+.action-toggle:hover .btn-delete-action {
   opacity: 1;
 }
 
-.btn-delete-action:hover,
-.btn-delete-shortcut:hover {
+.btn-delete-action:hover {
   background: rgba(231, 76, 60, 0.4);
   transform: scale(1.1);
 }
 
 .action-toggle {
   position: relative;
+}
+
+/* Bouton supprimer raccourci - dans le wrapper, pas absolu */
+.btn-delete-shortcut {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(231, 76, 60, 0.2);
+  border: 1px solid rgba(231, 76, 60, 0.3);
+  border-radius: 6px;
+  color: #e74c3c;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-delete-shortcut:hover {
+  background: rgba(231, 76, 60, 0.4);
+  transform: scale(1.05);
 }
 
 /* Message vide */

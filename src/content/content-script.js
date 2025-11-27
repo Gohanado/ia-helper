@@ -611,7 +611,7 @@
     }
   });
 
-  // Executer une action via raccourci
+  // Executer une action via raccourci - demande le prompt au service-worker
   function executeShortcutAction(actionId, targetLang = null) {
     const selection = window.getSelection();
     const selectedText = selection ? selection.toString().trim() : '';
@@ -621,13 +621,33 @@
       return;
     }
 
-    // Envoyer au handler d'action
-    handleAction({
-      actionId: actionId,
-      actionType: targetLang ? 'translate' : 'selection',
-      selectedText: selectedText,
-      targetLanguage: targetLang,
-      isEditable: false
+    // Demander le prompt au service-worker pour avoir le meme que le menu contextuel
+    chrome.runtime.sendMessage({
+      type: 'GET_ACTION_PROMPT',
+      actionId: actionId
+    }, (response) => {
+      if (chrome.runtime.lastError) {
+        console.error('IA Helper: Erreur get prompt', chrome.runtime.lastError);
+        // Fallback sur les prompts locaux
+        handleAction({
+          actionId: actionId,
+          actionType: targetLang ? 'translate' : 'selection',
+          selectedText: selectedText,
+          targetLanguage: targetLang,
+          isEditable: false
+        });
+        return;
+      }
+
+      // Utiliser le prompt du service-worker
+      handleAction({
+        actionId: actionId,
+        actionType: targetLang ? 'translate' : 'action',
+        selectedText: selectedText,
+        targetLanguage: targetLang,
+        presetPrompt: response?.prompt || '',
+        isEditable: false
+      });
     });
   }
 
