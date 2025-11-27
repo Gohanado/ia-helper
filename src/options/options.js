@@ -75,6 +75,7 @@ let defaultTranslateLang = 'en';
 let recordingShortcut = null;
 let customActions = [];
 let enabledTranslations = ['fr', 'en', 'es', 'de'];
+let customPrompts = {}; // Prompts personnalises pour les actions de base
 
 // Configuration actuelle
 let config = { ...DEFAULT_CONFIG };
@@ -163,8 +164,9 @@ async function loadAllSettings() {
 // Charger les actions personnalisees
 async function loadCustomActions() {
   return new Promise((resolve) => {
-    chrome.storage.local.get(['customActions'], (result) => {
+    chrome.storage.local.get(['customActions', 'customPrompts'], (result) => {
       customActions = result.customActions || [];
+      customPrompts = result.customPrompts || {};
       resolve();
     });
   });
@@ -535,19 +537,32 @@ function renderActionsGrid() {
 function createActionToggle(action, isEnabled, isCustom = false) {
   const toggle = document.createElement('label');
   toggle.className = `action-toggle ${isEnabled ? 'active' : ''}`;
+
+  // Verifier si le prompt a ete personnalise
+  const hasCustomPrompt = customPrompts[action.id] !== undefined;
+
   toggle.innerHTML = `
     <input type="checkbox" ${isEnabled ? 'checked' : ''} data-action-id="${action.id}">
     <span class="toggle-indicator"></span>
     <span class="action-info">
-      <span class="action-name">${action.name}</span>
+      <span class="action-name">${action.name}${hasCustomPrompt ? ' *' : ''}</span>
       <span class="action-desc">${action.description || ''}</span>
     </span>
-    ${isCustom ? '<button class="btn-delete-action" data-id="' + action.id + '">X</button>' : ''}
+    <div class="action-buttons">
+      <button class="btn-edit-action" data-id="${action.id}" title="Modifier le prompt">&#9998;</button>
+      ${isCustom ? '<button class="btn-delete-action" data-id="' + action.id + '" title="Supprimer">X</button>' : ''}
+    </div>
   `;
 
   toggle.querySelector('input').addEventListener('change', (e) => {
     toggleAction(action.id, e.target.checked, isCustom);
     toggle.classList.toggle('active', e.target.checked);
+  });
+
+  toggle.querySelector('.btn-edit-action')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    showEditActionModal(action, isCustom);
   });
 
   if (isCustom) {
@@ -759,6 +774,116 @@ function deleteCustomAction(actionId) {
 async function saveCustomActions() {
   return new Promise((resolve) => {
     chrome.storage.local.set({ customActions }, resolve);
+  });
+}
+
+// Sauvegarder les prompts personnalises
+async function saveCustomPrompts() {
+  return new Promise((resolve) => {
+    chrome.storage.local.set({ customPrompts }, resolve);
+  });
+}
+
+// Afficher le modal pour modifier une action
+function showEditActionModal(action, isCustom = false) {
+  const existingModal = document.getElementById('edit-action-modal');
+  if (existingModal) existingModal.remove();
+
+  // Obtenir le prompt actuel (personnalise ou par defaut)
+  let currentPrompt = '';
+  if (isCustom) {
+    currentPrompt = action.prompt || '';
+  } else {
+    currentPrompt = customPrompts[action.id] || BASE_ACTIONS[action.id]?.prompt || '';
+  }
+
+  const defaultPrompt = isCustom ? '' : (BASE_ACTIONS[action.id]?.prompt || '');
+  const isModified = !isCustom && customPrompts[action.id] !== undefined;
+
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay active';
+  modal.id = 'edit-action-modal';
+  modal.innerHTML = `
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Modifier: ${action.name}</h3>
+        <button class="modal-close" type="button">&times;</button>
+      </div>
+      <div class="modal-body">
+        ${isCustom ? `
+        <div class="form-group">
+          <label>Nom de l'action</label>
+          <input type="text" class="edit-action-name-input" value="${action.name}">
+        </div>
+        ` : ''}
+        <div class="form-group">
+          <label>Prompt</label>
+          <textarea class="edit-action-prompt-input" rows="6" placeholder="Entrez votre prompt personnalise...">${currentPrompt}</textarea>
+          ${!isCustom ? `<p class="form-hint">Prompt par defaut: "${defaultPrompt}"</p>` : ''}
+        </div>
+        ${isModified ? `
+        <div class="form-group">
+          <button class="btn btn-secondary btn-reset-prompt" type="button">Restaurer le prompt par defaut</button>
+        </div>
+        ` : ''}
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary modal-cancel" type="button">Annuler</button>
+        <button class="btn btn-primary modal-save" type="button">Sauvegarder</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  // Event listeners
+  modal.querySelector('.modal-close').addEventListener('click', () => modal.remove());
+  modal.querySelector('.modal-cancel').addEventListener('click', () => modal.remove());
+
+  // Restaurer le prompt par defaut
+  modal.querySelector('.btn-reset-prompt')?.addEventListener('click', () => {
+    modal.querySelector('.edit-action-prompt-input').value = defaultPrompt;
+  });
+
+  // Sauvegarder
+  modal.querySelector('.modal-save').addEventListener('click', async () => {
+    const newPrompt = modal.querySelector('.edit-action-prompt-input').value.trim();
+
+    if (!newPrompt) {
+      showNotification('Le prompt ne peut pas etre vide', 'error');
+      return;
+    }
+
+    if (isCustom) {
+      // Modifier l'action personnalisee
+      const newName = modal.querySelector('.edit-action-name-input')?.value.trim() || action.name;
+      const actionIndex = customActions.findIndex(a => a.id === action.id);
+      if (actionIndex !== -1) {
+        customActions[actionIndex].name = newName;
+        customActions[actionIndex].prompt = newPrompt;
+        await saveCustomActions();
+      }
+    } else {
+      // Sauvegarder le prompt personnalise pour une action de base
+      if (newPrompt === defaultPrompt) {
+        // Si c'est le prompt par defaut, supprimer la personnalisation
+        delete customPrompts[action.id];
+      } else {
+        customPrompts[action.id] = newPrompt;
+      }
+      await saveCustomPrompts();
+    }
+
+    // Notifier le service worker de recharger les menus
+    chrome.runtime.sendMessage({ type: 'RELOAD_MENUS' });
+
+    renderActionsGrid();
+    modal.remove();
+    showNotification('Action modifiee !', 'success');
+  });
+
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) modal.remove();
   });
 }
 

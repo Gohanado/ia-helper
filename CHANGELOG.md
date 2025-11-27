@@ -14,6 +14,19 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 
 ---
 
+## [1.3.0] - 2025-11-27
+
+### Ajoute
+- **Modification des prompts**: Chaque action peut maintenant etre personnalisee avec un prompt sur mesure
+- **Bouton d'edition**: Icone crayon sur chaque action pour modifier son prompt
+- **Indicateur visuel**: Les actions avec un prompt modifie affichent un asterisque (*)
+- **Restauration**: Bouton pour restaurer le prompt par defaut
+
+### Ameliore
+- Le menu contextuel et les raccourcis utilisent les prompts personnalises
+
+---
+
 ## [1.2.2] - 2025-11-27
 
 ### Corrige
@@ -176,7 +189,8 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 
 ---
 
-[Non publie]: https://github.com/Gohanado/ia-helper/compare/v1.2.2...HEAD
+[Non publie]: https://github.com/Gohanado/ia-helper/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/Gohanado/ia-helper/releases/tag/v1.3.0
 [1.2.2]: https://github.com/Gohanado/ia-helper/releases/tag/v1.2.2
 [1.2.1]: https://github.com/Gohanado/ia-helper/releases/tag/v1.2.1
 [1.2.0]: https://github.com/Gohanado/ia-helper/releases/tag/v1.2.0

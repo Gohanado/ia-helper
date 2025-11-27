@@ -400,9 +400,16 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   else if (menuId.startsWith('action-')) {
     actionType = 'action';
     actionId = menuId.replace('action-', '');
-    const action = BASE_ACTIONS[actionId];
-    if (action) {
-      presetPrompt = action.prompt;
+
+    // Verifier d'abord les prompts personnalises
+    const customPrompts = await getStoredActions('customPrompts', {});
+    if (customPrompts[actionId]) {
+      presetPrompt = customPrompts[actionId];
+    } else {
+      const action = BASE_ACTIONS[actionId];
+      if (action) {
+        presetPrompt = action.prompt;
+      }
     }
   }
   // Actions personnalisees (format: custom-{actionId})
@@ -526,14 +533,21 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     // Retourner le prompt d'une action (pour les raccourcis)
     const actionId = message.actionId;
 
-    // Chercher dans BASE_ACTIONS
-    if (BASE_ACTIONS[actionId]) {
-      sendResponse({ prompt: BASE_ACTIONS[actionId].prompt });
-      return;
-    }
-
-    // Chercher dans les actions personnalisees
     (async () => {
+      // D'abord verifier les prompts personnalises
+      const customPrompts = await getStoredActions('customPrompts', {});
+      if (customPrompts[actionId]) {
+        sendResponse({ prompt: customPrompts[actionId] });
+        return;
+      }
+
+      // Ensuite chercher dans BASE_ACTIONS
+      if (BASE_ACTIONS[actionId]) {
+        sendResponse({ prompt: BASE_ACTIONS[actionId].prompt });
+        return;
+      }
+
+      // Enfin chercher dans les actions personnalisees
       const customActions = await getStoredActions('customActions', []);
       const customAction = customActions.find(a => a.id === actionId);
       if (customAction) {
