@@ -17,7 +17,8 @@
     apiUrl: 'http://localhost:11434',
     apiKey: '',
     selectedModel: '',
-    streamingEnabled: true
+    streamingEnabled: true,
+    inlinePopupEnabled: true
   };
 
   let config = { ...DEFAULT_CONFIG };
@@ -965,21 +966,237 @@
     let systemPrompt = '';
 
     if ((mode === 'with' || mode === 'only') && selectedText) {
-      // Utiliser le texte selectionne comme contenu
       content = selectedText;
       systemPrompt = `${input}\n\nReponds de maniere claire et naturelle. Pas de tableaux.`;
     } else {
-      // Pas de selection ou mode sans selection
       content = input;
       systemPrompt = 'Tu es un assistant IA. Reponds de maniere claire et naturelle. Pas de tableaux.';
     }
 
     console.log('IA Helper: Quick prompt envoi', { mode, content: content.substring(0, 50), systemPrompt });
 
-    closeQuickModal();
+    // Mode popup inline ou ouverture dans un nouvel onglet
+    if (config.inlinePopupEnabled) {
+      showInlineResponse(modal, content, systemPrompt, input, selectedText);
+    } else {
+      closeQuickModal();
+      openResultsPage('quick_prompt', content, systemPrompt, null);
+    }
+  }
 
-    // Ouvrir la page de resultats
-    openResultsPage('quick_prompt', content, systemPrompt, null);
+  // Afficher la reponse en streaming dans le popup
+  async function showInlineResponse(modal, content, systemPrompt, userInput, selectedText) {
+    const container = modal.querySelector('.ia-quick-container');
+
+    // Transformer le modal en mode reponse
+    container.innerHTML = `
+      <div class="ia-quick-header">
+        <span class="ia-quick-title">IA Helper - Reponse</span>
+        <button class="ia-quick-close">&times;</button>
+      </div>
+      <div class="ia-quick-response-area">
+        <div class="ia-quick-response-content">
+          <span class="ia-quick-cursor"></span>
+        </div>
+      </div>
+      <div class="ia-quick-response-actions">
+        <button class="ia-quick-btn ia-quick-btn-secondary ia-quick-copy">Copier</button>
+        <button class="ia-quick-btn ia-quick-btn-secondary ia-quick-detail">Voir en detail</button>
+        <button class="ia-quick-btn ia-quick-btn-primary ia-quick-close-final">Fermer</button>
+      </div>
+    `;
+
+    // Ajouter les styles de reponse
+    addResponseStyles();
+
+    // Event listeners
+    container.querySelector('.ia-quick-close').addEventListener('click', closeQuickModal);
+    container.querySelector('.ia-quick-close-final').addEventListener('click', closeQuickModal);
+    container.querySelector('.ia-quick-copy').addEventListener('click', () => {
+      const responseText = container.querySelector('.ia-quick-response-content').textContent;
+      navigator.clipboard.writeText(responseText);
+      showNotification('Copie dans le presse-papier!', 'success');
+    });
+    container.querySelector('.ia-quick-detail').addEventListener('click', () => {
+      closeQuickModal();
+      openResultsPage('quick_prompt', content, systemPrompt, null);
+    });
+
+    // Lancer le streaming
+    const responseEl = container.querySelector('.ia-quick-response-content');
+    await streamResponse(responseEl, content, systemPrompt);
+  }
+
+  // Ajouter les styles pour le mode reponse
+  function addResponseStyles() {
+    if (document.getElementById('ia-helper-response-styles')) return;
+
+    const styles = document.createElement('style');
+    styles.id = 'ia-helper-response-styles';
+    styles.textContent = `
+      .ia-quick-response-area {
+        padding: 20px;
+        max-height: 400px;
+        overflow-y: auto;
+      }
+      .ia-quick-response-content {
+        font-size: 14px;
+        line-height: 1.7;
+        color: rgba(255, 255, 255, 0.9);
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+      .ia-quick-cursor {
+        display: inline-block;
+        width: 8px;
+        height: 16px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        animation: ia-blink 1s infinite;
+        vertical-align: middle;
+        margin-left: 2px;
+      }
+      @keyframes ia-blink {
+        0%, 50% { opacity: 1; }
+        51%, 100% { opacity: 0; }
+      }
+      .ia-quick-response-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        padding: 16px 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        background: rgba(0, 0, 0, 0.2);
+      }
+      .ia-quick-error {
+        color: #ff6b6b;
+        padding: 20px;
+        text-align: center;
+      }
+    `;
+    document.head.appendChild(styles);
+  }
+
+  // Stream la reponse depuis l'API
+  async function streamResponse(element, content, systemPrompt) {
+    const provider = config.provider || 'ollama';
+    let fullResponse = '';
+
+    try {
+      let response;
+
+      if (provider === 'ollama') {
+        response = await fetch(`${config.apiUrl}/api/generate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: config.selectedModel,
+            prompt: content,
+            system: systemPrompt,
+            stream: true
+          })
+        });
+      } else if (provider === 'openai' || provider === 'openrouter' || provider === 'custom') {
+        const apiUrl = provider === 'openai' ? 'https://api.openai.com/v1' :
+                       provider === 'openrouter' ? 'https://openrouter.ai/api/v1' : config.apiUrl;
+        response = await fetch(`${apiUrl}/chat/completions`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${config.apiKey}`
+          },
+          body: JSON.stringify({
+            model: config.selectedModel,
+            messages: [
+              { role: 'system', content: systemPrompt },
+              { role: 'user', content: content }
+            ],
+            stream: true
+          })
+        });
+      } else if (provider === 'anthropic') {
+        response = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': config.apiKey,
+            'anthropic-version': '2023-06-01',
+            'anthropic-dangerous-direct-browser-access': 'true'
+          },
+          body: JSON.stringify({
+            model: config.selectedModel,
+            max_tokens: 4096,
+            system: systemPrompt,
+            messages: [{ role: 'user', content: content }],
+            stream: true
+          })
+        });
+      } else if (provider === 'groq') {
+        response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${config.apiKey}`
+          },
+          body: JSON.stringify({
+            model: config.selectedModel,
+            messages: [
+              { role: 'system', content: systemPrompt },
+              { role: 'user', content: content }
+            ],
+            stream: true
+          })
+        });
+      }
+
+      if (!response.ok) {
+        throw new Error(`Erreur API: ${response.status}`);
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split('\n').filter(line => line.trim());
+
+        for (const line of lines) {
+          try {
+            if (provider === 'ollama') {
+              const json = JSON.parse(line);
+              if (json.response) {
+                fullResponse += json.response;
+                element.textContent = fullResponse;
+              }
+            } else {
+              // OpenAI-compatible format
+              if (line.startsWith('data: ')) {
+                const data = line.slice(6);
+                if (data === '[DONE]') continue;
+                const json = JSON.parse(data);
+                const text = json.choices?.[0]?.delta?.content ||
+                             json.delta?.text || '';
+                if (text) {
+                  fullResponse += text;
+                  element.textContent = fullResponse;
+                }
+              }
+            }
+          } catch (e) {
+            // Ignorer les erreurs de parsing
+          }
+        }
+      }
+
+      // Fin du streaming - retirer le curseur
+      element.innerHTML = escapeHtml(fullResponse);
+
+    } catch (error) {
+      console.error('IA Helper: Erreur streaming', error);
+      element.innerHTML = `<span class="ia-quick-error">Erreur: ${error.message}</span>`;
+    }
   }
 
   // Recharger les raccourcis si mis a jour

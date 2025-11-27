@@ -13,6 +13,7 @@ const DEFAULT_CONFIG = {
   apiKey: '',
   selectedModel: '',
   streamingEnabled: true,
+  inlinePopupEnabled: true,
   interfaceLanguage: 'fr',
   responseLanguage: 'fr'
 };
@@ -102,6 +103,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     apiUrlLabel: document.getElementById('api-url-label'),
     modelSelect: document.getElementById('model-select'),
     streamingEnabled: document.getElementById('streaming-enabled'),
+    inlinePopupEnabled: document.getElementById('inline-popup-enabled'),
     interfaceLanguage: document.getElementById('interface-language'),
     responseLanguage: document.getElementById('response-language'),
     connectionStatus: document.getElementById('connection-status')
@@ -156,6 +158,7 @@ async function loadAllSettings() {
       if (elements.apiUrl) elements.apiUrl.value = config.apiUrl || PROVIDERS[config.provider]?.defaultUrl || '';
       if (elements.apiKey) elements.apiKey.value = config.apiKey || '';
       if (elements.streamingEnabled) elements.streamingEnabled.checked = config.streamingEnabled !== false;
+      if (elements.inlinePopupEnabled) elements.inlinePopupEnabled.checked = config.inlinePopupEnabled !== false;
       if (elements.interfaceLanguage) elements.interfaceLanguage.value = config.interfaceLanguage || 'fr';
       if (elements.responseLanguage) elements.responseLanguage.value = config.responseLanguage || 'auto';
 
@@ -397,6 +400,7 @@ async function saveConnectionSettings() {
   config.apiKey = elements.apiKey?.value.trim() || '';
   config.selectedModel = elements.modelSelect?.value || '';
   config.streamingEnabled = elements.streamingEnabled?.checked !== false;
+  config.inlinePopupEnabled = elements.inlinePopupEnabled?.checked !== false;
   config.interfaceLanguage = elements.interfaceLanguage?.value || 'fr';
   config.responseLanguage = elements.responseLanguage?.value || 'auto';
 

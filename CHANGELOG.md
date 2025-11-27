@@ -14,6 +14,19 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 
 ---
 
+## [1.4.0] - 2025-11-27
+
+### Ajoute
+- **Popup inline avec streaming**: Le prompt rapide affiche maintenant la reponse directement dans un popup flottant avec streaming en temps reel
+- **Bouton "Voir en detail"**: Permet d'ouvrir la reponse dans un nouvel onglet pour plus de confort
+- **Bouton "Copier"**: Copie la reponse dans le presse-papier en un clic
+- **Option desactivable**: Possibilite de desactiver le popup inline dans les options pour revenir au comportement classique (ouverture dans un nouvel onglet)
+
+### Ameliore
+- **Experience utilisateur**: Plus besoin de changer d'onglet pour voir les reponses courtes
+
+---
+
 ## [1.3.2] - 2025-11-27
 
 ### Corrige
@@ -210,7 +223,8 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 
 ---
 
-[Non publie]: https://github.com/Gohanado/ia-helper/compare/v1.3.2...HEAD
+[Non publie]: https://github.com/Gohanado/ia-helper/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/Gohanado/ia-helper/releases/tag/v1.4.0
 [1.3.2]: https://github.com/Gohanado/ia-helper/releases/tag/v1.3.2
 [1.3.1]: https://github.com/Gohanado/ia-helper/releases/tag/v1.3.1
 [1.3.0]: https://github.com/Gohanado/ia-helper/releases/tag/v1.3.0
