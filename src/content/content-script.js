@@ -359,11 +359,11 @@
     return true;
   });
 
-  // Prompts pour les actions rapides
+  // Prompts pour les actions rapides - SANS TABLEAUX
   const QUICK_PROMPTS = {
-    'quick_summarize_page': 'Resume cette page web de maniere claire et concise. Extrais les informations principales et presente-les de facon structuree.',
-    'quick_extract_main': 'Extrais les points essentiels de cette page. Presente-les sous forme de liste a puces.',
-    'quick_translate_page': 'Traduis le contenu principal de cette page en francais.'
+    'quick_summarize_page': 'Resume cette page en quelques paragraphes fluides. Pas de tableaux, pas de listes complexes. Juste un resume clair et naturel.',
+    'quick_extract_main': 'Donne les 5 points essentiels de cette page avec des tirets simples. Pas de tableaux.',
+    'quick_translate_page': 'Traduis le contenu principal en francais. Pas de formatage special.'
   };
 
   // Gerer une action
@@ -392,8 +392,8 @@
       } else {
         content = selectedText || window.getSelection().toString() || document.body.innerText.substring(0, 15000);
       }
-    } else if (actionType === 'custom' || actionType === 'preset' || actionType === 'custompreset') {
-      // Pour les actions custom et preset, utiliser la selection ou la page
+    } else if (actionType === 'action' || actionType === 'custom' || actionType === 'preset' || actionType === 'custompreset') {
+      // Pour les actions (categories), custom et preset, utiliser la selection ou la page
       content = selectedText || window.getSelection().toString() || document.body.innerText.substring(0, 15000);
     }
 
@@ -412,11 +412,11 @@
     } else if (actionType === 'translate') {
       // Traduction globale
       const langName = LANG_NAMES[targetLanguage] || targetLanguage;
-      systemPrompt = `Tu es un traducteur professionnel. Traduis le texte suivant en ${langName}. Conserve le ton et le style. Retourne uniquement la traduction.`;
-    } else if (actionType === 'preset' || actionType === 'custompreset') {
-      // Le prompt est fourni par le service worker
+      systemPrompt = `Traduis le texte en ${langName}. Retourne uniquement la traduction, sans commentaires.`;
+    } else if (actionType === 'action' || actionType === 'custom' || actionType === 'preset' || actionType === 'custompreset') {
+      // Les actions des categories + custom: le prompt est fourni par le service worker
       systemPrompt = message.presetPrompt || '';
-      console.log('IA Helper: Action preset avec prompt', systemPrompt);
+      console.log('IA Helper: Action avec prompt', systemPrompt);
     } else {
       systemPrompt = PROMPTS[actionId] || '';
     }
