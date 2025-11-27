@@ -69,39 +69,39 @@
         <h2 data-i18n="serverConfig">Configuration du serveur</h2>
 
         <div class="form-group">
-          <label for="provider-select">Fournisseur IA</label>
+          <label for="provider-select" data-i18n="iaProvider">Fournisseur IA</label>
           <select id="provider-select">
             <option value="ollama">Ollama (local)</option>
             <option value="openai">OpenAI</option>
             <option value="anthropic">Anthropic (Claude)</option>
             <option value="groq">Groq</option>
             <option value="openrouter">OpenRouter</option>
-            <option value="custom">Personnalise (compatible OpenAI)</option>
+            <option value="custom">Custom (OpenAI compatible)</option>
           </select>
         </div>
 
         <div class="form-group" id="api-url-group">
-          <label for="api-url" id="api-url-label">URL du serveur Ollama</label>
+          <label for="api-url" id="api-url-label" data-i18n="serverUrl">URL du serveur Ollama</label>
           <div class="input-with-btn">
             <input type="text" id="api-url" placeholder="http://localhost:11434">
-            <button id="btn-test-connection" class="btn btn-secondary">Tester</button>
+            <button id="btn-test-connection" class="btn btn-secondary" data-i18n="testConnection">Tester</button>
           </div>
           <div class="connection-status" id="connection-status"></div>
         </div>
 
         <div class="form-group" id="api-key-group" style="display: none;">
-          <label for="api-key">Cle API</label>
+          <label for="api-key" data-i18n="apiKey">Cle API</label>
           <input type="password" id="api-key" placeholder="sk-...">
-          <p class="form-hint">Votre cle API est stockee localement et jamais partagee.</p>
+          <p class="form-hint" data-i18n="apiKeyHint">Votre cle API est stockee localement et jamais partagee.</p>
         </div>
 
         <div class="form-group">
-          <label for="model-select">Modele</label>
+          <label for="model-select" data-i18n="model">Modele</label>
           <div class="input-with-btn">
             <select id="model-select">
-              <option value="">Selectionnez un modele</option>
+              <option value="" data-i18n="selectModel">Selectionnez un modele</option>
             </select>
-            <button id="btn-refresh-models" class="btn btn-secondary">Actualiser</button>
+            <button id="btn-refresh-models" class="btn btn-secondary" data-i18n="refreshModels">Actualiser</button>
           </div>
         </div>
 
@@ -117,9 +117,9 @@
           <label class="toggle-label">
             <input type="checkbox" id="inline-popup-enabled" checked>
             <span class="toggle-switch"></span>
-            <span class="toggle-text">Afficher les reponses dans un popup (au lieu d'un nouvel onglet)</span>
+            <span class="toggle-text" data-i18n="inlinePopup">Afficher les reponses dans un popup</span>
           </label>
-          <p class="form-hint">Si active, les reponses du prompt rapide s'affichent dans une popup flottante avec streaming.</p>
+          <p class="form-hint" data-i18n="inlinePopupHint">Si active, les reponses du prompt rapide s'affichent dans une popup flottante avec streaming.</p>
         </div>
 
         <div class="form-group">
@@ -153,23 +153,23 @@
 
       <!-- Section Actions -->
       <section class="section" id="section-presets">
-        <h2>Actions du menu contextuel</h2>
-        <p class="section-desc">Choisissez les actions disponibles dans le menu clic-droit. Activez ou desactivez chaque fonction individuellement.</p>
+        <h2 data-i18n="contextMenuActions">Actions du menu contextuel</h2>
+        <p class="section-desc" data-i18n="contextMenuActionsDesc">Choisissez les actions disponibles dans le menu clic-droit. Activez ou desactivez chaque fonction individuellement.</p>
 
         <!-- Actions Personnalisees - EN HAUT -->
         <div class="actions-category">
-          <h3 class="category-title">Mes actions personnalisees</h3>
-          <p class="category-desc">Creez vos propres actions avec des prompts personnalises</p>
+          <h3 class="category-title" data-i18n="myCustomActions">Mes actions personnalisees</h3>
+          <p class="category-desc" data-i18n="myCustomActionsDesc">Creez vos propres actions avec des prompts personnalises</p>
           <div class="actions-grid" id="actions-custom">
             <!-- Genere par JS -->
           </div>
-          <button id="btn-add-custom-action" class="btn btn-primary" style="margin-top: 16px;">+ Ajouter une action</button>
+          <button id="btn-add-custom-action" class="btn btn-primary" style="margin-top: 16px;" data-i18n="addCustomActionBtn">+ Ajouter une action</button>
         </div>
 
         <!-- Actions Essentielles -->
         <div class="actions-category">
-          <h3 class="category-title">Essentiels</h3>
-          <p class="category-desc">Actions de base recommandees pour tous</p>
+          <h3 class="category-title" data-i18n="essentials">Essentiels</h3>
+          <p class="category-desc" data-i18n="essentialsDesc">Actions de base recommandees pour tous</p>
           <div class="actions-grid" id="actions-essential">
             <!-- Genere par JS -->
           </div>
@@ -177,8 +177,8 @@
 
         <!-- Actions Pratiques -->
         <div class="actions-category">
-          <h3 class="category-title">Pratiques</h3>
-          <p class="category-desc">Actions utiles au quotidien</p>
+          <h3 class="category-title" data-i18n="practical">Pratiques</h3>
+          <p class="category-desc" data-i18n="practicalDesc">Actions utiles au quotidien</p>
           <div class="actions-grid" id="actions-practical">
             <!-- Genere par JS -->
           </div>
@@ -186,8 +186,8 @@
 
         <!-- Actions Techniques -->
         <div class="actions-category">
-          <h3 class="category-title">Techniques</h3>
-          <p class="category-desc">Pour developpeurs et techniques</p>
+          <h3 class="category-title" data-i18n="technical">Techniques</h3>
+          <p class="category-desc" data-i18n="technicalDesc">Pour developpeurs et techniques</p>
           <div class="actions-grid" id="actions-technical">
             <!-- Genere par JS -->
           </div>
@@ -195,8 +195,8 @@
 
         <!-- Actions Analyse -->
         <div class="actions-category">
-          <h3 class="category-title">Analyse</h3>
-          <p class="category-desc">Analyse et comprehension de texte</p>
+          <h3 class="category-title" data-i18n="analysis">Analyse</h3>
+          <p class="category-desc" data-i18n="analysisDesc">Analyse et comprehension de texte</p>
           <div class="actions-grid" id="actions-analysis">
             <!-- Genere par JS -->
           </div>
@@ -204,59 +204,59 @@
 
         <!-- Traduction -->
         <div class="actions-category">
-          <h3 class="category-title">Traduction</h3>
-          <p class="category-desc">Langues disponibles pour la traduction rapide</p>
+          <h3 class="category-title" data-i18n="translation">Traduction</h3>
+          <p class="category-desc" data-i18n="translationDesc">Langues disponibles pour la traduction rapide</p>
           <div class="actions-grid" id="actions-translate">
             <!-- Genere par JS -->
           </div>
         </div>
 
         <div class="form-actions" style="margin-top: 24px;">
-          <button id="btn-enable-all" class="btn btn-secondary">Tout activer</button>
-          <button id="btn-disable-all" class="btn btn-secondary">Tout desactiver</button>
-          <button id="btn-reset-actions" class="btn btn-secondary">Valeurs par defaut</button>
+          <button id="btn-enable-all" class="btn btn-secondary" data-i18n="enableAll">Tout activer</button>
+          <button id="btn-disable-all" class="btn btn-secondary" data-i18n="disableAll">Tout desactiver</button>
+          <button id="btn-reset-actions" class="btn btn-secondary" data-i18n="defaultValues">Valeurs par defaut</button>
         </div>
       </section>
 
       <!-- Section Raccourcis -->
       <section class="section" id="section-shortcuts">
-        <h2>Raccourcis clavier</h2>
-        <p class="section-desc">Configurez les raccourcis clavier pour acceder rapidement aux actions. Cliquez sur un raccourci pour le modifier.</p>
+        <h2 data-i18n="keyboardShortcuts">Raccourcis clavier</h2>
+        <p class="section-desc" data-i18n="keyboardShortcutsDesc">Configurez les raccourcis clavier pour acceder rapidement aux actions. Cliquez sur un raccourci pour le modifier.</p>
 
         <div class="form-group shortcut-options">
           <label class="toggle-label">
             <input type="checkbox" id="shortcuts-enabled" checked>
             <span class="toggle-switch"></span>
-            <span class="toggle-text">Activer les raccourcis clavier</span>
+            <span class="toggle-text" data-i18n="shortcutsEnabled">Activer les raccourcis clavier</span>
           </label>
         </div>
 
         <div class="form-group">
-          <label for="default-translate-lang">Langue de traduction par defaut</label>
+          <label for="default-translate-lang" data-i18n="defaultTranslateLang">Langue de traduction par defaut</label>
           <select id="default-translate-lang">
-            <option value="en">Anglais</option>
+            <option value="en">English</option>
             <option value="fr">Francais</option>
-            <option value="es">Espagnol</option>
-            <option value="de">Allemand</option>
-            <option value="it">Italien</option>
-            <option value="pt">Portugais</option>
-            <option value="zh">Chinois</option>
-            <option value="ja">Japonais</option>
-            <option value="ko">Coreen</option>
-            <option value="ar">Arabe</option>
-            <option value="ru">Russe</option>
+            <option value="es">Espanol</option>
+            <option value="de">Deutsch</option>
+            <option value="it">Italiano</option>
+            <option value="pt">Portugues</option>
+            <option value="zh">Chinese</option>
+            <option value="ja">Japanese</option>
+            <option value="ko">Korean</option>
+            <option value="ar">Arabic</option>
+            <option value="ru">Russian</option>
           </select>
         </div>
 
-        <h3 style="margin-top: 24px;">Raccourcis configures</h3>
+        <h3 style="margin-top: 24px;" data-i18n="configuredShortcuts">Raccourcis configures</h3>
         <div class="shortcuts-list" id="shortcuts-list">
           <!-- Genere par JS -->
         </div>
 
-        <button id="btn-add-shortcut" class="btn btn-secondary" style="margin-top: 16px;">+ Ajouter un raccourci</button>
+        <button id="btn-add-shortcut" class="btn btn-secondary" style="margin-top: 16px;" data-i18n="addShortcutBtn">+ Ajouter un raccourci</button>
 
         <div class="form-actions">
-          <button id="btn-save-shortcuts" class="btn btn-primary">Sauvegarder</button>
+          <button id="btn-save-shortcuts" class="btn btn-primary" data-i18n="save">Sauvegarder</button>
         </div>
 
         <div class="shortcut-help">

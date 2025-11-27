@@ -12,6 +12,15 @@ export const TRANSLATIONS = {
     delete: 'Supprimer',
     add: 'Ajouter',
     options: 'Options',
+    enabled: 'Active',
+    disabled: 'Desactive',
+    loading: 'Chargement...',
+    error: 'Erreur',
+    success: 'Succes',
+    warning: 'Attention',
+    confirm: 'Confirmer',
+    yes: 'Oui',
+    no: 'Non',
 
     // Connection
     connection: 'Connexion',
@@ -26,6 +35,11 @@ export const TRANSLATIONS = {
     enableStreaming: 'Activer le streaming (reponse en temps reel)',
     auto: 'Automatique (selon le texte)',
     responseLanguageHint: 'Cette option ne s\'applique pas aux traductions specifiques.',
+    iaProvider: 'Fournisseur IA',
+    apiKey: 'Cle API',
+    apiKeyHint: 'Votre cle API est stockee localement et jamais partagee.',
+    inlinePopup: 'Afficher les reponses dans un popup',
+    inlinePopupHint: 'Si active, les reponses du prompt rapide s\'affichent dans une popup flottante avec streaming.',
 
     // Presets
     presets: 'Presets',
@@ -54,6 +68,24 @@ export const TRANSLATIONS = {
     proActions: 'Actions IA Helper Pro',
     customActions: 'Actions personnalisees',
     quickActions: 'Actions rapides',
+    contextMenuActions: 'Actions du menu contextuel',
+    contextMenuActionsDesc: 'Choisissez les actions disponibles dans le menu clic-droit. Activez ou desactivez chaque fonction individuellement.',
+    myCustomActions: 'Mes actions personnalisees',
+    myCustomActionsDesc: 'Creez vos propres actions avec des prompts personnalises',
+    addCustomActionBtn: '+ Ajouter une action',
+    essentials: 'Essentiels',
+    essentialsDesc: 'Actions de base recommandees pour tous',
+    practical: 'Pratiques',
+    practicalDesc: 'Actions utiles au quotidien',
+    technical: 'Techniques',
+    technicalDesc: 'Pour developpeurs et techniques',
+    analysis: 'Analyse',
+    analysisDesc: 'Analyse et comprehension de texte',
+    translation: 'Traduction',
+    translationDesc: 'Langues disponibles pour la traduction rapide',
+    enableAll: 'Tout activer',
+    disableAll: 'Tout desactiver',
+    defaultValues: 'Valeurs par defaut',
 
     // Prompts
     prompts: 'Prompts',
@@ -119,12 +151,16 @@ export const TRANSLATIONS = {
 
     // Shortcuts
     shortcuts: 'Raccourcis',
+    keyboardShortcuts: 'Raccourcis clavier',
+    keyboardShortcutsDesc: 'Configurez les raccourcis clavier pour acceder rapidement aux actions. Cliquez sur un raccourci pour le modifier.',
     shortcutsEnabled: 'Activer les raccourcis clavier',
     defaultTranslateLang: 'Langue de traduction par defaut',
     howToChange: 'Comment modifier un raccourci',
     howToChangeDesc: 'Cliquez sur le bouton du raccourci, puis appuyez sur la nouvelle combinaison de touches (ex: Ctrl+Shift+K). Utilisez Alt, Ctrl ou Shift + une lettre.',
     noShortcuts: 'Aucun raccourci configure. Ajoutez-en via le bouton ci-dessus.',
+    configuredShortcuts: 'Raccourcis configures',
     addShortcut: 'Ajouter un raccourci',
+    addShortcutBtn: '+ Ajouter un raccourci',
     pressKey: 'Appuyez sur une touche...',
     shortcutSaved: 'Raccourci sauvegarde !',
     shortcutDeleted: 'Raccourci supprime',
@@ -146,7 +182,21 @@ export const TRANSLATIONS = {
     noContent: 'Aucun contenu a traiter',
     noModel: 'Veuillez configurer un modele dans les options',
     featureInDev: 'Fonctionnalite en cours de developpement',
-    languageChanged: 'Langue modifiee !'
+    languageChanged: 'Langue modifiee !',
+
+    // Popup inline
+    connectingToAI: 'Connexion a l\'IA en cours...',
+    viewDetails: 'Voir en detail',
+    response: 'Reponse',
+
+    // Results page
+    resultTitle: 'Resultat',
+    copyResult: 'Copier',
+    openInNewTab: 'Ouvrir dans un nouvel onglet',
+    refinementOptions: 'Options d\'affinement',
+    customInstructions: 'Instructions personnalisees',
+    sendInstructions: 'Envoyer',
+    instructionsPlaceholder: 'Ajouter des instructions...'
   },
   
   en: {
@@ -160,6 +210,15 @@ export const TRANSLATIONS = {
     delete: 'Delete',
     add: 'Add',
     options: 'Options',
+    enabled: 'Enabled',
+    disabled: 'Disabled',
+    loading: 'Loading...',
+    error: 'Error',
+    success: 'Success',
+    warning: 'Warning',
+    confirm: 'Confirm',
+    yes: 'Yes',
+    no: 'No',
     connection: 'Connection',
     serverConfig: 'Server configuration',
     serverUrl: 'Ollama server URL',
@@ -172,6 +231,11 @@ export const TRANSLATIONS = {
     enableStreaming: 'Enable streaming (real-time response)',
     auto: 'Automatic (based on text)',
     responseLanguageHint: 'This option does not apply to specific translations.',
+    iaProvider: 'AI Provider',
+    apiKey: 'API Key',
+    apiKeyHint: 'Your API key is stored locally and never shared.',
+    inlinePopup: 'Show responses in popup',
+    inlinePopupHint: 'If enabled, quick prompt responses are displayed in a floating popup with streaming.',
     presets: 'Presets',
     presetsDesc: 'Enable action sets for the context menu. Each preset adds a submenu to IA Helper.',
     allPresets: 'All presets',
@@ -196,6 +260,24 @@ export const TRANSLATIONS = {
     proActions: 'IA Helper Pro actions',
     customActions: 'Custom actions',
     quickActions: 'Quick actions',
+    contextMenuActions: 'Context menu actions',
+    contextMenuActionsDesc: 'Choose the actions available in the right-click menu. Enable or disable each feature individually.',
+    myCustomActions: 'My custom actions',
+    myCustomActionsDesc: 'Create your own actions with custom prompts',
+    addCustomActionBtn: '+ Add an action',
+    essentials: 'Essentials',
+    essentialsDesc: 'Basic actions recommended for everyone',
+    practical: 'Practical',
+    practicalDesc: 'Useful everyday actions',
+    technical: 'Technical',
+    technicalDesc: 'For developers and technical users',
+    analysis: 'Analysis',
+    analysisDesc: 'Text analysis and comprehension',
+    translation: 'Translation',
+    translationDesc: 'Available languages for quick translation',
+    enableAll: 'Enable all',
+    disableAll: 'Disable all',
+    defaultValues: 'Default values',
     prompts: 'Prompts',
     customizePrompts: 'Customize prompts',
     promptsDesc: 'Modify the instructions sent to the AI for each action.',
@@ -249,12 +331,16 @@ export const TRANSLATIONS = {
 
     // Shortcuts
     shortcuts: 'Shortcuts',
+    keyboardShortcuts: 'Keyboard shortcuts',
+    keyboardShortcutsDesc: 'Configure keyboard shortcuts for quick access to actions. Click on a shortcut to modify it.',
     shortcutsEnabled: 'Enable keyboard shortcuts',
     defaultTranslateLang: 'Default translation language',
     howToChange: 'How to change a shortcut',
     howToChangeDesc: 'Click on the shortcut button, then press a new key combination (e.g. Ctrl+Shift+K). Use Alt, Ctrl or Shift + a letter.',
     noShortcuts: 'No shortcuts configured. Add one using the button above.',
+    configuredShortcuts: 'Configured shortcuts',
     addShortcut: 'Add shortcut',
+    addShortcutBtn: '+ Add shortcut',
     pressKey: 'Press a key...',
     shortcutSaved: 'Shortcut saved!',
     shortcutDeleted: 'Shortcut deleted',
@@ -275,21 +361,44 @@ export const TRANSLATIONS = {
     noContent: 'No content to process',
     noModel: 'Please configure a model in options',
     featureInDev: 'Feature in development',
-    languageChanged: 'Language changed!'
+    languageChanged: 'Language changed!',
+
+    // Popup inline
+    connectingToAI: 'Connecting to AI...',
+    viewDetails: 'View details',
+    response: 'Response',
+
+    // Results page
+    resultTitle: 'Result',
+    copyResult: 'Copy',
+    openInNewTab: 'Open in new tab',
+    refinementOptions: 'Refinement options',
+    customInstructions: 'Custom instructions',
+    sendInstructions: 'Send',
+    instructionsPlaceholder: 'Add instructions...'
   }
 };
 
 // Espagnol
 TRANSLATIONS.es = {
   ...TRANSLATIONS.en,
+  // General
   save: 'Guardar', cancel: 'Cancelar', close: 'Cerrar', copy: 'Copiar',
   reset: 'Restablecer', edit: 'Editar', delete: 'Eliminar', add: 'Agregar',
-  options: 'Opciones', connection: 'Conexion', serverConfig: 'Configuracion del servidor',
+  options: 'Opciones', enabled: 'Activado', disabled: 'Desactivado',
+  loading: 'Cargando...', error: 'Error', success: 'Exito', warning: 'Advertencia',
+  confirm: 'Confirmar', yes: 'Si', no: 'No',
+  // Connection
+  connection: 'Conexion', serverConfig: 'Configuracion del servidor',
   serverUrl: 'URL del servidor Ollama', model: 'Modelo', testConnection: 'Probar',
   refreshModels: 'Actualizar', selectModel: 'Seleccione un modelo',
   connectionSuccess: 'Conexion exitosa!', connectionError: 'No se puede conectar',
   enableStreaming: 'Activar streaming (respuesta en tiempo real)',
   auto: 'Automatico (segun el texto)', responseLanguageHint: 'Esta opcion no se aplica a traducciones especificas.',
+  iaProvider: 'Proveedor IA', apiKey: 'Clave API',
+  apiKeyHint: 'Su clave API se almacena localmente y nunca se comparte.',
+  inlinePopup: 'Mostrar respuestas en popup', inlinePopupHint: 'Si esta activado, las respuestas del prompt rapido se muestran en un popup flotante con streaming.',
+  // Presets
   presets: 'Presets', presetsDesc: 'Active conjuntos de acciones para el menu contextual.',
   integratedPresets: 'Presets integrados', myCustomPresets: 'Mis presets personalizados',
   createPreset: 'Crear preset', presetActions: 'Acciones del preset',
@@ -298,6 +407,17 @@ TRANSLATIONS.es = {
   viewPrompt: 'Ver prompt', editPrompt: 'Editar prompt', actions: 'acciones', custom: 'Perso',
   presetActivated: 'Preset activado!', presetDeactivated: 'Preset desactivado',
   presetCreated: 'Preset creado!', presetModified: 'Preset modificado!', presetDeleted: 'Preset eliminado',
+  // Actions
+  contextMenuActions: 'Acciones del menu contextual', contextMenuActionsDesc: 'Elija las acciones disponibles en el menu clic derecho.',
+  myCustomActions: 'Mis acciones personalizadas', myCustomActionsDesc: 'Cree sus propias acciones con prompts personalizados',
+  addCustomActionBtn: '+ Agregar una accion',
+  essentials: 'Esenciales', essentialsDesc: 'Acciones basicas recomendadas para todos',
+  practical: 'Practicas', practicalDesc: 'Acciones utiles para el dia a dia',
+  technical: 'Tecnicas', technicalDesc: 'Para desarrolladores y usuarios tecnicos',
+  analysis: 'Analisis', analysisDesc: 'Analisis y comprension de texto',
+  translation: 'Traduccion', translationDesc: 'Idiomas disponibles para traduccion rapida',
+  enableAll: 'Activar todo', disableAll: 'Desactivar todo', defaultValues: 'Valores por defecto',
+  // About
   about: 'Acerca de', aboutTitle: 'Acerca de IA Helper', version: 'Version',
   description: 'Asistente IA inteligente para Chrome conectado a Ollama.',
   aboutText: 'IA Helper le permite usar modelos de IA locales para corregir, traducir, reformular y analizar texto.',
@@ -309,29 +429,54 @@ TRANSLATIONS.es = {
   actionName: 'Nombre de la accion', actionPrompt: 'Prompt del sistema...', createThePreset: 'Crear preset',
   enterPresetName: 'Ingrese un nombre para el preset', addAtLeastOneAction: 'Agregue al menos una accion',
   allActionsMustHaveNameAndPrompt: 'Todas las acciones deben tener nombre y prompt',
-  shortcuts: 'Atajos', shortcutsEnabled: 'Activar atajos de teclado',
-  defaultTranslateLang: 'Idioma de traduccion predeterminado',
+  // Shortcuts
+  shortcuts: 'Atajos', keyboardShortcuts: 'Atajos de teclado',
+  keyboardShortcutsDesc: 'Configure atajos de teclado para acceso rapido a las acciones.',
+  shortcutsEnabled: 'Activar atajos de teclado', defaultTranslateLang: 'Idioma de traduccion predeterminado',
   howToChange: 'Como cambiar un atajo', howToChangeDesc: 'Haga clic en el boton de atajo, luego presione una nueva combinacion de teclas.',
-  noShortcuts: 'Sin atajos configurados.', addShortcut: 'Agregar atajo', pressKey: 'Presione una tecla...',
+  noShortcuts: 'Sin atajos configurados.', configuredShortcuts: 'Atajos configurados',
+  addShortcut: 'Agregar atajo', addShortcutBtn: '+ Agregar atajo', pressKey: 'Presione una tecla...',
   shortcutSaved: 'Atajo guardado!', shortcutDeleted: 'Atajo eliminado',
+  // Custom actions
   customActionsTitle: 'Mis acciones personalizadas', customActionsDesc: 'Cree sus propias acciones con prompts personalizados',
   noCustomActions: 'Sin acciones personalizadas.', addCustomAction: 'Agregar una accion',
   actionCreated: 'Accion creada!', actionModified: 'Accion modificada!', actionDeleted: 'Accion eliminada',
   restoreDefault: 'Restaurar prompt predeterminado', promptEmpty: 'El prompt no puede estar vacio', modifyPrompt: 'Modificar prompt',
-  settingsSaved: 'Configuracion guardada!', languageChanged: 'Idioma cambiado!'
+  settingsSaved: 'Configuracion guardada!', languageChanged: 'Idioma cambiado!',
+  // Popup inline
+  connectingToAI: 'Conectando con la IA...', viewDetails: 'Ver detalles', response: 'Respuesta',
+  // Results
+  resultTitle: 'Resultado', copyResult: 'Copiar', openInNewTab: 'Abrir en nueva pestana',
+  refinementOptions: 'Opciones de refinamiento', customInstructions: 'Instrucciones personalizadas',
+  sendInstructions: 'Enviar', instructionsPlaceholder: 'Agregar instrucciones...',
+  // Results actions
+  result: 'Resultado', originalText: 'Texto original', generating: 'Generando...',
+  refine: 'Refinar resultado', regenerate: 'Regenerar', shorter: 'Mas corto', longer: 'Mas largo',
+  formal: 'Mas formal', casual: 'Mas informal', addInstructions: 'Agregar instrucciones', send: 'Enviar',
+  copyMarkdown: 'Copiar como Markdown', copyText: 'Copiar como texto', copyHtml: 'Copiar como HTML', copied: 'Copiado!',
+  language: 'Idioma', interfaceLanguage: 'Idioma de la interfaz', responseLanguage: 'Idioma de respuesta de la IA'
 };
 
 // Italien
 TRANSLATIONS.it = {
   ...TRANSLATIONS.en,
+  // General
   save: 'Salva', cancel: 'Annulla', close: 'Chiudi', copy: 'Copia',
   reset: 'Reimposta', edit: 'Modifica', delete: 'Elimina', add: 'Aggiungi',
-  options: 'Opzioni', connection: 'Connessione', serverConfig: 'Configurazione del server',
+  options: 'Opzioni', enabled: 'Attivato', disabled: 'Disattivato',
+  loading: 'Caricamento...', error: 'Errore', success: 'Successo', warning: 'Attenzione',
+  confirm: 'Conferma', yes: 'Si', no: 'No',
+  // Connection
+  connection: 'Connessione', serverConfig: 'Configurazione del server',
   serverUrl: 'URL del server Ollama', model: 'Modello', testConnection: 'Testa',
   refreshModels: 'Aggiorna', selectModel: 'Seleziona un modello',
   connectionSuccess: 'Connessione riuscita!', connectionError: 'Impossibile connettersi',
   enableStreaming: 'Attiva streaming (risposta in tempo reale)',
   auto: 'Automatico (in base al testo)', responseLanguageHint: 'Questa opzione non si applica alle traduzioni specifiche.',
+  iaProvider: 'Provider IA', apiKey: 'Chiave API',
+  apiKeyHint: 'La tua chiave API e memorizzata localmente e mai condivisa.',
+  inlinePopup: 'Mostra risposte in popup', inlinePopupHint: 'Se attivato, le risposte del prompt rapido vengono mostrate in un popup flottante con streaming.',
+  // Presets
   presets: 'Presets', presetsDesc: 'Attiva set di azioni per il menu contestuale.',
   integratedPresets: 'Presets integrati', myCustomPresets: 'I miei presets personalizzati',
   createPreset: 'Crea preset', presetActions: 'Azioni del preset',
@@ -340,6 +485,17 @@ TRANSLATIONS.it = {
   viewPrompt: 'Vedi prompt', editPrompt: 'Modifica prompt', actions: 'azioni', custom: 'Perso',
   presetActivated: 'Preset attivato!', presetDeactivated: 'Preset disattivato',
   presetCreated: 'Preset creato!', presetModified: 'Preset modificato!', presetDeleted: 'Preset eliminato',
+  // Actions
+  contextMenuActions: 'Azioni del menu contestuale', contextMenuActionsDesc: 'Scegli le azioni disponibili nel menu clic destro.',
+  myCustomActions: 'Le mie azioni personalizzate', myCustomActionsDesc: 'Crea le tue azioni con prompt personalizzati',
+  addCustomActionBtn: '+ Aggiungi un\'azione',
+  essentials: 'Essenziali', essentialsDesc: 'Azioni di base consigliate per tutti',
+  practical: 'Pratiche', practicalDesc: 'Azioni utili per tutti i giorni',
+  technical: 'Tecniche', technicalDesc: 'Per sviluppatori e utenti tecnici',
+  analysis: 'Analisi', analysisDesc: 'Analisi e comprensione del testo',
+  translation: 'Traduzione', translationDesc: 'Lingue disponibili per la traduzione rapida',
+  enableAll: 'Attiva tutto', disableAll: 'Disattiva tutto', defaultValues: 'Valori predefiniti',
+  // About
   about: 'Informazioni', aboutTitle: 'Informazioni su IA Helper', version: 'Versione',
   description: 'Assistente IA intelligente per Chrome connesso a Ollama.',
   aboutText: 'IA Helper ti permette di usare modelli IA locali per correggere, tradurre, riformulare e analizzare testo.',
@@ -351,29 +507,54 @@ TRANSLATIONS.it = {
   actionName: 'Nome dell\'azione', actionPrompt: 'Prompt di sistema...', createThePreset: 'Crea preset',
   enterPresetName: 'Inserisci un nome per il preset', addAtLeastOneAction: 'Aggiungi almeno un\'azione',
   allActionsMustHaveNameAndPrompt: 'Tutte le azioni devono avere nome e prompt',
-  shortcuts: 'Scorciatoie', shortcutsEnabled: 'Attiva scorciatoie da tastiera',
-  defaultTranslateLang: 'Lingua di traduzione predefinita',
+  // Shortcuts
+  shortcuts: 'Scorciatoie', keyboardShortcuts: 'Scorciatoie da tastiera',
+  keyboardShortcutsDesc: 'Configura le scorciatoie da tastiera per un accesso rapido alle azioni.',
+  shortcutsEnabled: 'Attiva scorciatoie da tastiera', defaultTranslateLang: 'Lingua di traduzione predefinita',
   howToChange: 'Come cambiare una scorciatoia', howToChangeDesc: 'Clicca sul pulsante della scorciatoia, poi premi una nuova combinazione di tasti.',
-  noShortcuts: 'Nessuna scorciatoia configurata.', addShortcut: 'Aggiungi scorciatoia', pressKey: 'Premi un tasto...',
+  noShortcuts: 'Nessuna scorciatoia configurata.', configuredShortcuts: 'Scorciatoie configurate',
+  addShortcut: 'Aggiungi scorciatoia', addShortcutBtn: '+ Aggiungi scorciatoia', pressKey: 'Premi un tasto...',
   shortcutSaved: 'Scorciatoia salvata!', shortcutDeleted: 'Scorciatoia eliminata',
+  // Custom actions
   customActionsTitle: 'Le mie azioni personalizzate', customActionsDesc: 'Crea le tue azioni con prompt personalizzati',
   noCustomActions: 'Nessuna azione personalizzata.', addCustomAction: 'Aggiungi un\'azione',
   actionCreated: 'Azione creata!', actionModified: 'Azione modificata!', actionDeleted: 'Azione eliminata',
   restoreDefault: 'Ripristina prompt predefinito', promptEmpty: 'Il prompt non puo essere vuoto', modifyPrompt: 'Modifica prompt',
-  settingsSaved: 'Impostazioni salvate!', languageChanged: 'Lingua cambiata!'
+  settingsSaved: 'Impostazioni salvate!', languageChanged: 'Lingua cambiata!',
+  // Popup inline
+  connectingToAI: 'Connessione all\'IA in corso...', viewDetails: 'Vedi dettagli', response: 'Risposta',
+  // Results
+  resultTitle: 'Risultato', copyResult: 'Copia', openInNewTab: 'Apri in nuova scheda',
+  refinementOptions: 'Opzioni di perfezionamento', customInstructions: 'Istruzioni personalizzate',
+  sendInstructions: 'Invia', instructionsPlaceholder: 'Aggiungi istruzioni...',
+  // Results actions
+  result: 'Risultato', originalText: 'Testo originale', generating: 'Generazione...',
+  refine: 'Perfeziona risultato', regenerate: 'Rigenera', shorter: 'Piu corto', longer: 'Piu lungo',
+  formal: 'Piu formale', casual: 'Piu informale', addInstructions: 'Aggiungi istruzioni', send: 'Invia',
+  copyMarkdown: 'Copia come Markdown', copyText: 'Copia come testo', copyHtml: 'Copia come HTML', copied: 'Copiato!',
+  language: 'Lingua', interfaceLanguage: 'Lingua dell\'interfaccia', responseLanguage: 'Lingua di risposta dell\'IA'
 };
 
 // Portugais
 TRANSLATIONS.pt = {
   ...TRANSLATIONS.en,
+  // General
   save: 'Salvar', cancel: 'Cancelar', close: 'Fechar', copy: 'Copiar',
   reset: 'Redefinir', edit: 'Editar', delete: 'Excluir', add: 'Adicionar',
-  options: 'Opcoes', connection: 'Conexao', serverConfig: 'Configuracao do servidor',
+  options: 'Opcoes', enabled: 'Ativado', disabled: 'Desativado',
+  loading: 'Carregando...', error: 'Erro', success: 'Sucesso', warning: 'Aviso',
+  confirm: 'Confirmar', yes: 'Sim', no: 'Nao',
+  // Connection
+  connection: 'Conexao', serverConfig: 'Configuracao do servidor',
   serverUrl: 'URL do servidor Ollama', model: 'Modelo', testConnection: 'Testar',
   refreshModels: 'Atualizar', selectModel: 'Selecione um modelo',
   connectionSuccess: 'Conexao bem-sucedida!', connectionError: 'Nao foi possivel conectar',
   enableStreaming: 'Ativar streaming (resposta em tempo real)',
   auto: 'Automatico (baseado no texto)', responseLanguageHint: 'Esta opcao nao se aplica a traducoes especificas.',
+  iaProvider: 'Provedor IA', apiKey: 'Chave API',
+  apiKeyHint: 'Sua chave API e armazenada localmente e nunca compartilhada.',
+  inlinePopup: 'Mostrar respostas em popup', inlinePopupHint: 'Se ativado, as respostas do prompt rapido sao exibidas em um popup flutuante com streaming.',
+  // Presets
   presets: 'Presets', presetsDesc: 'Ative conjuntos de acoes para o menu contextual.',
   integratedPresets: 'Presets integrados', myCustomPresets: 'Meus presets personalizados',
   createPreset: 'Criar preset', presetActions: 'Acoes do preset',
@@ -382,6 +563,17 @@ TRANSLATIONS.pt = {
   viewPrompt: 'Ver prompt', editPrompt: 'Editar prompt', actions: 'acoes', custom: 'Perso',
   presetActivated: 'Preset ativado!', presetDeactivated: 'Preset desativado',
   presetCreated: 'Preset criado!', presetModified: 'Preset modificado!', presetDeleted: 'Preset excluido',
+  // Actions
+  contextMenuActions: 'Acoes do menu contextual', contextMenuActionsDesc: 'Escolha as acoes disponiveis no menu de clique direito.',
+  myCustomActions: 'Minhas acoes personalizadas', myCustomActionsDesc: 'Crie suas proprias acoes com prompts personalizados',
+  addCustomActionBtn: '+ Adicionar uma acao',
+  essentials: 'Essenciais', essentialsDesc: 'Acoes basicas recomendadas para todos',
+  practical: 'Praticas', practicalDesc: 'Acoes uteis para o dia a dia',
+  technical: 'Tecnicas', technicalDesc: 'Para desenvolvedores e usuarios tecnicos',
+  analysis: 'Analise', analysisDesc: 'Analise e compreensao de texto',
+  translation: 'Traducao', translationDesc: 'Idiomas disponiveis para traducao rapida',
+  enableAll: 'Ativar tudo', disableAll: 'Desativar tudo', defaultValues: 'Valores padrao',
+  // About
   about: 'Sobre', aboutTitle: 'Sobre o IA Helper', version: 'Versao',
   description: 'Assistente IA inteligente para Chrome conectado ao Ollama.',
   aboutText: 'IA Helper permite usar modelos de IA locais para corrigir, traduzir, reformular e analisar texto.',
@@ -393,16 +585,32 @@ TRANSLATIONS.pt = {
   actionName: 'Nome da acao', actionPrompt: 'Prompt do sistema...', createThePreset: 'Criar preset',
   enterPresetName: 'Insira um nome para o preset', addAtLeastOneAction: 'Adicione pelo menos uma acao',
   allActionsMustHaveNameAndPrompt: 'Todas as acoes devem ter nome e prompt',
-  shortcuts: 'Atalhos', shortcutsEnabled: 'Ativar atalhos de teclado',
-  defaultTranslateLang: 'Idioma de traducao padrao',
+  // Shortcuts
+  shortcuts: 'Atalhos', keyboardShortcuts: 'Atalhos de teclado',
+  keyboardShortcutsDesc: 'Configure atalhos de teclado para acesso rapido as acoes.',
+  shortcutsEnabled: 'Ativar atalhos de teclado', defaultTranslateLang: 'Idioma de traducao padrao',
   howToChange: 'Como alterar um atalho', howToChangeDesc: 'Clique no botao do atalho, depois pressione uma nova combinacao de teclas.',
-  noShortcuts: 'Nenhum atalho configurado.', addShortcut: 'Adicionar atalho', pressKey: 'Pressione uma tecla...',
+  noShortcuts: 'Nenhum atalho configurado.', configuredShortcuts: 'Atalhos configurados',
+  addShortcut: 'Adicionar atalho', addShortcutBtn: '+ Adicionar atalho', pressKey: 'Pressione uma tecla...',
   shortcutSaved: 'Atalho salvo!', shortcutDeleted: 'Atalho excluido',
+  // Custom actions
   customActionsTitle: 'Minhas acoes personalizadas', customActionsDesc: 'Crie suas proprias acoes com prompts personalizados',
   noCustomActions: 'Nenhuma acao personalizada.', addCustomAction: 'Adicionar uma acao',
   actionCreated: 'Acao criada!', actionModified: 'Acao modificada!', actionDeleted: 'Acao excluida',
   restoreDefault: 'Restaurar prompt padrao', promptEmpty: 'O prompt nao pode estar vazio', modifyPrompt: 'Modificar prompt',
-  settingsSaved: 'Configuracoes salvas!', languageChanged: 'Idioma alterado!'
+  settingsSaved: 'Configuracoes salvas!', languageChanged: 'Idioma alterado!',
+  // Popup inline
+  connectingToAI: 'Conectando com a IA...', viewDetails: 'Ver detalhes', response: 'Resposta',
+  // Results
+  resultTitle: 'Resultado', copyResult: 'Copiar', openInNewTab: 'Abrir em nova aba',
+  refinementOptions: 'Opcoes de refinamento', customInstructions: 'Instrucoes personalizadas',
+  sendInstructions: 'Enviar', instructionsPlaceholder: 'Adicionar instrucoes...',
+  // Results actions
+  result: 'Resultado', originalText: 'Texto original', generating: 'Gerando...',
+  refine: 'Refinar resultado', regenerate: 'Regenerar', shorter: 'Mais curto', longer: 'Mais longo',
+  formal: 'Mais formal', casual: 'Mais informal', addInstructions: 'Adicionar instrucoes', send: 'Enviar',
+  copyMarkdown: 'Copiar como Markdown', copyText: 'Copiar como texto', copyHtml: 'Copiar como HTML', copied: 'Copiado!',
+  language: 'Idioma', interfaceLanguage: 'Idioma da interface', responseLanguage: 'Idioma de resposta da IA'
 };
 
 // Available languages

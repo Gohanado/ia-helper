@@ -14,6 +14,15 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 
 ---
 
+## [1.4.5] - 2025-11-27
+
+### Ameliore
+- **Traductions 100% completes**: Toutes les cles de traduction sont maintenant disponibles pour les 5 langues (FR, EN, ES, IT, PT)
+- **Interface HTML traduite**: Tous les textes en dur dans options.html utilisent maintenant le systeme i18n
+- **Nouvelles cles ajoutees**: iaProvider, apiKey, apiKeyHint, inlinePopup, contextMenuActions, essentials, practical, technical, analysis, translation, enableAll, disableAll, keyboardShortcuts, connectingToAI, viewDetails, etc.
+
+---
+
 ## [1.4.4] - 2025-11-27
 
 ### Ajoute
@@ -266,7 +275,8 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 
 ---
 
-[Non publie]: https://github.com/Gohanado/ia-helper/compare/v1.4.4...HEAD
+[Non publie]: https://github.com/Gohanado/ia-helper/compare/v1.4.5...HEAD
+[1.4.5]: https://github.com/Gohanado/ia-helper/releases/tag/v1.4.5
 [1.4.4]: https://github.com/Gohanado/ia-helper/releases/tag/v1.4.4
 [1.4.3]: https://github.com/Gohanado/ia-helper/releases/tag/v1.4.3
 [1.4.2]: https://github.com/Gohanado/ia-helper/releases/tag/v1.4.2
