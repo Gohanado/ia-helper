@@ -48,9 +48,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadConfig();
   await loadPendingResult();
   setupEventListeners();
-  
+
   if (pendingResult) {
-    startGeneration();
+    // Si on a un resultat pre-genere, l'afficher directement
+    if (pendingResult.preGeneratedResult) {
+      currentResult = pendingResult.preGeneratedResult;
+      renderMarkdown(currentResult, elements.resultContent, false);
+      setStatus('done', 'Termine');
+      updateStats();
+    } else {
+      startGeneration();
+    }
   }
 });
 

@@ -14,6 +14,17 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 
 ---
 
+## [1.4.3] - 2025-11-27
+
+### Ajoute
+- **Menu copie avance**: Copier en Markdown, Texte brut ou HTML depuis le popup
+- **Voir en detail sans regenerer**: Cliquer sur "Voir en detail" affiche directement le resultat deja genere au lieu de relancer l'IA
+
+### Retire
+- **Bouton "Nouvel onglet"**: Retire de la page results.html (inutile)
+
+---
+
 ## [1.4.2] - 2025-11-27
 
 ### Ajoute
@@ -244,7 +255,8 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 
 ---
 
-[Non publie]: https://github.com/Gohanado/ia-helper/compare/v1.4.2...HEAD
+[Non publie]: https://github.com/Gohanado/ia-helper/compare/v1.4.3...HEAD
+[1.4.3]: https://github.com/Gohanado/ia-helper/releases/tag/v1.4.3
 [1.4.2]: https://github.com/Gohanado/ia-helper/releases/tag/v1.4.2
 [1.4.1]: https://github.com/Gohanado/ia-helper/releases/tag/v1.4.1
 [1.4.0]: https://github.com/Gohanado/ia-helper/releases/tag/v1.4.0

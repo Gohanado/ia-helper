@@ -485,8 +485,13 @@
     }
   }
 
+  // Variable pour stocker le resultat genere
+  let currentPopupResult = '';
+
   // Afficher le popup inline pour une action
   function showActionPopup(actionId, content, systemPrompt) {
+    currentPopupResult = '';
+
     // Creer le modal
     const modal = document.createElement('div');
     modal.id = 'ia-helper-action-modal';
@@ -504,7 +509,14 @@
           </div>
         </div>
         <div class="ia-action-actions">
-          <button class="ia-action-btn ia-action-btn-secondary ia-action-copy">Copier</button>
+          <div class="ia-action-copy-dropdown">
+            <button class="ia-action-btn ia-action-btn-secondary ia-action-copy-toggle">Copier</button>
+            <div class="ia-action-copy-menu">
+              <button class="ia-action-copy-option" data-format="markdown">Markdown</button>
+              <button class="ia-action-copy-option" data-format="text">Texte brut</button>
+              <button class="ia-action-copy-option" data-format="html">HTML</button>
+            </div>
+          </div>
           <button class="ia-action-btn ia-action-btn-secondary ia-action-detail">Voir en detail</button>
           <button class="ia-action-btn ia-action-btn-primary ia-action-close-final">Fermer</button>
         </div>
@@ -649,6 +661,42 @@
         transform: translateY(-1px);
         box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
       }
+      .ia-action-copy-dropdown {
+        position: relative;
+      }
+      .ia-action-copy-menu {
+        display: none;
+        position: absolute;
+        bottom: 100%;
+        left: 0;
+        background: #1a1a2e;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 8px;
+        padding: 4px;
+        margin-bottom: 4px;
+        min-width: 140px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+      }
+      .ia-action-copy-menu.active {
+        display: block;
+      }
+      .ia-action-copy-option {
+        display: block;
+        width: 100%;
+        padding: 10px 14px;
+        background: none;
+        border: none;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 13px;
+        text-align: left;
+        cursor: pointer;
+        border-radius: 6px;
+        transition: all 0.15s;
+      }
+      .ia-action-copy-option:hover {
+        background: rgba(102, 126, 234, 0.2);
+        color: #fff;
+      }
     `;
 
     if (!document.getElementById('ia-helper-action-styles')) {
@@ -663,23 +711,84 @@
       if (m) m.remove();
     };
 
+    // Menu copie dropdown
+    const copyToggle = modal.querySelector('.ia-action-copy-toggle');
+    const copyMenu = modal.querySelector('.ia-action-copy-menu');
+
+    copyToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      copyMenu.classList.toggle('active');
+    });
+
+    // Options de copie
+    modal.querySelectorAll('.ia-action-copy-option').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const format = btn.dataset.format;
+        copyInFormat(format);
+        copyMenu.classList.remove('active');
+      });
+    });
+
+    // Fermer menu au clic ailleurs
+    modal.addEventListener('click', () => {
+      copyMenu.classList.remove('active');
+    });
+
     // Event listeners
     modal.querySelector('.ia-action-close').addEventListener('click', closeModal);
     modal.querySelector('.ia-action-close-final').addEventListener('click', closeModal);
     modal.querySelector('.ia-action-overlay').addEventListener('click', closeModal);
-    modal.querySelector('.ia-action-copy').addEventListener('click', () => {
-      const responseText = modal.querySelector('.ia-action-response-content').textContent;
-      navigator.clipboard.writeText(responseText);
-      showNotification('Copie dans le presse-papier!', 'success');
-    });
+
     modal.querySelector('.ia-action-detail').addEventListener('click', () => {
       closeModal();
-      openResultsPage(actionId, content, systemPrompt, null);
+      // Passer le resultat deja genere au lieu de regenerer
+      openResultsPageWithResult(actionId, content, systemPrompt, currentPopupResult);
     });
 
     // Lancer la generation
     const responseEl = modal.querySelector('.ia-action-response-content');
     generateActionResponse(responseEl, content, systemPrompt);
+  }
+
+  // Copier dans un format specifique
+  function copyInFormat(format) {
+    if (!currentPopupResult) {
+      showNotification('Aucun contenu a copier', 'error');
+      return;
+    }
+
+    let textToCopy = currentPopupResult;
+
+    if (format === 'text') {
+      // Texte brut sans formatage Markdown
+      textToCopy = currentPopupResult
+        .replace(/#{1,6}\s/g, '')
+        .replace(/\*\*(.+?)\*\*/g, '$1')
+        .replace(/\*(.+?)\*/g, '$1')
+        .replace(/`{3}[\s\S]*?`{3}/g, (match) => match.replace(/`{3}\w*\n?/g, ''))
+        .replace(/`(.+?)`/g, '$1')
+        .replace(/^[-*+]\s/gm, '')
+        .replace(/^\d+\.\s/gm, '')
+        .replace(/\[(.+?)\]\(.+?\)/g, '$1')
+        .replace(/!\[.*?\]\(.+?\)/g, '')
+        .replace(/>\s/g, '')
+        .trim();
+    } else if (format === 'html') {
+      // Conversion basique Markdown vers HTML
+      textToCopy = currentPopupResult
+        .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+        .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+        .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.+?)\*/g, '<em>$1</em>')
+        .replace(/`(.+?)`/g, '<code>$1</code>')
+        .replace(/\n/g, '<br>');
+    }
+    // format === 'markdown' garde le texte tel quel
+
+    navigator.clipboard.writeText(textToCopy);
+    const formatNames = { markdown: 'Markdown', text: 'Texte brut', html: 'HTML' };
+    showNotification(`Copie en ${formatNames[format]}!`, 'success');
   }
 
   // Generer la reponse pour une action via le background script
@@ -702,7 +811,11 @@
       });
 
       if (response && response.result) {
+        currentPopupResult = response.result;
         element.textContent = response.result;
+        // Retirer le curseur une fois la reponse recue
+        const cursor = element.parentElement?.querySelector('.ia-action-cursor');
+        if (cursor) cursor.remove();
       } else {
         element.innerHTML = `<span class="ia-action-error">Aucune reponse recue</span>`;
       }
@@ -710,6 +823,26 @@
       console.error('IA Helper: Erreur generation', error);
       element.innerHTML = `<span class="ia-action-error">Erreur: ${error.message}</span>`;
     }
+  }
+
+  // Ouvrir la page de resultats avec un resultat deja genere
+  function openResultsPageWithResult(actionId, content, systemPrompt, result) {
+    const resultData = {
+      actionId,
+      content,
+      systemPrompt,
+      targetLanguage: null,
+      timestamp: Date.now(),
+      preGeneratedResult: result // Resultat deja genere
+    };
+
+    chrome.storage.local.set({ pendingResult: resultData }, () => {
+      if (chrome.runtime.lastError) {
+        console.error('IA Helper: Erreur stockage', chrome.runtime.lastError);
+        return;
+      }
+      chrome.runtime.sendMessage({ type: 'OPEN_RESULTS_PAGE' });
+    });
   }
 
   // Ouvrir la page de resultats dans un nouvel onglet
