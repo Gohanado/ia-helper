@@ -1,9 +1,9 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "releaseDate": "2025-11-27",
   "minChromeVersion": "88",
   "downloadUrl": "https://github.com/Gohanado/ia-helper/releases/latest/download/ia-helper.zip",
   "changelogUrl": "https://github.com/Gohanado/ia-helper/blob/main/CHANGELOG.md",
-  "releaseNotes": "Support multi-providers (Ollama, OpenAI, Anthropic, Groq, OpenRouter), actions personnalisees, raccourcis dynamiques"
+  "releaseNotes": "Corrections importantes: prompts sans tableaux, actions categories fonctionnelles, prompt rapide corrige"
 }
 

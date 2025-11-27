@@ -901,7 +901,7 @@
     const input = modal.querySelector('.ia-quick-input').value.trim();
     const selectedText = modal.dataset.selectedText || '';
 
-    if (!input && !selectedText) {
+    if (!input) {
       showNotification('Entrez une instruction', 'error');
       return;
     }
@@ -911,29 +911,25 @@
     const modeRadio = modal.querySelector('input[name="ia-mode"]:checked');
     if (modeRadio) mode = modeRadio.value;
 
-    // Construire le prompt final
-    let finalPrompt = '';
+    // Construire le contenu et le prompt
     let content = '';
+    let systemPrompt = '';
 
-    if (mode === 'with' && selectedText) {
-      // Utiliser le texte comme contexte
-      finalPrompt = input || 'Analyse ce texte et donne-moi des informations utiles.';
+    if ((mode === 'with' || mode === 'only') && selectedText) {
+      // Utiliser le texte selectionne comme contenu
       content = selectedText;
-    } else if (mode === 'only' && selectedText) {
-      // Traiter uniquement le texte selectionne
-      finalPrompt = input || 'Traite ce texte.';
-      content = selectedText;
+      systemPrompt = `${input}\n\nReponds de maniere claire et naturelle. Pas de tableaux.`;
     } else {
-      // Ignorer la selection ou pas de selection
-      finalPrompt = input;
+      // Pas de selection ou mode sans selection
       content = input;
+      systemPrompt = 'Tu es un assistant IA. Reponds de maniere claire et naturelle. Pas de tableaux.';
     }
+
+    console.log('IA Helper: Quick prompt envoi', { mode, content: content.substring(0, 50), systemPrompt });
 
     closeQuickModal();
 
-    // Ouvrir la page de resultats avec le prompt personnalise
-    const systemPrompt = `Tu es un assistant IA intelligent et polyvalent. L'utilisateur te demande: "${finalPrompt}". Reponds de maniere claire, precise et utile.`;
-
+    // Ouvrir la page de resultats
     openResultsPage('quick_prompt', content, systemPrompt, null);
   }
 

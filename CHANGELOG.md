@@ -14,6 +14,25 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 
 ---
 
+## [1.2.0] - 2025-11-27
+
+### Corrige
+- **Modal action personnalisee**: Utilise maintenant des classes CSS au lieu d'IDs pour eviter les conflits
+- **Prompt rapide (Alt+I)**: Correction de l'envoi qui ne fonctionnait pas avec du texte selectionne
+- **Actions des categories**: Les actions Essentiels, Pratiques, Techniques et Analyse fonctionnent maintenant correctement
+- **CSS popup rapide**: Le champ de saisie ne depasse plus a droite (box-sizing corrige)
+- **Duplication de fonctions**: Suppression de 133 lignes de code duplique dans options.js
+- **Menu contextuel**: Ajout d'un mutex pour eviter les doublons d'IDs
+
+### Modifie
+- **Tous les prompts revus**: Plus de tableaux markdown generes
+  - Prompts simplifies pour des reponses fluides et naturelles
+  - Ajout explicite de "Pas de tableaux" dans chaque prompt
+  - Resumer, Expliquer, Developper produisent du texte fluide
+- **Quick prompts**: Resumer page et Extraire points sans formatage excessif
+
+---
+
 ## [1.1.0] - 2025-11-27
 
 ### Ajoute
@@ -138,7 +157,8 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 
 ---
 
-[Non publie]: https://github.com/Gohanado/ia-helper/compare/v1.1.0...HEAD
+[Non publie]: https://github.com/Gohanado/ia-helper/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/Gohanado/ia-helper/releases/tag/v1.2.0
 [1.1.0]: https://github.com/Gohanado/ia-helper/releases/tag/v1.1.0
 [1.0.0]: https://github.com/Gohanado/ia-helper/releases/tag/v1.0.0
 
