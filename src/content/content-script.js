@@ -470,6 +470,10 @@
         // Streaming dans le champ de saisie
         await generateWithStreaming(targetElement, content, systemPrompt);
         showNotification('Traitement termine', 'success');
+      } else if (config.inlinePopupEnabled) {
+        // Afficher dans un popup inline
+        console.log('IA Helper: Affichage popup inline');
+        showActionPopup(actionId, content, systemPrompt);
       } else {
         // Ouvrir la page de resultats
         console.log('IA Helper: Ouverture page resultats');
@@ -478,6 +482,233 @@
     } catch (error) {
       console.error('IA Helper: Erreur', error);
       showNotification('Erreur: ' + error.message, 'error');
+    }
+  }
+
+  // Afficher le popup inline pour une action
+  function showActionPopup(actionId, content, systemPrompt) {
+    // Creer le modal
+    const modal = document.createElement('div');
+    modal.id = 'ia-helper-action-modal';
+    modal.innerHTML = `
+      <div class="ia-action-overlay"></div>
+      <div class="ia-action-container">
+        <div class="ia-action-header">
+          <span class="ia-action-title">IA Helper - Reponse</span>
+          <button class="ia-action-close">&times;</button>
+        </div>
+        <div class="ia-action-response-area">
+          <div class="ia-action-response-content">
+            <span class="ia-action-waiting">Connexion a l'IA en cours...</span>
+            <span class="ia-action-cursor"></span>
+          </div>
+        </div>
+        <div class="ia-action-actions">
+          <button class="ia-action-btn ia-action-btn-secondary ia-action-copy">Copier</button>
+          <button class="ia-action-btn ia-action-btn-secondary ia-action-detail">Voir en detail</button>
+          <button class="ia-action-btn ia-action-btn-primary ia-action-close-final">Fermer</button>
+        </div>
+      </div>
+    `;
+
+    // Styles
+    const styles = document.createElement('style');
+    styles.id = 'ia-helper-action-styles';
+    styles.textContent = `
+      #ia-helper-action-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 2147483647;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      }
+      .ia-action-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(4px);
+      }
+      .ia-action-container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: linear-gradient(145deg, #1a1a2e 0%, #16213e 100%);
+        border-radius: 16px;
+        width: 90%;
+        max-width: 600px;
+        max-height: 80vh;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .ia-action-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .ia-action-title {
+        font-size: 16px;
+        font-weight: 600;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .ia-action-close {
+        background: none;
+        border: none;
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 24px;
+        cursor: pointer;
+        padding: 0;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        transition: all 0.2s;
+      }
+      .ia-action-close:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+      }
+      .ia-action-response-area {
+        padding: 20px;
+        max-height: 400px;
+        overflow-y: auto;
+        flex: 1;
+      }
+      .ia-action-response-content {
+        font-size: 14px;
+        line-height: 1.7;
+        color: rgba(255, 255, 255, 0.9);
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+      .ia-action-cursor {
+        display: inline-block;
+        width: 8px;
+        height: 16px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        animation: ia-action-blink 1s infinite;
+        vertical-align: middle;
+        margin-left: 2px;
+      }
+      @keyframes ia-action-blink {
+        0%, 50% { opacity: 1; }
+        51%, 100% { opacity: 0; }
+      }
+      .ia-action-waiting {
+        color: rgba(255, 255, 255, 0.5);
+        font-style: italic;
+      }
+      .ia-action-error {
+        color: #ff6b6b;
+      }
+      .ia-action-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        padding: 16px 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        background: rgba(0, 0, 0, 0.2);
+      }
+      .ia-action-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+      }
+      .ia-action-btn-secondary {
+        background: rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.8);
+      }
+      .ia-action-btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.15);
+      }
+      .ia-action-btn-primary {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: #fff;
+      }
+      .ia-action-btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+      }
+    `;
+
+    if (!document.getElementById('ia-helper-action-styles')) {
+      document.head.appendChild(styles);
+    }
+
+    document.body.appendChild(modal);
+
+    // Fonction pour fermer
+    const closeModal = () => {
+      const m = document.getElementById('ia-helper-action-modal');
+      if (m) m.remove();
+    };
+
+    // Event listeners
+    modal.querySelector('.ia-action-close').addEventListener('click', closeModal);
+    modal.querySelector('.ia-action-close-final').addEventListener('click', closeModal);
+    modal.querySelector('.ia-action-overlay').addEventListener('click', closeModal);
+    modal.querySelector('.ia-action-copy').addEventListener('click', () => {
+      const responseText = modal.querySelector('.ia-action-response-content').textContent;
+      navigator.clipboard.writeText(responseText);
+      showNotification('Copie dans le presse-papier!', 'success');
+    });
+    modal.querySelector('.ia-action-detail').addEventListener('click', () => {
+      closeModal();
+      openResultsPage(actionId, content, systemPrompt, null);
+    });
+
+    // Lancer la generation
+    const responseEl = modal.querySelector('.ia-action-response-content');
+    generateActionResponse(responseEl, content, systemPrompt);
+  }
+
+  // Generer la reponse pour une action via le background script
+  async function generateActionResponse(element, content, systemPrompt) {
+    try {
+      const response = await new Promise((resolve, reject) => {
+        chrome.runtime.sendMessage({
+          type: 'GENERATE_RESPONSE',
+          content: content,
+          systemPrompt: systemPrompt
+        }, (response) => {
+          if (chrome.runtime.lastError) {
+            reject(new Error(chrome.runtime.lastError.message));
+          } else if (response && response.error) {
+            reject(new Error(response.error));
+          } else {
+            resolve(response);
+          }
+        });
+      });
+
+      if (response && response.result) {
+        element.textContent = response.result;
+      } else {
+        element.innerHTML = `<span class="ia-action-error">Aucune reponse recue</span>`;
+      }
+    } catch (error) {
+      console.error('IA Helper: Erreur generation', error);
+      element.innerHTML = `<span class="ia-action-error">Erreur: ${error.message}</span>`;
     }
   }
 

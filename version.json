@@ -1,9 +1,9 @@
 {
-  "version": "1.4.1",
+  "version": "1.4.2",
   "releaseDate": "2025-11-27",
   "minChromeVersion": "88",
-  "downloadUrl": "https://github.com/Gohanado/ia-helper/archive/refs/tags/v1.4.1.zip",
+  "downloadUrl": "https://github.com/Gohanado/ia-helper/archive/refs/tags/v1.4.2.zip",
   "changelogUrl": "https://github.com/Gohanado/ia-helper/blob/main/CHANGELOG.md",
-  "releaseNotes": "Fix popup inline - generation via background script"
+  "releaseNotes": "Popup inline pour toutes les actions du menu contextuel"
 }
 

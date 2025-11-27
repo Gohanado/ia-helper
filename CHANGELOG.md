@@ -14,6 +14,18 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 
 ---
 
+## [1.4.2] - 2025-11-27
+
+### Ajoute
+- **Popup inline pour le menu contextuel**: Toutes les actions du menu clic-droit affichent maintenant la reponse dans un popup flottant au lieu d'ouvrir un nouvel onglet
+- **Boutons Copier/Voir en detail**: Disponibles pour chaque action
+- **Option desactivable**: Si desactive dans les options, les actions ouvrent un nouvel onglet comme avant
+
+### Corrige
+- **Erreur currentConfig**: Correction de la reference a la variable config dans le service-worker
+
+---
+
 ## [1.4.1] - 2025-11-27
 
 ### Corrige
@@ -232,7 +244,8 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 
 ---
 
-[Non publie]: https://github.com/Gohanado/ia-helper/compare/v1.4.1...HEAD
+[Non publie]: https://github.com/Gohanado/ia-helper/compare/v1.4.2...HEAD
+[1.4.2]: https://github.com/Gohanado/ia-helper/releases/tag/v1.4.2
 [1.4.1]: https://github.com/Gohanado/ia-helper/releases/tag/v1.4.1
 [1.4.0]: https://github.com/Gohanado/ia-helper/releases/tag/v1.4.0
 [1.3.2]: https://github.com/Gohanado/ia-helper/releases/tag/v1.3.2

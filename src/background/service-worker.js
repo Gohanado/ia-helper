@@ -570,10 +570,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 // Generer une reponse IA (multi-provider)
 async function generateAIResponse(content, systemPrompt) {
-  const provider = currentConfig.provider || 'ollama';
-  const apiUrl = currentConfig.apiUrl || DEFAULT_CONFIG.apiUrl;
-  const apiKey = currentConfig.apiKey || '';
-  const model = currentConfig.selectedModel || '';
+  // Recharger la config pour avoir les derniers parametres
+  await loadConfig();
+
+  const provider = config.provider || 'ollama';
+  const apiUrl = config.apiUrl || DEFAULT_CONFIG.apiUrl;
+  const apiKey = config.apiKey || '';
+  const model = config.selectedModel || '';
 
   let response;
   let result = '';
