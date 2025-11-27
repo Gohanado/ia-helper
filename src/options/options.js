@@ -43,23 +43,27 @@ const TRANSLATE_LANGUAGES = [
   { code: 'nl', name: 'Neerlandais' }
 ];
 
-// Actions de base
+// Actions de base avec prompts
 const BASE_ACTIONS = {
-  correct_errors: { id: 'correct_errors', name: 'Corriger l\'orthographe', description: 'Corrige les fautes', category: 'essential', defaultEnabled: true },
-  summarize: { id: 'summarize', name: 'Resumer', description: 'Resume le texte', category: 'essential', defaultEnabled: true },
-  explain_simple: { id: 'explain_simple', name: 'Expliquer simplement', description: 'Explique simplement', category: 'essential', defaultEnabled: true },
-  improve_style: { id: 'improve_style', name: 'Ameliorer le style', description: 'Ameliore la clarte', category: 'essential', defaultEnabled: true },
-  expand_content: { id: 'expand_content', name: 'Developper', description: 'Developpe le texte', category: 'essential', defaultEnabled: true },
-  reformat_mail_pro: { id: 'reformat_mail_pro', name: 'Email professionnel', description: 'Format email pro', category: 'essential', defaultEnabled: true },
-  bullet_points: { id: 'bullet_points', name: 'Liste a puces', description: 'Convertit en liste', category: 'practical', defaultEnabled: false },
-  extract_key_points: { id: 'extract_key_points', name: 'Points cles', description: 'Extrait l\'essentiel', category: 'practical', defaultEnabled: false },
-  make_shorter: { id: 'make_shorter', name: 'Raccourcir', description: 'Reduit la longueur', category: 'practical', defaultEnabled: false },
-  make_formal: { id: 'make_formal', name: 'Ton formel', description: 'Rend plus formel', category: 'practical', defaultEnabled: false },
-  make_casual: { id: 'make_casual', name: 'Ton decontracte', description: 'Rend plus decontracte', category: 'practical', defaultEnabled: false },
-  explain_code: { id: 'explain_code', name: 'Expliquer le code', description: 'Explique le code', category: 'technical', defaultEnabled: false },
-  review_code: { id: 'review_code', name: 'Revue de code', description: 'Analyse le code', category: 'technical', defaultEnabled: false },
-  debug_help: { id: 'debug_help', name: 'Aide debug', description: 'Aide a debugger', category: 'technical', defaultEnabled: false },
-  sentiment_analysis: { id: 'sentiment_analysis', name: 'Analyser le sentiment', description: 'Analyse le ton', category: 'analysis', defaultEnabled: false }
+  // === ESSENTIELS ===
+  correct_errors: { id: 'correct_errors', name: 'Corriger l\'orthographe', description: 'Corrige les fautes', prompt: 'Corrige les fautes. Retourne uniquement le texte corrige.', category: 'essential', defaultEnabled: true },
+  summarize: { id: 'summarize', name: 'Resumer', description: 'Resume le texte', prompt: 'Resume en un paragraphe fluide. Pas de listes ni tableaux.', category: 'essential', defaultEnabled: true },
+  explain_simple: { id: 'explain_simple', name: 'Expliquer simplement', description: 'Explique simplement', prompt: 'Explique simplement. Texte fluide, pas de listes ni tableaux.', category: 'essential', defaultEnabled: true },
+  improve_style: { id: 'improve_style', name: 'Ameliorer le style', description: 'Ameliore la clarte', prompt: 'Ameliore le style. Pas de formatage special.', category: 'essential', defaultEnabled: true },
+  expand_content: { id: 'expand_content', name: 'Developper', description: 'Developpe le texte', prompt: 'Developpe avec plus de details. Style fluide, pas de tableaux.', category: 'essential', defaultEnabled: true },
+  reformat_mail_pro: { id: 'reformat_mail_pro', name: 'Email professionnel', description: 'Format email pro', prompt: 'Transforme en email professionnel. Texte fluide, pas de tableaux.', category: 'essential', defaultEnabled: true },
+  // === PRATIQUES ===
+  bullet_points: { id: 'bullet_points', name: 'Liste a puces', description: 'Convertit en liste', prompt: 'Convertis en liste avec des tirets simples. Pas de tableaux.', category: 'practical', defaultEnabled: false },
+  extract_key_points: { id: 'extract_key_points', name: 'Points cles', description: 'Extrait l\'essentiel', prompt: 'Donne 3-5 points essentiels avec des tirets. Pas de tableaux.', category: 'practical', defaultEnabled: false },
+  make_shorter: { id: 'make_shorter', name: 'Raccourcir', description: 'Reduit la longueur', prompt: 'Raccourcis de moitie. Texte fluide.', category: 'practical', defaultEnabled: false },
+  make_formal: { id: 'make_formal', name: 'Ton formel', description: 'Rend plus formel', prompt: 'Reecris en ton formel. Pas de formatage special.', category: 'practical', defaultEnabled: false },
+  make_casual: { id: 'make_casual', name: 'Ton decontracte', description: 'Rend plus decontracte', prompt: 'Reecris en ton decontracte. Pas de formatage special.', category: 'practical', defaultEnabled: false },
+  // === TECHNIQUES ===
+  explain_code: { id: 'explain_code', name: 'Expliquer le code', description: 'Explique le code', prompt: 'Explique ce code clairement. Pas de tableaux.', category: 'technical', defaultEnabled: false },
+  review_code: { id: 'review_code', name: 'Revue de code', description: 'Analyse le code', prompt: 'Revue de code avec tirets pour les points. Pas de tableaux.', category: 'technical', defaultEnabled: false },
+  debug_help: { id: 'debug_help', name: 'Aide debug', description: 'Aide a debugger', prompt: 'Analyse l\'erreur et propose des solutions. Pas de tableaux.', category: 'technical', defaultEnabled: false },
+  // === ANALYSE ===
+  sentiment_analysis: { id: 'sentiment_analysis', name: 'Analyser le sentiment', description: 'Analyse le ton', prompt: 'Analyse le sentiment en 2-3 phrases. Pas de tableaux.', category: 'analysis', defaultEnabled: false }
 };
 
 const DEFAULT_ENABLED_ACTIONS = Object.keys(BASE_ACTIONS).filter(k => BASE_ACTIONS[k].defaultEnabled);
@@ -972,6 +976,40 @@ function formatShortcut(shortcut) {
   return parts.join(' + ');
 }
 
+// Raccourcis systeme/navigateur courants a eviter
+const SYSTEM_SHORTCUTS = [
+  { key: 'c', ctrl: true }, { key: 'v', ctrl: true }, { key: 'x', ctrl: true }, { key: 'z', ctrl: true },
+  { key: 'a', ctrl: true }, { key: 's', ctrl: true }, { key: 'f', ctrl: true }, { key: 'p', ctrl: true },
+  { key: 'n', ctrl: true }, { key: 't', ctrl: true }, { key: 'w', ctrl: true }, { key: 'r', ctrl: true },
+  { key: 'l', ctrl: true }, { key: 'd', ctrl: true }, { key: 'h', ctrl: true }, { key: 'j', ctrl: true },
+  { key: 'tab', alt: true }, { key: 'f4', alt: true }, { key: 'escape', alt: false }
+];
+
+// Verifier si un raccourci est en conflit
+function checkShortcutConflict(newShortcut, excludeActionId = null) {
+  // Verifier les raccourcis systeme
+  for (const sys of SYSTEM_SHORTCUTS) {
+    if (newShortcut.key === sys.key &&
+        newShortcut.ctrl === (sys.ctrl || false) &&
+        !newShortcut.alt && !newShortcut.shift) {
+      return { conflict: true, reason: 'systeme', message: `${formatShortcut(newShortcut)} est un raccourci systeme/navigateur` };
+    }
+  }
+
+  // Verifier les raccourcis existants
+  for (const [actionId, shortcut] of Object.entries(shortcuts)) {
+    if (actionId === excludeActionId) continue;
+    if (newShortcut.key === shortcut.key &&
+        newShortcut.ctrl === shortcut.ctrl &&
+        newShortcut.alt === shortcut.alt &&
+        newShortcut.shift === shortcut.shift) {
+      return { conflict: true, reason: 'existant', message: `Deja utilise pour "${shortcut.actionName}"` };
+    }
+  }
+
+  return { conflict: false };
+}
+
 // Commencer l'enregistrement d'un raccourci
 function startRecordingShortcut(button, actionId) {
   button.classList.add('recording');
@@ -982,11 +1020,25 @@ function startRecordingShortcut(button, actionId) {
 
     if (['Control', 'Alt', 'Shift', 'Meta'].includes(e.key)) return;
 
-    shortcuts[actionId] = {
+    const newShortcut = {
       key: e.key.toLowerCase(),
       ctrl: e.ctrlKey,
       alt: e.altKey,
-      shift: e.shiftKey,
+      shift: e.shiftKey
+    };
+
+    // Verifier les conflits
+    const conflict = checkShortcutConflict(newShortcut, actionId);
+    if (conflict.conflict) {
+      showNotification(conflict.message, 'error');
+      button.classList.remove('recording');
+      button.querySelector('.key-display').textContent = formatShortcut(shortcuts[actionId] || { key: '?' });
+      document.removeEventListener('keydown', handler);
+      return;
+    }
+
+    shortcuts[actionId] = {
+      ...newShortcut,
       actionId,
       actionName: getActionName(actionId)
     };
@@ -994,6 +1046,7 @@ function startRecordingShortcut(button, actionId) {
     button.classList.remove('recording');
     button.querySelector('.key-display').textContent = formatShortcut(shortcuts[actionId]);
     document.removeEventListener('keydown', handler);
+    showNotification('Raccourci enregistre !', 'success');
   };
 
   document.addEventListener('keydown', handler);
@@ -1054,13 +1107,25 @@ function showAddShortcutModal() {
     e.preventDefault();
     if (['Control', 'Alt', 'Shift', 'Meta'].includes(e.key)) return;
 
-    newShortcut = {
+    const testShortcut = {
       key: e.key.toLowerCase(),
       ctrl: e.ctrlKey,
       alt: e.altKey,
       shift: e.shiftKey
     };
 
+    // Verifier les conflits
+    const conflict = checkShortcutConflict(testShortcut);
+    if (conflict.conflict) {
+      showNotification(conflict.message, 'error');
+      shortcutBtn.classList.remove('recording');
+      shortcutBtn.querySelector('.key-display').textContent = 'Cliquez pour definir';
+      saveBtn.disabled = true;
+      newShortcut = null;
+      return;
+    }
+
+    newShortcut = testShortcut;
     shortcutBtn.classList.remove('recording');
     shortcutBtn.querySelector('.key-display').textContent = formatShortcut(newShortcut);
     saveBtn.disabled = false;
@@ -1078,6 +1143,7 @@ function showAddShortcutModal() {
   });
 
   saveBtn.addEventListener('click', () => {
+    if (!newShortcut) return;
     const actionId = document.getElementById('shortcut-action').value;
     shortcuts[actionId] = {
       ...newShortcut,

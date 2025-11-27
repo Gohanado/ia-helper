@@ -267,6 +267,7 @@ body {
 }
 
 input[type="text"],
+input[type="password"],
 textarea {
   flex: 1;
   padding: 12px 16px;
@@ -305,6 +306,7 @@ select option {
 }
 
 input[type="text"]:focus,
+input[type="password"]:focus,
 select:focus,
 textarea:focus {
   outline: none;

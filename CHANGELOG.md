@@ -14,6 +14,19 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 
 ---
 
+## [1.3.2] - 2025-11-27
+
+### Corrige
+- **Bug critique prompts**: Les prompts par defaut sont maintenant affiches correctement lors de la modification d'une action
+- **CSS champ API key**: Le champ de saisie de la cle API a maintenant le meme style que les autres champs
+- **Detection conflits raccourcis**: Verification automatique des conflits avec les raccourcis systeme (Ctrl+C, Ctrl+V, etc.) et les raccourcis existants
+- **Message de confirmation**: Notification de succes lors de l'enregistrement d'un raccourci
+
+### Supprime
+- **Liens de don**: Suppression des liens PayPal de la sidebar et de la page A propos
+
+---
+
 ## [1.3.1] - 2025-11-27
 
 ### Corrige
@@ -197,7 +210,8 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 
 ---
 
-[Non publie]: https://github.com/Gohanado/ia-helper/compare/v1.3.1...HEAD
+[Non publie]: https://github.com/Gohanado/ia-helper/compare/v1.3.2...HEAD
+[1.3.2]: https://github.com/Gohanado/ia-helper/releases/tag/v1.3.2
 [1.3.1]: https://github.com/Gohanado/ia-helper/releases/tag/v1.3.1
 [1.3.0]: https://github.com/Gohanado/ia-helper/releases/tag/v1.3.0
 [1.2.2]: https://github.com/Gohanado/ia-helper/releases/tag/v1.2.2
