@@ -599,11 +599,14 @@
     const provider = config.provider || 'ollama';
     const indicator = showLoadingIndicator(element);
 
+    // Sauvegarder le contenu original pour restauration en cas d'erreur
+    const savedContent = getEditableContent(element) || '';
+
     try {
       // Determiner le contenu initial selon le mode
       let currentContent = '';
       if (mode === 'append') {
-        currentContent = getEditableContent(element) || '';
+        currentContent = savedContent;
         if (currentContent && !currentContent.endsWith('\n')) {
           currentContent += '\n\n';
         }
@@ -714,6 +717,8 @@
       hideLoadingIndicator(indicator);
     } catch (error) {
       hideLoadingIndicator(indicator);
+      // Restaurer le contenu original en cas d'erreur
+      setEditableContent(element, savedContent);
       throw error;
     }
   }
