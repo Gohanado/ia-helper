@@ -13,7 +13,17 @@
       <div class="sidebar-header">
         <img src="../../assets/icons/icon48.png" alt="IA Helper" class="sidebar-logo">
         <h1>IA Helper</h1>
-        <span class="version">v1.0.0</span>
+        <span class="version" id="current-version">v1.1.0</span>
+      </div>
+
+      <!-- Notification mise a jour -->
+      <div class="update-banner" id="update-banner" style="display: none;">
+        <div class="update-icon">!</div>
+        <div class="update-text">
+          <strong>Mise a jour disponible</strong>
+          <span id="update-version">v1.2.0</span>
+        </div>
+        <a href="#" id="update-link" target="_blank" class="update-btn">Telecharger</a>
       </div>
 
       <nav class="sidebar-nav">
@@ -23,7 +33,7 @@
         </button>
         <button class="nav-item" data-section="presets">
           <span class="nav-icon">P</span>
-          <span data-i18n="presets">Presets</span>
+          <span data-i18n="presets">Actions</span>
         </button>
         <button class="nav-item" data-section="shortcuts">
           <span class="nav-icon">K</span>
@@ -34,6 +44,26 @@
           <span data-i18n="about">A propos</span>
         </button>
       </nav>
+
+      <!-- Quick actions sidebar -->
+      <div class="sidebar-footer">
+        <a href="https://github.com/Gohanado/ia-helper/blob/main/docs/README.md" target="_blank" class="sidebar-link">
+          <span class="link-icon">?</span>
+          <span>Documentation</span>
+        </a>
+        <a href="https://github.com/Gohanado/ia-helper/issues/new?template=bug_report.md" target="_blank" class="sidebar-link">
+          <span class="link-icon">!</span>
+          <span>Signaler un bug</span>
+        </a>
+        <a href="https://github.com/Gohanado/ia-helper/issues/new?template=feature_request.md" target="_blank" class="sidebar-link">
+          <span class="link-icon">+</span>
+          <span>Suggerer une feature</span>
+        </a>
+        <a href="https://paypal.me/gohanado" target="_blank" class="sidebar-link sidebar-link-donate">
+          <span class="link-icon">$</span>
+          <span>Faire un don</span>
+        </a>
+      </div>
     </aside>
 
     <!-- Main Content -->
@@ -233,16 +263,80 @@
       <!-- Section A propos -->
       <section class="section" id="section-about">
         <h2 data-i18n="aboutTitle">A propos de IA Helper</h2>
-        <div class="about-content">
-          <p><strong data-i18n="version">Version:</strong> 1.0.0</p>
-          <p><strong>Description:</strong> <span data-i18n="description">Assistant IA intelligent pour Chrome connecte a Ollama.</span></p>
-          <p data-i18n="aboutText">IA Helper vous permet d'utiliser des modeles d'IA locaux pour corriger, traduire, reformuler et analyser du texte directement dans votre navigateur.</p>
-          <div class="about-links">
-            <a href="https://github.com/Gohanado/ia-helper/blob/main/docs/README.md" target="_blank" class="btn btn-secondary" data-i18n="documentation">Documentation</a>
-            <a href="https://github.com/Gohanado/ia-helper/issues/new?template=bug_report.md&title=%5BBUG%5D+&labels=bug&body=%23%23%20Description%20du%20bug%0A%0A%23%23%20Etapes%20pour%20reproduire%0A1.%20%0A2.%20%0A3.%20%0A%0A%23%23%20Comportement%20attendu%0A%0A%23%23%20Captures%20d%27ecran%20(si%20applicable)%0A%0A%23%23%20Environnement%0A-%20Navigateur%3A%20Chrome%0A-%20Version%20extension%3A%201.0.0%0A-%20Modele%20Ollama%3A%20" target="_blank" class="btn btn-secondary" data-i18n="reportBug">Signaler un bug</a>
-            <a href="https://github.com/Gohanado/ia-helper/issues/new?template=feature_request.md&title=%5BFEATURE%5D+&labels=enhancement&body=%23%23%20Description%20de%20la%20fonctionnalite%0A%0A%23%23%20Cas%20d%27utilisation%0A%0A%23%23%20Solution%20proposee%0A%0A%23%23%20Alternatives%20considerees%0A" target="_blank" class="btn btn-secondary" data-i18n="requestFeature">Demander une feature</a>
+
+        <div class="about-hero">
+          <img src="../../assets/icons/icon128.png" alt="IA Helper" class="about-logo">
+          <div class="about-hero-text">
+            <h3>IA Helper</h3>
+            <p class="about-version" id="about-version">Version 1.1.0</p>
+            <p class="about-tagline">Assistant IA intelligent pour Chrome</p>
           </div>
-          <button id="btn-reset" class="btn btn-danger" data-i18n="resetOptions">Reinitialiser les options</button>
+        </div>
+
+        <div class="about-cards">
+          <!-- Mise a jour -->
+          <div class="about-card" id="update-card">
+            <div class="about-card-icon">!</div>
+            <div class="about-card-content">
+              <h4>Mises a jour</h4>
+              <p id="update-status">Verification...</p>
+              <button id="btn-check-update" class="btn btn-secondary btn-sm">Verifier maintenant</button>
+            </div>
+          </div>
+
+          <!-- Changelog -->
+          <div class="about-card">
+            <div class="about-card-icon">*</div>
+            <div class="about-card-content">
+              <h4>Changelog</h4>
+              <p>Voir les nouveautes de cette version</p>
+              <a href="https://github.com/Gohanado/ia-helper/blob/main/CHANGELOG.md" target="_blank" class="btn btn-secondary btn-sm">Voir le changelog</a>
+            </div>
+          </div>
+
+          <!-- Documentation -->
+          <div class="about-card">
+            <div class="about-card-icon">?</div>
+            <div class="about-card-content">
+              <h4>Documentation</h4>
+              <p>Guide d'installation et d'utilisation</p>
+              <a href="https://github.com/Gohanado/ia-helper/blob/main/docs/README.md" target="_blank" class="btn btn-secondary btn-sm">Lire la doc</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="about-section">
+          <h4>Signaler un probleme</h4>
+          <div class="about-buttons">
+            <a href="https://github.com/Gohanado/ia-helper/issues/new?template=bug_report.md" target="_blank" class="btn btn-secondary">
+              <span class="btn-icon">!</span> Signaler un bug
+            </a>
+            <a href="https://github.com/Gohanado/ia-helper/issues/new?template=feature_request.md" target="_blank" class="btn btn-secondary">
+              <span class="btn-icon">+</span> Suggerer une feature
+            </a>
+          </div>
+        </div>
+
+        <div class="about-section">
+          <h4>Soutenir le projet</h4>
+          <p>Si IA Helper vous est utile, vous pouvez soutenir son developpement.</p>
+          <a href="https://paypal.me/gohanado" target="_blank" class="btn btn-donate">
+            Faire un don via PayPal
+          </a>
+        </div>
+
+        <div class="about-section about-credits">
+          <h4>Credits</h4>
+          <p><strong>Developpeur:</strong> Gohanado</p>
+          <p><strong>Contact:</strong> contact@badom.ch</p>
+          <p><strong>GitHub:</strong> <a href="https://github.com/Gohanado/ia-helper" target="_blank">github.com/Gohanado/ia-helper</a></p>
+          <p><strong>Licence:</strong> Source-Available (usage personnel gratuit)</p>
+        </div>
+
+        <div class="about-section">
+          <h4>Reinitialisation</h4>
+          <p class="text-muted">Restaurer tous les parametres par defaut. Cette action est irreversible.</p>
+          <button id="btn-reset" class="btn btn-danger">Reinitialiser les options</button>
         </div>
       </section>
     </main>

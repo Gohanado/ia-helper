@@ -2,6 +2,10 @@
 
 import { t } from '../i18n/translations.js';
 
+// Version courante
+const VERSION = '1.1.0';
+const VERSION_URL = 'https://raw.githubusercontent.com/Gohanado/ia-helper/main/version.json';
+
 // Configuration par defaut
 const DEFAULT_CONFIG = {
   provider: 'ollama',
@@ -1519,3 +1523,129 @@ async function saveShortcuts() {
 
   showNotification('Raccourcis sauvegardes !', 'success');
 }
+
+// ============================================
+// SYSTEME DE MISE A JOUR
+// ============================================
+
+function compareVersions(v1, v2) {
+  const parts1 = v1.split('.').map(Number);
+  const parts2 = v2.split('.').map(Number);
+
+  for (let i = 0; i < Math.max(parts1.length, parts2.length); i++) {
+    const p1 = parts1[i] || 0;
+    const p2 = parts2[i] || 0;
+    if (p1 > p2) return 1;
+    if (p1 < p2) return -1;
+  }
+  return 0;
+}
+
+async function checkForUpdates() {
+  const updateStatus = document.getElementById('update-status');
+  const updateCard = document.getElementById('update-card');
+  const updateBanner = document.getElementById('update-banner');
+
+  if (updateStatus) {
+    updateStatus.textContent = 'Verification en cours...';
+  }
+
+  try {
+    const response = await fetch(VERSION_URL, { cache: 'no-store' });
+    if (!response.ok) throw new Error('Network error');
+
+    const data = await response.json();
+    const currentVersion = VERSION;
+
+    if (compareVersions(data.version, currentVersion) > 0) {
+      // Mise a jour disponible
+      if (updateStatus) {
+        updateStatus.innerHTML = `<strong style="color: var(--success);">Nouvelle version ${data.version} disponible!</strong><br><small>${data.releaseNotes || ''}</small>`;
+      }
+      if (updateCard) {
+        updateCard.classList.add('update-available');
+      }
+      if (updateBanner) {
+        updateBanner.style.display = 'flex';
+        document.getElementById('update-version').textContent = `v${data.version}`;
+        document.getElementById('update-link').href = data.downloadUrl || 'https://github.com/Gohanado/ia-helper/releases/latest';
+      }
+
+      // Sauvegarder l'info de mise a jour
+      await chrome.storage.local.set({
+        updateAvailable: {
+          version: data.version,
+          downloadUrl: data.downloadUrl,
+          releaseNotes: data.releaseNotes
+        }
+      });
+    } else {
+      if (updateStatus) {
+        updateStatus.textContent = 'Vous avez la derniere version.';
+      }
+      if (updateBanner) {
+        updateBanner.style.display = 'none';
+      }
+      await chrome.storage.local.remove(['updateAvailable']);
+    }
+
+    // Sauvegarder le timestamp de verification
+    await chrome.storage.local.set({ lastUpdateCheck: Date.now() });
+
+  } catch (error) {
+    console.error('Erreur verification mise a jour:', error);
+    if (updateStatus) {
+      updateStatus.textContent = 'Impossible de verifier les mises a jour.';
+    }
+  }
+}
+
+async function loadUpdateStatus() {
+  // Afficher la version courante
+  const versionEl = document.getElementById('current-version');
+  const aboutVersionEl = document.getElementById('about-version');
+  if (versionEl) versionEl.textContent = `v${VERSION}`;
+  if (aboutVersionEl) aboutVersionEl.textContent = `Version ${VERSION}`;
+
+  // Verifier si une mise a jour est deja connue
+  const result = await chrome.storage.local.get(['updateAvailable', 'lastUpdateCheck']);
+
+  if (result.updateAvailable) {
+    const updateBanner = document.getElementById('update-banner');
+    const updateStatus = document.getElementById('update-status');
+    const updateCard = document.getElementById('update-card');
+
+    if (updateBanner) {
+      updateBanner.style.display = 'flex';
+      document.getElementById('update-version').textContent = `v${result.updateAvailable.version}`;
+      document.getElementById('update-link').href = result.updateAvailable.downloadUrl || 'https://github.com/Gohanado/ia-helper/releases/latest';
+    }
+    if (updateStatus) {
+      updateStatus.innerHTML = `<strong style="color: var(--success);">Nouvelle version ${result.updateAvailable.version} disponible!</strong>`;
+    }
+    if (updateCard) {
+      updateCard.classList.add('update-available');
+    }
+  }
+
+  // Verifier automatiquement si derniere verification > 24h
+  const lastCheck = result.lastUpdateCheck || 0;
+  const dayInMs = 24 * 60 * 60 * 1000;
+
+  if (Date.now() - lastCheck > dayInMs) {
+    checkForUpdates();
+  }
+}
+
+// Bouton verification manuelle
+document.addEventListener('DOMContentLoaded', () => {
+  const btnCheckUpdate = document.getElementById('btn-check-update');
+  if (btnCheckUpdate) {
+    btnCheckUpdate.addEventListener('click', () => {
+      checkForUpdates();
+    });
+  }
+
+  // Charger le statut des mises a jour
+  loadUpdateStatus();
+});

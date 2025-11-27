@@ -9,10 +9,51 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 
 ### A venir
 - Systeme de logging et debug avance
-- Creation automatique d'issues GitHub en cas d'erreur
-- Mode sombre/clair automatique
-- Raccourcis clavier personnalisables
 - Historique des actions
+- Mode sombre/clair automatique
+
+---
+
+## [1.1.0] - 2025-11-27
+
+### Ajoute
+- **Support multi-providers IA**
+  - Ollama (local, par defaut)
+  - OpenAI (GPT-4o, GPT-4-turbo, GPT-3.5-turbo)
+  - Anthropic (Claude Sonnet 4, Claude 3.5 Sonnet, Claude 3 Haiku)
+  - Groq (Llama 3.3 70B, Mixtral)
+  - OpenRouter (acces multi-modeles)
+  - Provider personnalise (compatible OpenAI API)
+
+- **Actions personnalisees**
+  - Creation d'actions avec prompts personnalises
+  - Integration au menu contextuel
+  - Gestion (ajout/suppression) depuis les options
+
+- **Raccourcis clavier dynamiques**
+  - Attribution de raccourcis a n'importe quelle action
+  - Support des actions personnalisees
+  - Support des traductions rapides
+  - Enregistrement visuel des combinaisons
+
+- **Traductions etendues**
+  - 12 langues disponibles (FR, EN, ES, DE, IT, PT, ZH, JA, KO, AR, RU, NL)
+  - Activation/desactivation individuelle
+  - Integration au menu contextuel
+
+- **Systeme de mise a jour**
+  - Verification automatique des nouvelles versions
+  - Notification dans les options
+  - Lien direct vers le changelog
+
+### Modifie
+- Interface des options reorganisee
+- Gestion des providers avec URL et cle API dynamiques
+- Streaming adapte a chaque provider (Ollama, OpenAI, Anthropic)
+
+### Corrige
+- Injections multiples du content-script dans les iframes
+- Actions du popup qui ne fonctionnaient pas
 
 ---
 
@@ -97,6 +138,7 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 
 ---
 
-[Non publie]: https://github.com/Gohanado/ia-helper/compare/v1.0.0...HEAD
+[Non publie]: https://github.com/Gohanado/ia-helper/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/Gohanado/ia-helper/releases/tag/v1.1.0
 [1.0.0]: https://github.com/Gohanado/ia-helper/releases/tag/v1.0.0
 
