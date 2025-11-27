@@ -196,7 +196,58 @@ export const TRANSLATIONS = {
     refinementOptions: 'Options d\'affinement',
     customInstructions: 'Instructions personnalisees',
     sendInstructions: 'Envoyer',
-    instructionsPlaceholder: 'Ajouter des instructions...'
+    instructionsPlaceholder: 'Ajouter des instructions...',
+    reduce: 'Reduire',
+    expand: 'Agrandir',
+    waiting: 'En attente...',
+    responseWillAppear: 'La reponse apparaitra ici...',
+    apply: 'Appliquer',
+    copyOptions: 'Options de copie',
+
+    // About section
+    updates: 'Mises a jour',
+    checking: 'Verification...',
+    checkNow: 'Verifier maintenant',
+    changelog: 'Changelog',
+    changelogDesc: 'Voir les nouveautes de cette version',
+    viewChangelog: 'Voir le changelog',
+    documentationDesc: 'Guide d\'installation et d\'utilisation',
+    readDoc: 'Lire la doc',
+    reportProblem: 'Signaler un probleme',
+    credits: 'Credits',
+    developer: 'Developpeur:',
+    contact: 'Contact:',
+    license: 'Licence:',
+    freePersonalUse: 'usage personnel gratuit',
+    resetSection: 'Reinitialisation',
+    resetWarning: 'Restaurer tous les parametres par defaut. Cette action est irreversible.',
+    updateAvailable: 'Mise a jour disponible',
+    download: 'Telecharger',
+    youHaveLatest: 'Vous avez la derniere version.',
+    unableToCheckUpdates: 'Impossible de verifier les mises a jour.',
+
+    // Modal
+    newAction: 'Nouvelle action',
+    name: 'Nom',
+    context: 'Contexte',
+    textSelection: 'Selection de texte',
+    inputField: 'Champs de saisie',
+    fullPage: 'Page entiere',
+    all: 'Tous',
+    promptPlaceholder: 'Instructions pour l\'IA...',
+    actionNamePlaceholder: 'Ex: Reformuler en poesie',
+    presetNameExample: 'Ex: Mon workflow',
+    shortDescription: 'Description courte',
+
+    // Notifications
+    allActionsEnabled: 'Toutes les actions activees',
+    allActionsDisabled: 'Toutes les actions desactivees',
+    defaultActionsRestored: 'Actions par defaut restaurees',
+    shortcutAdded: 'Raccourci ajoute !',
+    shortcutsSaved: 'Raccourcis sauvegardes !',
+    fillAllFields: 'Veuillez remplir tous les champs',
+    actionCustomCreated: 'Action personnalisee creee !',
+    allActionsHaveShortcuts: 'Toutes les actions ont deja un raccourci'
   },
   
   en: {
@@ -375,7 +426,58 @@ export const TRANSLATIONS = {
     refinementOptions: 'Refinement options',
     customInstructions: 'Custom instructions',
     sendInstructions: 'Send',
-    instructionsPlaceholder: 'Add instructions...'
+    instructionsPlaceholder: 'Add instructions...',
+    reduce: 'Reduce',
+    expand: 'Expand',
+    waiting: 'Waiting...',
+    responseWillAppear: 'Response will appear here...',
+    apply: 'Apply',
+    copyOptions: 'Copy options',
+
+    // About section
+    updates: 'Updates',
+    checking: 'Checking...',
+    checkNow: 'Check now',
+    changelog: 'Changelog',
+    changelogDesc: 'See what\'s new in this version',
+    viewChangelog: 'View changelog',
+    documentationDesc: 'Installation and usage guide',
+    readDoc: 'Read docs',
+    reportProblem: 'Report a problem',
+    credits: 'Credits',
+    developer: 'Developer:',
+    contact: 'Contact:',
+    license: 'License:',
+    freePersonalUse: 'free for personal use',
+    resetSection: 'Reset',
+    resetWarning: 'Restore all default settings. This action is irreversible.',
+    updateAvailable: 'Update available',
+    download: 'Download',
+    youHaveLatest: 'You have the latest version.',
+    unableToCheckUpdates: 'Unable to check for updates.',
+
+    // Modal
+    newAction: 'New action',
+    name: 'Name',
+    context: 'Context',
+    textSelection: 'Text selection',
+    inputField: 'Input field',
+    fullPage: 'Full page',
+    all: 'All',
+    promptPlaceholder: 'Instructions for AI...',
+    actionNamePlaceholder: 'Ex: Rephrase as poetry',
+    presetNameExample: 'Ex: My workflow',
+    shortDescription: 'Short description',
+
+    // Notifications
+    allActionsEnabled: 'All actions enabled',
+    allActionsDisabled: 'All actions disabled',
+    defaultActionsRestored: 'Default actions restored',
+    shortcutAdded: 'Shortcut added!',
+    shortcutsSaved: 'Shortcuts saved!',
+    fillAllFields: 'Please fill all fields',
+    actionCustomCreated: 'Custom action created!',
+    allActionsHaveShortcuts: 'All actions already have a shortcut'
   }
 };
 
@@ -454,7 +556,26 @@ TRANSLATIONS.es = {
   refine: 'Refinar resultado', regenerate: 'Regenerar', shorter: 'Mas corto', longer: 'Mas largo',
   formal: 'Mas formal', casual: 'Mas informal', addInstructions: 'Agregar instrucciones', send: 'Enviar',
   copyMarkdown: 'Copiar como Markdown', copyText: 'Copiar como texto', copyHtml: 'Copiar como HTML', copied: 'Copiado!',
-  language: 'Idioma', interfaceLanguage: 'Idioma de la interfaz', responseLanguage: 'Idioma de respuesta de la IA'
+  language: 'Idioma', interfaceLanguage: 'Idioma de la interfaz', responseLanguage: 'Idioma de respuesta de la IA',
+  // New keys
+  reduce: 'Reducir', expand: 'Ampliar', waiting: 'Esperando...', responseWillAppear: 'La respuesta aparecera aqui...',
+  apply: 'Aplicar', copyOptions: 'Opciones de copia',
+  updates: 'Actualizaciones', checking: 'Verificando...', checkNow: 'Verificar ahora',
+  changelog: 'Changelog', changelogDesc: 'Ver novedades de esta version', viewChangelog: 'Ver changelog',
+  documentationDesc: 'Guia de instalacion y uso', readDoc: 'Leer documentacion',
+  reportProblem: 'Reportar un problema', credits: 'Creditos', developer: 'Desarrollador:', contact: 'Contacto:',
+  license: 'Licencia:', freePersonalUse: 'uso personal gratuito', resetSection: 'Reinicializacion',
+  resetWarning: 'Restaurar todos los ajustes por defecto. Esta accion es irreversible.',
+  updateAvailable: 'Actualizacion disponible', download: 'Descargar',
+  youHaveLatest: 'Tiene la ultima version.', unableToCheckUpdates: 'No se pueden verificar las actualizaciones.',
+  newAction: 'Nueva accion', name: 'Nombre', context: 'Contexto', textSelection: 'Seleccion de texto',
+  inputField: 'Campo de entrada', fullPage: 'Pagina completa', all: 'Todos',
+  promptPlaceholder: 'Instrucciones para la IA...', actionNamePlaceholder: 'Ej: Reformular como poesia',
+  presetNameExample: 'Ej: Mi flujo de trabajo', shortDescription: 'Descripcion corta',
+  allActionsEnabled: 'Todas las acciones activadas', allActionsDisabled: 'Todas las acciones desactivadas',
+  defaultActionsRestored: 'Acciones por defecto restauradas', shortcutAdded: 'Atajo agregado!',
+  shortcutsSaved: 'Atajos guardados!', fillAllFields: 'Complete todos los campos',
+  actionCustomCreated: 'Accion personalizada creada!', allActionsHaveShortcuts: 'Todas las acciones ya tienen atajo'
 };
 
 // Italien
@@ -532,7 +653,26 @@ TRANSLATIONS.it = {
   refine: 'Perfeziona risultato', regenerate: 'Rigenera', shorter: 'Piu corto', longer: 'Piu lungo',
   formal: 'Piu formale', casual: 'Piu informale', addInstructions: 'Aggiungi istruzioni', send: 'Invia',
   copyMarkdown: 'Copia come Markdown', copyText: 'Copia come testo', copyHtml: 'Copia come HTML', copied: 'Copiato!',
-  language: 'Lingua', interfaceLanguage: 'Lingua dell\'interfaccia', responseLanguage: 'Lingua di risposta dell\'IA'
+  language: 'Lingua', interfaceLanguage: 'Lingua dell\'interfaccia', responseLanguage: 'Lingua di risposta dell\'IA',
+  // New keys
+  reduce: 'Riduci', expand: 'Espandi', waiting: 'In attesa...', responseWillAppear: 'La risposta apparira qui...',
+  apply: 'Applica', copyOptions: 'Opzioni di copia',
+  updates: 'Aggiornamenti', checking: 'Verifica...', checkNow: 'Verifica ora',
+  changelog: 'Changelog', changelogDesc: 'Vedi le novita di questa versione', viewChangelog: 'Vedi changelog',
+  documentationDesc: 'Guida all\'installazione e all\'uso', readDoc: 'Leggi documentazione',
+  reportProblem: 'Segnala un problema', credits: 'Crediti', developer: 'Sviluppatore:', contact: 'Contatto:',
+  license: 'Licenza:', freePersonalUse: 'uso personale gratuito', resetSection: 'Reimpostazione',
+  resetWarning: 'Ripristina tutte le impostazioni predefinite. Questa azione e irreversibile.',
+  updateAvailable: 'Aggiornamento disponibile', download: 'Scarica',
+  youHaveLatest: 'Hai l\'ultima versione.', unableToCheckUpdates: 'Impossibile verificare gli aggiornamenti.',
+  newAction: 'Nuova azione', name: 'Nome', context: 'Contesto', textSelection: 'Selezione testo',
+  inputField: 'Campo di input', fullPage: 'Pagina intera', all: 'Tutti',
+  promptPlaceholder: 'Istruzioni per l\'IA...', actionNamePlaceholder: 'Es: Riformula come poesia',
+  presetNameExample: 'Es: Il mio flusso di lavoro', shortDescription: 'Descrizione breve',
+  allActionsEnabled: 'Tutte le azioni attivate', allActionsDisabled: 'Tutte le azioni disattivate',
+  defaultActionsRestored: 'Azioni predefinite ripristinate', shortcutAdded: 'Scorciatoia aggiunta!',
+  shortcutsSaved: 'Scorciatoie salvate!', fillAllFields: 'Compila tutti i campi',
+  actionCustomCreated: 'Azione personalizzata creata!', allActionsHaveShortcuts: 'Tutte le azioni hanno gia una scorciatoia'
 };
 
 // Portugais
@@ -610,7 +750,26 @@ TRANSLATIONS.pt = {
   refine: 'Refinar resultado', regenerate: 'Regenerar', shorter: 'Mais curto', longer: 'Mais longo',
   formal: 'Mais formal', casual: 'Mais informal', addInstructions: 'Adicionar instrucoes', send: 'Enviar',
   copyMarkdown: 'Copiar como Markdown', copyText: 'Copiar como texto', copyHtml: 'Copiar como HTML', copied: 'Copiado!',
-  language: 'Idioma', interfaceLanguage: 'Idioma da interface', responseLanguage: 'Idioma de resposta da IA'
+  language: 'Idioma', interfaceLanguage: 'Idioma da interface', responseLanguage: 'Idioma de resposta da IA',
+  // New keys
+  reduce: 'Reduzir', expand: 'Expandir', waiting: 'Aguardando...', responseWillAppear: 'A resposta aparecera aqui...',
+  apply: 'Aplicar', copyOptions: 'Opcoes de copia',
+  updates: 'Atualizacoes', checking: 'Verificando...', checkNow: 'Verificar agora',
+  changelog: 'Changelog', changelogDesc: 'Veja as novidades desta versao', viewChangelog: 'Ver changelog',
+  documentationDesc: 'Guia de instalacao e uso', readDoc: 'Ler documentacao',
+  reportProblem: 'Reportar um problema', credits: 'Creditos', developer: 'Desenvolvedor:', contact: 'Contato:',
+  license: 'Licenca:', freePersonalUse: 'uso pessoal gratuito', resetSection: 'Redefinicao',
+  resetWarning: 'Restaurar todas as configuracoes padrao. Esta acao e irreversivel.',
+  updateAvailable: 'Atualizacao disponivel', download: 'Baixar',
+  youHaveLatest: 'Voce tem a versao mais recente.', unableToCheckUpdates: 'Nao foi possivel verificar atualizacoes.',
+  newAction: 'Nova acao', name: 'Nome', context: 'Contexto', textSelection: 'Selecao de texto',
+  inputField: 'Campo de entrada', fullPage: 'Pagina inteira', all: 'Todos',
+  promptPlaceholder: 'Instrucoes para a IA...', actionNamePlaceholder: 'Ex: Reformular como poesia',
+  presetNameExample: 'Ex: Meu fluxo de trabalho', shortDescription: 'Descricao curta',
+  allActionsEnabled: 'Todas as acoes ativadas', allActionsDisabled: 'Todas as acoes desativadas',
+  defaultActionsRestored: 'Acoes padrao restauradas', shortcutAdded: 'Atalho adicionado!',
+  shortcutsSaved: 'Atalhos salvos!', fillAllFields: 'Preencha todos os campos',
+  actionCustomCreated: 'Acao personalizada criada!', allActionsHaveShortcuts: 'Todas as acoes ja tem um atalho'
 };
 
 // Available languages

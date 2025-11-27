@@ -14,10 +14,19 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 
 ---
 
-## [1.4.5] - 2025-11-27
+## [1.4.6] - 2025-11-27
 
 ### Ameliore
 - **Traductions 100% completes**: Toutes les cles de traduction sont maintenant disponibles pour les 5 langues (FR, EN, ES, IT, PT)
+- **Popup inline traduit**: Le popup de reponse utilise maintenant le systeme i18n (Copier, Voir en detail, Fermer, etc.)
+- **Notifications traduites**: Toutes les notifications dans options.js utilisent maintenant t() au lieu de textes en dur
+- **Nouvelles cles ajoutees**: reduce, expand, waiting, responseWillAppear, apply, copyOptions, updates, checking, checkNow, changelog, changelogDesc, viewChangelog, documentationDesc, readDoc, reportProblem, credits, developer, contact, license, freePersonalUse, resetSection, resetWarning, updateAvailable, download, youHaveLatest, unableToCheckUpdates, newAction, name, context, textSelection, inputField, fullPage, all, promptPlaceholder, actionNamePlaceholder, presetNameExample, shortDescription, allActionsEnabled, allActionsDisabled, defaultActionsRestored, shortcutAdded, shortcutsSaved, fillAllFields, actionCustomCreated, allActionsHaveShortcuts
+
+---
+
+## [1.4.5] - 2025-11-27
+
+### Ameliore
 - **Interface HTML traduite**: Tous les textes en dur dans options.html utilisent maintenant le systeme i18n
 - **Nouvelles cles ajoutees**: iaProvider, apiKey, apiKeyHint, inlinePopup, contextMenuActions, essentials, practical, technical, analysis, translation, enableAll, disableAll, keyboardShortcuts, connectingToAI, viewDetails, etc.
 

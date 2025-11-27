@@ -1,9 +1,9 @@
 {
-  "version": "1.4.5",
+  "version": "1.4.6",
   "releaseDate": "2025-11-27",
   "minChromeVersion": "88",
-  "downloadUrl": "https://github.com/Gohanado/ia-helper/archive/refs/tags/v1.4.5.zip",
+  "downloadUrl": "https://github.com/Gohanado/ia-helper/archive/refs/tags/v1.4.6.zip",
   "changelogUrl": "https://github.com/Gohanado/ia-helper/blob/main/CHANGELOG.md",
-  "releaseNotes": "Traductions 100% completes pour FR, EN, ES, IT, PT"
+  "releaseNotes": "Traductions 100% completes pour FR, EN, ES, IT, PT - Popup inline et notifications traduits"
 }
 

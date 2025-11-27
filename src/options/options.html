@@ -20,10 +20,10 @@
       <div class="update-banner" id="update-banner" style="display: none;">
         <div class="update-icon">!</div>
         <div class="update-text">
-          <strong>Mise a jour disponible</strong>
+          <strong data-i18n="updateAvailable">Mise a jour disponible</strong>
           <span id="update-version">v1.2.0</span>
         </div>
-        <a href="#" id="update-link" target="_blank" class="update-btn">Telecharger</a>
+        <a href="#" id="update-link" target="_blank" class="update-btn" data-i18n="download">Telecharger</a>
       </div>
 
       <nav class="sidebar-nav">
@@ -49,15 +49,15 @@
       <div class="sidebar-footer">
         <a href="https://github.com/Gohanado/ia-helper/blob/main/docs/README.md" target="_blank" class="sidebar-link">
           <span class="link-icon">?</span>
-          <span>Documentation</span>
+          <span data-i18n="documentation">Documentation</span>
         </a>
         <a href="https://github.com/Gohanado/ia-helper/issues/new?template=bug_report.md" target="_blank" class="sidebar-link">
           <span class="link-icon">!</span>
-          <span>Signaler un bug</span>
+          <span data-i18n="reportBug">Signaler un bug</span>
         </a>
         <a href="https://github.com/Gohanado/ia-helper/issues/new?template=feature_request.md" target="_blank" class="sidebar-link">
           <span class="link-icon">+</span>
-          <span>Suggerer une feature</span>
+          <span data-i18n="requestFeature">Suggerer une feature</span>
         </a>
       </div>
     </aside>
@@ -274,7 +274,7 @@
           <div class="about-hero-text">
             <h3>IA Helper</h3>
             <p class="about-version" id="about-version">Version 1.1.0</p>
-            <p class="about-tagline">Assistant IA intelligent pour Chrome</p>
+            <p class="about-tagline" data-i18n="description">Assistant IA intelligent pour Chrome</p>
           </div>
         </div>
 
@@ -283,9 +283,9 @@
           <div class="about-card" id="update-card">
             <div class="about-card-icon">!</div>
             <div class="about-card-content">
-              <h4>Mises a jour</h4>
-              <p id="update-status">Verification...</p>
-              <button id="btn-check-update" class="btn btn-secondary btn-sm">Verifier maintenant</button>
+              <h4 data-i18n="updates">Mises a jour</h4>
+              <p id="update-status" data-i18n="checking">Verification...</p>
+              <button id="btn-check-update" class="btn btn-secondary btn-sm" data-i18n="checkNow">Verifier maintenant</button>
             </div>
           </div>
 
@@ -293,9 +293,9 @@
           <div class="about-card">
             <div class="about-card-icon">*</div>
             <div class="about-card-content">
-              <h4>Changelog</h4>
-              <p>Voir les nouveautes de cette version</p>
-              <a href="https://github.com/Gohanado/ia-helper/blob/main/CHANGELOG.md" target="_blank" class="btn btn-secondary btn-sm">Voir le changelog</a>
+              <h4 data-i18n="changelog">Changelog</h4>
+              <p data-i18n="changelogDesc">Voir les nouveautes de cette version</p>
+              <a href="https://github.com/Gohanado/ia-helper/blob/main/CHANGELOG.md" target="_blank" class="btn btn-secondary btn-sm" data-i18n="viewChangelog">Voir le changelog</a>
             </div>
           </div>
 
@@ -303,37 +303,37 @@
           <div class="about-card">
             <div class="about-card-icon">?</div>
             <div class="about-card-content">
-              <h4>Documentation</h4>
-              <p>Guide d'installation et d'utilisation</p>
-              <a href="https://github.com/Gohanado/ia-helper/blob/main/docs/README.md" target="_blank" class="btn btn-secondary btn-sm">Lire la doc</a>
+              <h4 data-i18n="documentation">Documentation</h4>
+              <p data-i18n="documentationDesc">Guide d'installation et d'utilisation</p>
+              <a href="https://github.com/Gohanado/ia-helper/blob/main/docs/README.md" target="_blank" class="btn btn-secondary btn-sm" data-i18n="readDoc">Lire la doc</a>
             </div>
           </div>
         </div>
 
         <div class="about-section">
-          <h4>Signaler un probleme</h4>
+          <h4 data-i18n="reportProblem">Signaler un probleme</h4>
           <div class="about-buttons">
             <a href="https://github.com/Gohanado/ia-helper/issues/new?template=bug_report.md" target="_blank" class="btn btn-secondary">
-              <span class="btn-icon">!</span> Signaler un bug
+              <span class="btn-icon">!</span> <span data-i18n="reportBug">Signaler un bug</span>
             </a>
             <a href="https://github.com/Gohanado/ia-helper/issues/new?template=feature_request.md" target="_blank" class="btn btn-secondary">
-              <span class="btn-icon">+</span> Suggerer une feature
+              <span class="btn-icon">+</span> <span data-i18n="requestFeature">Suggerer une feature</span>
             </a>
           </div>
         </div>
 
         <div class="about-section about-credits">
-          <h4>Credits</h4>
-          <p><strong>Developpeur:</strong> Gohanado</p>
-          <p><strong>Contact:</strong> contact@badom.ch</p>
+          <h4 data-i18n="credits">Credits</h4>
+          <p><strong data-i18n="developer">Developpeur:</strong> Gohanado</p>
+          <p><strong data-i18n="contact">Contact:</strong> contact@badom.ch</p>
           <p><strong>GitHub:</strong> <a href="https://github.com/Gohanado/ia-helper" target="_blank">github.com/Gohanado/ia-helper</a></p>
-          <p><strong>Licence:</strong> Source-Available (usage personnel gratuit)</p>
+          <p><strong data-i18n="license">Licence:</strong> Source-Available (<span data-i18n="freePersonalUse">usage personnel gratuit</span>)</p>
         </div>
 
         <div class="about-section">
-          <h4>Reinitialisation</h4>
-          <p class="text-muted">Restaurer tous les parametres par defaut. Cette action est irreversible.</p>
-          <button id="btn-reset" class="btn btn-danger">Reinitialiser les options</button>
+          <h4 data-i18n="resetSection">Reinitialisation</h4>
+          <p class="text-muted" data-i18n="resetWarning">Restaurer tous les parametres par defaut. Cette action est irreversible.</p>
+          <button id="btn-reset" class="btn btn-danger" data-i18n="resetOptions">Reinitialiser les options</button>
         </div>
       </section>
     </main>
@@ -343,31 +343,31 @@
   <div class="modal-overlay" id="modal-overlay">
     <div class="modal" id="modal-add-action">
       <div class="modal-header">
-        <h3 class="modal-title">Nouvelle action</h3>
+        <h3 class="modal-title" data-i18n="newAction">Nouvelle action</h3>
         <button class="modal-close" id="modal-close">&times;</button>
       </div>
       <div class="modal-body">
         <div class="form-group">
-          <label for="custom-action-name">Nom</label>
-          <input type="text" id="custom-action-name" placeholder="Ex: Reformuler en poesie">
+          <label for="custom-action-name" data-i18n="name">Nom</label>
+          <input type="text" id="custom-action-name" data-i18n-placeholder="actionNamePlaceholder" placeholder="Ex: Reformuler en poesie">
         </div>
         <div class="form-group">
-          <label for="custom-action-context">Contexte</label>
+          <label for="custom-action-context" data-i18n="context">Contexte</label>
           <select id="custom-action-context">
-            <option value="selection">Selection de texte</option>
-            <option value="input">Champs de saisie</option>
-            <option value="page">Page entiere</option>
-            <option value="both">Tous</option>
+            <option value="selection" data-i18n="textSelection">Selection de texte</option>
+            <option value="input" data-i18n="inputField">Champs de saisie</option>
+            <option value="page" data-i18n="fullPage">Page entiere</option>
+            <option value="both" data-i18n="all">Tous</option>
           </select>
         </div>
         <div class="form-group">
-          <label for="custom-action-prompt">Prompt systeme</label>
-          <textarea id="custom-action-prompt" rows="6" placeholder="Instructions pour l'IA..."></textarea>
+          <label for="custom-action-prompt" data-i18n="systemPrompt">Prompt systeme</label>
+          <textarea id="custom-action-prompt" rows="6" data-i18n-placeholder="promptPlaceholder" placeholder="Instructions pour l'IA..."></textarea>
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-secondary" id="modal-cancel">Annuler</button>
-        <button class="btn btn-primary" id="modal-save">Sauvegarder</button>
+        <button class="btn btn-secondary" id="modal-cancel" data-i18n="cancel">Annuler</button>
+        <button class="btn btn-primary" id="modal-save" data-i18n="save">Sauvegarder</button>
       </div>
     </div>
   </div>
@@ -376,32 +376,32 @@
   <div class="modal-overlay" id="modal-preset-overlay">
     <div class="modal modal-large" id="modal-add-preset">
       <div class="modal-header">
-        <h3 class="modal-title">Creer un preset</h3>
+        <h3 class="modal-title" data-i18n="newPreset">Creer un preset</h3>
         <button class="modal-close" id="modal-preset-close">&times;</button>
       </div>
       <div class="modal-body">
         <div class="form-group">
-          <label for="preset-name">Nom du preset</label>
-          <input type="text" id="preset-name" placeholder="Ex: Mon workflow">
-          <p class="form-hint">Ce nom apparaitra dans le menu contextuel</p>
+          <label for="preset-name" data-i18n="presetName">Nom du preset</label>
+          <input type="text" id="preset-name" data-i18n-placeholder="presetNameExample" placeholder="Ex: Mon workflow">
+          <p class="form-hint" data-i18n="presetNameHint">Ce nom apparaitra dans le menu contextuel</p>
         </div>
         <div class="form-group">
-          <label for="preset-description">Description</label>
-          <input type="text" id="preset-description" placeholder="Description courte">
+          <label for="preset-description" data-i18n="presetDescription">Description</label>
+          <input type="text" id="preset-description" data-i18n-placeholder="shortDescription" placeholder="Description courte">
         </div>
         <div class="preset-actions-editor">
           <div class="preset-actions-header">
-            <label>Actions du preset</label>
-            <button class="btn btn-secondary btn-sm" id="btn-add-preset-action">+ Ajouter action</button>
+            <label data-i18n="presetActionsLabel">Actions du preset</label>
+            <button class="btn btn-secondary btn-sm" id="btn-add-preset-action" data-i18n="addAction">+ Ajouter action</button>
           </div>
           <div class="preset-actions-items" id="preset-actions-items">
-            <p class="empty-state">Aucune action. Cliquez sur "+ Ajouter action".</p>
+            <p class="empty-state" data-i18n="noActions">Aucune action. Cliquez sur "+ Ajouter action".</p>
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-secondary" id="modal-preset-cancel">Annuler</button>
-        <button class="btn btn-primary" id="modal-preset-save">Creer le preset</button>
+        <button class="btn btn-secondary" id="modal-preset-cancel" data-i18n="cancel">Annuler</button>
+        <button class="btn btn-primary" id="modal-preset-save" data-i18n="createThePreset">Creer le preset</button>
       </div>
     </div>
   </div>

@@ -18,10 +18,80 @@
     apiKey: '',
     selectedModel: '',
     streamingEnabled: true,
-    inlinePopupEnabled: true
+    inlinePopupEnabled: true,
+    interfaceLanguage: 'fr'
   };
 
   let config = { ...DEFAULT_CONFIG };
+
+  // Mini-systeme de traduction pour le content-script
+  const CONTENT_TRANSLATIONS = {
+    fr: {
+      connectingToAI: 'Connexion a l\'IA en cours...',
+      copy: 'Copier',
+      viewDetails: 'Voir en detail',
+      close: 'Fermer',
+      error: 'Erreur',
+      nothingToCopy: 'Aucun contenu a copier',
+      copied: 'Copie !',
+      storageError: 'Erreur de stockage',
+      response: 'Reponse',
+      plainText: 'Texte brut'
+    },
+    en: {
+      connectingToAI: 'Connecting to AI...',
+      copy: 'Copy',
+      viewDetails: 'View details',
+      close: 'Close',
+      error: 'Error',
+      nothingToCopy: 'Nothing to copy',
+      copied: 'Copied!',
+      storageError: 'Storage error',
+      response: 'Response',
+      plainText: 'Plain text'
+    },
+    es: {
+      connectingToAI: 'Conectando con la IA...',
+      copy: 'Copiar',
+      viewDetails: 'Ver detalles',
+      close: 'Cerrar',
+      error: 'Error',
+      nothingToCopy: 'Nada que copiar',
+      copied: 'Copiado!',
+      storageError: 'Error de almacenamiento',
+      response: 'Respuesta',
+      plainText: 'Texto plano'
+    },
+    it: {
+      connectingToAI: 'Connessione all\'IA in corso...',
+      copy: 'Copia',
+      viewDetails: 'Vedi dettagli',
+      close: 'Chiudi',
+      error: 'Errore',
+      nothingToCopy: 'Niente da copiare',
+      copied: 'Copiato!',
+      storageError: 'Errore di archiviazione',
+      response: 'Risposta',
+      plainText: 'Testo semplice'
+    },
+    pt: {
+      connectingToAI: 'Conectando com a IA...',
+      copy: 'Copiar',
+      viewDetails: 'Ver detalhes',
+      close: 'Fechar',
+      error: 'Erro',
+      nothingToCopy: 'Nada para copiar',
+      copied: 'Copiado!',
+      storageError: 'Erro de armazenamento',
+      response: 'Resposta',
+      plainText: 'Texto simples'
+    }
+  };
+
+  function ct(key) {
+    const lang = config.interfaceLanguage || 'fr';
+    return CONTENT_TRANSLATIONS[lang]?.[key] || CONTENT_TRANSLATIONS['fr'][key] || key;
+  }
 
   // Element actif actuel
   let activeElement = null;
@@ -499,26 +569,26 @@
       <div class="ia-action-overlay"></div>
       <div class="ia-action-container">
         <div class="ia-action-header">
-          <span class="ia-action-title">IA Helper - Reponse</span>
+          <span class="ia-action-title">IA Helper - ${ct('response') || 'Reponse'}</span>
           <button class="ia-action-close">&times;</button>
         </div>
         <div class="ia-action-response-area">
           <div class="ia-action-response-content">
-            <span class="ia-action-waiting">Connexion a l'IA en cours...</span>
+            <span class="ia-action-waiting">${ct('connectingToAI')}</span>
             <span class="ia-action-cursor"></span>
           </div>
         </div>
         <div class="ia-action-actions">
           <div class="ia-action-copy-dropdown">
-            <button class="ia-action-btn ia-action-btn-secondary ia-action-copy-toggle">Copier</button>
+            <button class="ia-action-btn ia-action-btn-secondary ia-action-copy-toggle">${ct('copy')}</button>
             <div class="ia-action-copy-menu">
               <button class="ia-action-copy-option" data-format="markdown">Markdown</button>
-              <button class="ia-action-copy-option" data-format="text">Texte brut</button>
+              <button class="ia-action-copy-option" data-format="text">${ct('plainText') || 'Texte brut'}</button>
               <button class="ia-action-copy-option" data-format="html">HTML</button>
             </div>
           </div>
-          <button class="ia-action-btn ia-action-btn-secondary ia-action-detail">Voir en detail</button>
-          <button class="ia-action-btn ia-action-btn-primary ia-action-close-final">Fermer</button>
+          <button class="ia-action-btn ia-action-btn-secondary ia-action-detail">${ct('viewDetails')}</button>
+          <button class="ia-action-btn ia-action-btn-primary ia-action-close-final">${ct('close')}</button>
         </div>
       </div>
     `;
@@ -753,7 +823,7 @@
   // Copier dans un format specifique
   function copyInFormat(format) {
     if (!currentPopupResult) {
-      showNotification('Aucun contenu a copier', 'error');
+      showNotification(ct('nothingToCopy'), 'error');
       return;
     }
 
@@ -787,8 +857,8 @@
     // format === 'markdown' garde le texte tel quel
 
     navigator.clipboard.writeText(textToCopy);
-    const formatNames = { markdown: 'Markdown', text: 'Texte brut', html: 'HTML' };
-    showNotification(`Copie en ${formatNames[format]}!`, 'success');
+    const formatNames = { markdown: 'Markdown', text: ct('plainText'), html: 'HTML' };
+    showNotification(`${ct('copied')} (${formatNames[format]})`, 'success');
   }
 
   // Generer la reponse pour une action via le background script avec STREAMING
@@ -1380,19 +1450,19 @@
     // Transformer le modal en mode reponse
     container.innerHTML = `
       <div class="ia-quick-header">
-        <span class="ia-quick-title">IA Helper - Reponse</span>
+        <span class="ia-quick-title">IA Helper - ${ct('response')}</span>
         <button class="ia-quick-close">&times;</button>
       </div>
       <div class="ia-quick-response-area">
         <div class="ia-quick-response-content">
-          <span class="ia-quick-waiting">Connexion a l'IA en cours...</span>
+          <span class="ia-quick-waiting">${ct('connectingToAI')}</span>
           <span class="ia-quick-cursor"></span>
         </div>
       </div>
       <div class="ia-quick-response-actions">
-        <button class="ia-quick-btn ia-quick-btn-secondary ia-quick-copy">Copier</button>
-        <button class="ia-quick-btn ia-quick-btn-secondary ia-quick-detail">Voir en detail</button>
-        <button class="ia-quick-btn ia-quick-btn-primary ia-quick-close-final">Fermer</button>
+        <button class="ia-quick-btn ia-quick-btn-secondary ia-quick-copy">${ct('copy')}</button>
+        <button class="ia-quick-btn ia-quick-btn-secondary ia-quick-detail">${ct('viewDetails')}</button>
+        <button class="ia-quick-btn ia-quick-btn-primary ia-quick-close-final">${ct('close')}</button>
       </div>
     `;
 
@@ -1405,7 +1475,7 @@
     container.querySelector('.ia-quick-copy').addEventListener('click', () => {
       const responseText = container.querySelector('.ia-quick-response-content').textContent;
       navigator.clipboard.writeText(responseText);
-      showNotification('Copie dans le presse-papier!', 'success');
+      showNotification(ct('copied'), 'success');
     });
     container.querySelector('.ia-quick-detail').addEventListener('click', () => {
       closeQuickModal();

@@ -411,9 +411,9 @@ async function saveConnectionSettings() {
     currentLang = config.interfaceLanguage;
     applyTranslations();
     renderActionsGrid();
-    showNotification('Langue changee. Parametres sauvegardes.', 'success');
+    showNotification(t('languageChanged', currentLang) + ' ' + t('settingsSaved', currentLang), 'success');
   } else {
-    showNotification('Parametres sauvegardes.', 'success');
+    showNotification(t('settingsSaved', currentLang), 'success');
   }
 }
 
@@ -428,7 +428,13 @@ async function saveConfig() {
 
 // Reset aux valeurs par defaut
 async function resetToDefaults() {
-  if (confirm('Etes-vous sur de vouloir reinitialiser tous les parametres ?')) {
+  const confirmMsg = currentLang === 'fr' ? 'Etes-vous sur de vouloir reinitialiser tous les parametres ?' :
+    currentLang === 'en' ? 'Are you sure you want to reset all settings?' :
+    currentLang === 'es' ? 'Esta seguro de que desea restablecer todos los ajustes?' :
+    currentLang === 'it' ? 'Sei sicuro di voler reimpostare tutte le impostazioni?' :
+    currentLang === 'pt' ? 'Tem certeza de que deseja redefinir todas as configuracoes?' :
+    'Are you sure you want to reset all settings?';
+  if (confirm(confirmMsg)) {
     await new Promise((resolve) => {
       chrome.storage.local.clear(resolve);
     });
@@ -663,7 +669,7 @@ function toggleAllActions(enable) {
   saveEnabledActions();
   saveEnabledTranslations();
   renderActionsGrid();
-  showNotification(enable ? 'Toutes les actions activees' : 'Toutes les actions desactivees', 'success');
+  showNotification(enable ? t('allActionsEnabled', currentLang) : t('allActionsDisabled', currentLang), 'success');
 }
 
 // Reset actions par defaut
@@ -673,7 +679,7 @@ function resetActionsToDefault() {
   saveEnabledActions();
   saveEnabledTranslations();
   renderActionsGrid();
-  showNotification('Actions par defaut restaurees', 'success');
+  showNotification(t('defaultActionsRestored', currentLang), 'success');
 }
 
 // Activer/desactiver une action
@@ -734,7 +740,7 @@ function showAddCustomActionModal() {
     const prompt = promptInput.value.trim();
 
     if (!name || !prompt) {
-      showNotification('Veuillez remplir tous les champs', 'error');
+      showNotification(t('fillAllFields', currentLang), 'error');
       return;
     }
 
@@ -752,7 +758,7 @@ function showAddCustomActionModal() {
     saveEnabledActions();
     renderActionsGrid();
     modal.remove();
-    showNotification('Action personnalisee creee !', 'success');
+    showNotification(t('actionCustomCreated', currentLang), 'success');
   });
 
   modal.addEventListener('click', (e) => {
@@ -762,7 +768,13 @@ function showAddCustomActionModal() {
 
 // Supprimer une action personnalisee
 function deleteCustomAction(actionId) {
-  if (!confirm('Supprimer cette action personnalisee ?')) return;
+  const confirmMsg = currentLang === 'fr' ? 'Supprimer cette action personnalisee ?' :
+    currentLang === 'en' ? 'Delete this custom action?' :
+    currentLang === 'es' ? 'Eliminar esta accion personalizada?' :
+    currentLang === 'it' ? 'Eliminare questa azione personalizzata?' :
+    currentLang === 'pt' ? 'Excluir esta acao personalizada?' :
+    'Delete this custom action?';
+  if (!confirm(confirmMsg)) return;
 
   customActions = customActions.filter(a => a.id !== actionId);
   enabledActions = enabledActions.filter(id => id !== actionId);
@@ -775,7 +787,7 @@ function deleteCustomAction(actionId) {
   saveShortcuts();
   renderActionsGrid();
   renderShortcutsList();
-  showNotification('Action supprimee', 'success');
+  showNotification(t('actionDeleted', currentLang), 'success');
 }
 
 // Sauvegarder les actions personnalisees
@@ -858,7 +870,7 @@ function showEditActionModal(action, isCustom = false) {
     const newPrompt = modal.querySelector('.edit-action-prompt-input').value.trim();
 
     if (!newPrompt) {
-      showNotification('Le prompt ne peut pas etre vide', 'error');
+      showNotification(t('promptEmpty', currentLang), 'error');
       return;
     }
 
@@ -887,7 +899,7 @@ function showEditActionModal(action, isCustom = false) {
 
     renderActionsGrid();
     modal.remove();
-    showNotification('Action modifiee !', 'success');
+    showNotification(t('actionModified', currentLang), 'success');
   });
 
   modal.addEventListener('click', (e) => {
@@ -1050,7 +1062,7 @@ function startRecordingShortcut(button, actionId) {
     button.classList.remove('recording');
     button.querySelector('.key-display').textContent = formatShortcut(shortcuts[actionId]);
     document.removeEventListener('keydown', handler);
-    showNotification('Raccourci enregistre !', 'success');
+    showNotification(t('shortcutSaved', currentLang), 'success');
   };
 
   document.addEventListener('keydown', handler);
@@ -1059,15 +1071,17 @@ function startRecordingShortcut(button, actionId) {
 // Afficher le modal pour ajouter un raccourci
 function showAddShortcutModal() {
   // Collecter toutes les actions disponibles
+  const quickPromptName = currentLang === 'fr' ? 'Prompt rapide' : currentLang === 'en' ? 'Quick prompt' : currentLang === 'es' ? 'Prompt rapido' : currentLang === 'it' ? 'Prompt rapido' : 'Prompt rapido';
+  const translatePrefix = currentLang === 'fr' ? 'Traduire en' : currentLang === 'en' ? 'Translate to' : currentLang === 'es' ? 'Traducir a' : currentLang === 'it' ? 'Traduci in' : 'Traduzir para';
   const allActions = [
-    { id: 'quickPrompt', name: 'Prompt rapide' },
+    { id: 'quickPrompt', name: quickPromptName },
     ...Object.values(BASE_ACTIONS).map(a => ({ id: a.id, name: a.name })),
-    ...TRANSLATE_LANGUAGES.map(l => ({ id: `translate_${l.code}`, name: `Traduire en ${l.name}` })),
+    ...TRANSLATE_LANGUAGES.map(l => ({ id: `translate_${l.code}`, name: `${translatePrefix} ${l.name}` })),
     ...customActions.map(a => ({ id: a.id, name: a.name }))
   ].filter(a => !shortcuts[a.id]); // Exclure ceux qui ont deja un raccourci
 
   if (allActions.length === 0) {
-    showNotification('Toutes les actions ont deja un raccourci', 'info');
+    showNotification(t('allActionsHaveShortcuts', currentLang), 'info');
     return;
   }
 
@@ -1077,26 +1091,26 @@ function showAddShortcutModal() {
   modal.innerHTML = `
     <div class="modal">
       <div class="modal-header">
-        <h3>Ajouter un raccourci</h3>
+        <h3>${t('addShortcut', currentLang)}</h3>
         <button class="modal-close">&times;</button>
       </div>
       <div class="modal-body">
         <div class="form-group">
-          <label for="shortcut-action">Action</label>
+          <label for="shortcut-action">${t('actions', currentLang)}</label>
           <select id="shortcut-action">
             ${allActions.map(a => `<option value="${a.id}">${a.name}</option>`).join('')}
           </select>
         </div>
         <div class="form-group">
-          <label>Raccourci</label>
+          <label>${t('shortcuts', currentLang)}</label>
           <button class="shortcut-key-btn recording" id="new-shortcut-btn">
-            <span class="key-display">Appuyez sur une touche...</span>
+            <span class="key-display">${t('pressKey', currentLang)}</span>
           </button>
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-secondary modal-cancel">Annuler</button>
-        <button class="btn btn-primary modal-save" disabled>Ajouter</button>
+        <button class="btn btn-secondary modal-cancel">${t('cancel', currentLang)}</button>
+        <button class="btn btn-primary modal-save" disabled>${t('add', currentLang)}</button>
       </div>
     </div>
   `;
@@ -1120,10 +1134,11 @@ function showAddShortcutModal() {
 
     // Verifier les conflits
     const conflict = checkShortcutConflict(testShortcut);
+    const clickToDefine = currentLang === 'fr' ? 'Cliquez pour definir' : currentLang === 'en' ? 'Click to define' : currentLang === 'es' ? 'Haga clic para definir' : currentLang === 'it' ? 'Clicca per definire' : 'Clique para definir';
     if (conflict.conflict) {
       showNotification(conflict.message, 'error');
       shortcutBtn.classList.remove('recording');
-      shortcutBtn.querySelector('.key-display').textContent = 'Cliquez pour definir';
+      shortcutBtn.querySelector('.key-display').textContent = clickToDefine;
       saveBtn.disabled = true;
       newShortcut = null;
       return;
@@ -1157,7 +1172,7 @@ function showAddShortcutModal() {
     document.removeEventListener('keydown', keyHandler);
     modal.remove();
     renderShortcutsList();
-    showNotification('Raccourci ajoute !', 'success');
+    showNotification(t('shortcutAdded', currentLang), 'success');
   });
 
   modal.addEventListener('click', (e) => {
@@ -1177,7 +1192,7 @@ async function saveShortcuts() {
     chrome.storage.local.set({ shortcuts, shortcutsEnabled, defaultTranslateLang }, resolve);
   });
 
-  showNotification('Raccourcis sauvegardes !', 'success');
+  showNotification(t('shortcutsSaved', currentLang), 'success');
 }
 
 // Activer/desactiver un preset (legacy)
@@ -1192,7 +1207,7 @@ async function togglePreset(presetId, active) {
 
   await saveActivePresets();
   chrome.runtime.sendMessage({ type: 'RELOAD_MENUS' });
-  showNotification(active ? 'Preset active !' : 'Preset desactive', 'success');
+  showNotification(active ? t('presetActivated', currentLang) : t('presetDeactivated', currentLang), 'success');
 }
 
 // Afficher les actions d'un preset (integre ou personnalise)
@@ -1425,19 +1440,19 @@ async function saveCustomPreset() {
   const description = document.getElementById('preset-description').value.trim();
 
   if (!name) {
-    showNotification('Veuillez entrer un nom pour le preset', 'error');
+    showNotification(t('enterPresetName', currentLang), 'error');
     return;
   }
 
   if (currentPresetActions.length === 0) {
-    showNotification('Ajoutez au moins une action', 'error');
+    showNotification(t('addAtLeastOneAction', currentLang), 'error');
     return;
   }
 
   // Valider les actions
   for (const action of currentPresetActions) {
     if (!action.name.trim() || !action.prompt.trim()) {
-      showNotification('Toutes les actions doivent avoir un nom et un prompt', 'error');
+      showNotification(t('allActionsMustHaveNameAndPrompt', currentLang), 'error');
       return;
     }
   }
