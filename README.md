@@ -1,10 +1,11 @@
 # IA Helper
 
-Extension Chrome d'assistant IA intelligent connectee a Ollama. Toutes vos donnees restent **100% locales** sur votre machine.
+Extension navigateur d'assistant IA intelligent. Multi-providers (Ollama, OpenAI, Anthropic, Groq, OpenRouter). Compatible Chrome et Firefox.
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/Gohanado/ia-helper/releases)
+[![Version](https://img.shields.io/badge/version-1.5.0-blue.svg)](https://github.com/Gohanado/ia-helper/releases)
 [![License](https://img.shields.io/badge/license-Source%20Available-orange.svg)](LICENSE)
 [![Chrome](https://img.shields.io/badge/chrome-88%2B-yellow.svg)](https://www.google.com/chrome/)
+[![Firefox](https://img.shields.io/badge/firefox-109%2B-orange.svg)](https://www.mozilla.org/firefox/)
 [![Gratuit](https://img.shields.io/badge/prix-gratuit-brightgreen.svg)]()
 [![Sans Pub](https://img.shields.io/badge/pubs-aucune-brightgreen.svg)]()
 
@@ -41,42 +42,33 @@ Chaque don aide a maintenir et ameliorer le projet!
 
 ### Prerequis
 
-- [Ollama](https://ollama.ai/) installe et en cours d'execution
-- Au moins un modele telecharge (ex: `ollama pull llama3.2` ou `ollama pull mistral`)
-- Google Chrome version 88 ou superieure
+- Un provider IA configure:
+  - [Ollama](https://ollama.ai/) (local, gratuit) avec un modele telecharge (ex: `ollama pull llama3.2`)
+  - Ou une cle API: OpenAI, Anthropic, Groq, OpenRouter
+- Google Chrome 88+ ou Firefox 109+
 
-### Etapes d'installation
+### Installation Chrome
 
-1. **Clonez le depot**
-   ```bash
-   git clone https://github.com/Gohanado/ia-helper.git
-   ```
+1. Telechargez `ia-helper-chrome-v1.5.0.zip` depuis les [Releases](https://github.com/Gohanado/ia-helper/releases)
+2. Extrayez le ZIP
+3. Ouvrez `chrome://extensions/`
+4. Activez "Mode developpeur" (en haut a droite)
+5. Cliquez "Charger l'extension non empaquetee"
+6. Selectionnez le dossier extrait
 
-2. **Ouvrez Chrome et accedez aux extensions**
-   ```
-   chrome://extensions/
-   ```
+### Installation Firefox
 
-3. **Activez le mode developpeur**
-   - Cliquez sur le toggle "Mode developpeur" en haut a droite
+1. Telechargez `ia-helper-firefox-v1.5.0.zip` depuis les [Releases](https://github.com/Gohanado/ia-helper/releases)
+2. Ouvrez `about:debugging#/runtime/this-firefox`
+3. Cliquez "Charger un module complementaire temporaire"
+4. Selectionnez le fichier `manifest.json` du dossier extrait
 
-4. **Chargez l'extension**
-   - Cliquez sur "Charger l'extension non empaquetee"
-   - Selectionnez le dossier `ia-helper`
+### Configuration
 
-5. **Configurez l'extension**
-   - Cliquez sur l'icone IA Helper dans la barre d'outils
-   - Allez dans Options pour configurer Ollama
-
-## Configuration
-
-### Connexion a Ollama
-
-1. Assurez-vous qu'Ollama est en cours d'execution (`ollama serve`)
-2. Ouvrez les options de IA Helper
-3. L'URL par defaut est `http://localhost:11434`
-4. Cliquez sur "Tester la connexion"
-5. Selectionnez votre modele prefere dans la liste
+1. Cliquez sur l'icone IA Helper dans la barre d'outils
+2. Allez dans Options
+3. Choisissez votre provider et configurez la connexion
+4. Testez la connexion
 
 ### Personnalisation
 
@@ -161,10 +153,10 @@ ia-helper/
 
 ## Technologies utilisees
 
-- **Chrome Extension Manifest V3** - API moderne des extensions Chrome
+- **Extension Manifest V3** - API moderne compatible Chrome et Firefox
 - **JavaScript ES6+** - Aucun framework, code natif
 - **CSS3** - Design moderne avec variables CSS
-- **Ollama API** - Integration locale avec les modeles IA
+- **Multi-providers** - Ollama, OpenAI, Anthropic, Groq, OpenRouter
 
 ## Contribuer
 

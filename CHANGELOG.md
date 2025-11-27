@@ -347,7 +347,12 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 
 ---
 
-[Non publie]: https://github.com/Gohanado/ia-helper/compare/v1.4.5...HEAD
+[Non publie]: https://github.com/Gohanado/ia-helper/compare/v1.5.0...HEAD
+[1.5.0]: https://github.com/Gohanado/ia-helper/releases/tag/v1.5.0
+[1.4.9]: https://github.com/Gohanado/ia-helper/releases/tag/v1.4.9
+[1.4.8]: https://github.com/Gohanado/ia-helper/releases/tag/v1.4.8
+[1.4.7]: https://github.com/Gohanado/ia-helper/releases/tag/v1.4.7
+[1.4.6]: https://github.com/Gohanado/ia-helper/releases/tag/v1.4.6
 [1.4.5]: https://github.com/Gohanado/ia-helper/releases/tag/v1.4.5
 [1.4.4]: https://github.com/Gohanado/ia-helper/releases/tag/v1.4.4
 [1.4.3]: https://github.com/Gohanado/ia-helper/releases/tag/v1.4.3

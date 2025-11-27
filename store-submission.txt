@@ -1,0 +1,157 @@
+================================================================================
+                    IA HELPER - INFORMATIONS POUR PUBLICATION
+================================================================================
+
+Version: 1.5.0
+Date: 2025-11-27
+
+================================================================================
+                              CHROME WEB STORE
+================================================================================
+
+URL de soumission: https://chrome.google.com/webstore/devconsole
+
+--- NOM ---
+IA Helper
+
+--- DESCRIPTION COURTE (132 caracteres max) ---
+Assistant IA intelligent - Multi-providers (Ollama, OpenAI, Anthropic, Groq) - Menu contextuel, traduction, correction, et plus.
+
+--- DESCRIPTION LONGUE ---
+IA Helper est une extension navigateur qui ajoute un assistant IA puissant directement dans votre navigateur.
+
+FONCTIONNALITES PRINCIPALES:
+- Menu contextuel intelligent avec actions adaptees au contexte
+- Support multi-providers: Ollama (local), OpenAI, Anthropic, Groq, OpenRouter
+- Traduction instantanee vers 12 langues
+- Correction, reformulation, resume, explication de texte
+- 24 presets professionnels avec 140+ actions specialisees
+- Reponse en streaming directement dans les champs de saisie
+- Interface disponible en 5 langues (FR, EN, ES, IT, PT)
+
+RESPECT DE LA VIE PRIVEE:
+- Aucune collecte de donnees personnelles
+- Aucun tracking, aucune publicite
+- Compatible avec Ollama pour un usage 100% local
+- Vos textes ne transitent que vers le provider IA que vous choisissez
+
+UTILISATION:
+1. Selectionnez du texte sur n'importe quelle page
+2. Clic droit > IA Helper > Choisissez une action
+3. La reponse s'affiche instantanement
+
+Gratuit, open-source, sans publicite.
+
+--- CATEGORIE ---
+Productivite
+
+--- LANGUE ---
+Francais (disponible aussi en EN, ES, IT, PT)
+
+--- URL POLITIQUE DE CONFIDENTIALITE ---
+https://github.com/Gohanado/ia-helper/blob/main/PRIVACY.md
+
+--- JUSTIFICATION DES PERMISSIONS ---
+
+contextMenus: Necessaire pour afficher le menu clic-droit avec les actions IA.
+
+activeTab: Necessaire pour lire le texte selectionne et injecter les reponses dans la page active.
+
+storage: Necessaire pour sauvegarder les preferences utilisateur (provider, modele, langue, raccourcis).
+
+tabs: Necessaire pour ouvrir la page de resultats dans un nouvel onglet.
+
+scripting: Necessaire pour injecter le content script qui permet l'interaction avec les pages web.
+
+host_permissions (<all_urls>): L'extension doit fonctionner sur tous les sites web pour permettre a l'utilisateur d'utiliser l'assistant IA partout. Aucune donnee n'est collectee.
+
+--- SCREENSHOTS (1280x800 ou 640x400) ---
+1. screenshot-menu-contextuel.png - Menu clic-droit avec actions IA
+2. screenshot-popup.png - Interface popup avec actions rapides
+3. screenshot-options.png - Page de configuration
+4. screenshot-streaming.png - Reponse en streaming dans un champ
+5. screenshot-resultats.png - Page de resultats avec rendu Markdown
+
+
+================================================================================
+                           FIREFOX ADD-ONS (AMO)
+================================================================================
+
+URL de soumission: https://addons.mozilla.org/developers/
+
+--- NOM ---
+IA Helper
+
+--- RESUME (250 caracteres max) ---
+Assistant IA intelligent avec menu contextuel. Multi-providers (Ollama local, OpenAI, Anthropic, Groq). Traduction, correction, resume. 140+ actions. Gratuit et respectueux de la vie privee.
+
+--- DESCRIPTION ---
+(Meme contenu que Chrome Web Store ci-dessus)
+
+--- CATEGORIE ---
+Productivite
+
+--- TAGS ---
+ai, assistant, ollama, openai, traduction, correction, productivite
+
+--- URL SUPPORT ---
+https://github.com/Gohanado/ia-helper/issues
+
+--- URL POLITIQUE DE CONFIDENTIALITE ---
+https://github.com/Gohanado/ia-helper/blob/main/PRIVACY.md
+
+--- LICENCE ---
+Source Available (Custom)
+
+
+================================================================================
+                              SCREENSHOTS A FAIRE
+================================================================================
+
+Taille recommandee: 1280x800 pixels (ou 640x400 minimum)
+
+1. MENU CONTEXTUEL
+   - Selectionnez du texte sur une page web
+   - Faites clic-droit pour montrer le menu IA Helper
+   - Capturez le menu deploye avec les sous-menus
+
+2. POPUP PRINCIPAL
+   - Cliquez sur l'icone IA Helper dans la barre
+   - Montrez le popup avec le champ de prompt et les actions rapides
+
+3. PAGE OPTIONS
+   - Ouvrez les options (onglet Connexion)
+   - Montrez la configuration du provider avec un modele selectionne
+
+4. STREAMING EN ACTION
+   - Montrez une reponse qui s'ecrit en temps reel dans un champ textarea
+   - Ou le popup inline avec la reponse en cours
+
+5. PAGE RESULTATS
+   - Montrez la page results.html avec un rendu Markdown complet
+   - Incluez du code colore, des listes, etc.
+
+
+================================================================================
+                              FICHIERS A SOUMETTRE
+================================================================================
+
+Chrome: dist/ia-helper-chrome-v1.5.0.zip
+Firefox: dist/ia-helper-firefox-v1.5.0.zip
+
+
+================================================================================
+                              CHECKLIST PRE-SOUMISSION
+================================================================================
+
+[ ] Compte Chrome Web Store cree (5$ paiement unique)
+[ ] Compte Mozilla AMO cree (gratuit)
+[ ] 5 screenshots pris en 1280x800
+[ ] Screenshots places dans assets/screenshots/
+[ ] ZIPs generes avec build.ps1
+[ ] Test extension Chrome charge et fonctionne
+[ ] Test extension Firefox charge et fonctionne
+[ ] PRIVACY.md accessible sur GitHub
+[ ] Version 1.5.0 partout synchronisee
+
+
