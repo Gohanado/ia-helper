@@ -28,10 +28,10 @@ body {
 }
 
 .popup-container {
-  padding: 14px;
+  padding: 12px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 /* Header */
@@ -257,6 +257,9 @@ body {
 .lang-pill.more-langs {
   background: transparent;
   border-style: dashed;
+  padding: 6px 8px;
+  min-width: 28px;
+  text-align: center;
 }
 
 /* Page Actions Section */

@@ -480,12 +480,16 @@
       } else {
         content = selectedText || window.getSelection().toString() || document.body.innerText.substring(0, 15000);
       }
+    } else if (actionType === 'custom_prompt') {
+      // Prompt personnalise depuis le popup: utiliser la selection ou la page comme contexte
+      content = selectedText || window.getSelection().toString() || document.body.innerText.substring(0, 15000);
     } else if (actionType === 'action' || actionType === 'custom' || actionType === 'preset' || actionType === 'custompreset') {
       // Pour les actions (categories), custom et preset, utiliser la selection ou la page
       content = selectedText || window.getSelection().toString() || document.body.innerText.substring(0, 15000);
     }
 
-    if (!content.trim()) {
+    // Pour custom_prompt, le contenu peut etre vide si pas de selection et c'est OK
+    if (!content.trim() && actionType !== 'custom_prompt') {
       showNotification('Aucun contenu a traiter', 'error');
       return;
     }
@@ -495,7 +499,11 @@
     // Obtenir le prompt systeme
     let systemPrompt = '';
 
-    if (actionType === 'quick') {
+    if (actionType === 'custom_prompt') {
+      // Prompt personnalise depuis le popup - le prompt est directement le message.customPrompt
+      systemPrompt = message.customPrompt || '';
+      console.log('IA Helper: Custom prompt', systemPrompt);
+    } else if (actionType === 'quick') {
       systemPrompt = QUICK_PROMPTS[actionId] || '';
     } else if (actionType === 'translate') {
       // Traduction globale

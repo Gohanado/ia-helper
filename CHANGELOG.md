@@ -14,6 +14,20 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 
 ---
 
+## [1.4.9] - 2025-11-27
+
+### Corrige
+- **Quick prompt fonctionne**: Le champ de prompt rapide dans le popup envoie maintenant correctement les requetes
+- **Bouton Raccourcis**: Ouvre maintenant l'onglet Raccourcis dans les options (pas chrome://extensions)
+- **Scroll popup reduit**: Espacement reduit pour eviter le scroll inutile
+- **Bouton "..." langues**: Style ameliore pour le bouton de langues supplementaires
+
+### Ameliore
+- **Support custom_prompt**: Le content-script gere maintenant le type custom_prompt pour les prompts libres
+- **Navigation hash URL**: Les options supportent le hash pour ouvrir directement un onglet (ex: options.html#shortcuts)
+
+---
+
 ## [1.4.8] - 2025-11-27
 
 ### Ajoute

@@ -1,9 +1,9 @@
 {
-  "version": "1.4.8",
+  "version": "1.4.9",
   "releaseDate": "2025-11-27",
   "minChromeVersion": "88",
-  "downloadUrl": "https://github.com/Gohanado/ia-helper/archive/refs/tags/v1.4.8.zip",
+  "downloadUrl": "https://github.com/Gohanado/ia-helper/archive/refs/tags/v1.4.9.zip",
   "changelogUrl": "https://github.com/Gohanado/ia-helper/blob/main/CHANGELOG.md",
-  "releaseNotes": "Popup completement redesigne - Menu contextuel traduit - Messages mise a jour traduits"
+  "releaseNotes": "Fix popup bugs - Quick prompt fonctionne - Bouton shortcuts ouvre le bon onglet"
 }
 

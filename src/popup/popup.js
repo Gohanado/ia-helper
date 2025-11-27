@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   document.getElementById('btn-shortcuts')?.addEventListener('click', () => {
-    chrome.tabs.create({ url: 'chrome://extensions/shortcuts' });
+    chrome.tabs.create({ url: chrome.runtime.getURL('src/options/options.html#shortcuts') });
   });
 
   // === FONCTIONS ===

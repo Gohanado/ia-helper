@@ -130,10 +130,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Initialiser le systeme de mise a jour (en dernier, non-bloquant)
     initUpdateSystem();
+
+    // Gerer le hash URL pour ouvrir directement un onglet
+    handleHashNavigation();
   } catch (error) {
     console.error('IA Helper Options: Erreur initialisation', error);
   }
 });
+
+// Gerer la navigation par hash (ex: options.html#shortcuts)
+function handleHashNavigation() {
+  const hash = window.location.hash.replace('#', '');
+  if (hash) {
+    const navItem = document.querySelector(`.nav-item[data-section="${hash}"]`);
+    if (navItem) {
+      navItem.click();
+    }
+  }
+}
 
 // Appliquer les traductions a l'interface
 function applyTranslations() {
