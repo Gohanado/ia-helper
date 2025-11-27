@@ -14,6 +14,24 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 
 ---
 
+## [1.4.8] - 2025-11-27
+
+### Ajoute
+- **Popup completement redesigne**: Nouveau design professionnel avec prompt rapide, actions rapides, traduction, et infos du modele
+- **Menu contextuel traduit**: Tous les titres du menu clic droit sont maintenant traduits (5 langues)
+- **Messages mise a jour traduits**: Les notifications de mise a jour utilisent le systeme i18n
+
+### Ameliore
+- **Nouvelles traductions popup**: 15+ nouvelles cles pour le popup (connecting, ready, offline, askAnything, etc.)
+- **Support multi-provider dans popup**: Affichage du provider et modele actif
+- **Verification connexion amelioree**: Test adapte selon le provider (Ollama, OpenAI, Groq, etc.)
+
+### Modifie
+- **Popup simplifie**: Plus de tabs, interface directe avec toutes les fonctionnalites visibles
+- **Design moderne**: Icones SVG, pills de langues, barre d'info modele
+
+---
+
 ## [1.4.7] - 2025-11-27
 
 ### Ameliore

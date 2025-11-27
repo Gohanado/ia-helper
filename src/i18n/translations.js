@@ -189,6 +189,24 @@ export const TRANSLATIONS = {
     viewDetails: 'Voir en detail',
     response: 'Reponse',
 
+    // Popup (extension icon)
+    connecting: 'Connexion...',
+    ready: 'Pret',
+    offline: 'Hors ligne',
+    notConfigured: 'Non configure',
+    askAnything: 'Posez une question ou donnez une instruction...',
+    selectTextFirst: 'Selectionnez du texte sur la page pour l\'utiliser',
+    translateTo: 'Traduire vers',
+    summarizePage: 'Resumer la page',
+    send: 'Envoyer',
+    documentation: 'Documentation',
+    support: 'Soutenir',
+    correct: 'Corriger',
+    summarize: 'Resumer',
+    explain: 'Expliquer',
+    professional: 'Pro',
+    style: 'Style',
+
     // Results page
     resultTitle: 'Resultat',
     copyResult: 'Copier',
@@ -222,9 +240,11 @@ export const TRANSLATIONS = {
     resetSection: 'Reinitialisation',
     resetWarning: 'Restaurer tous les parametres par defaut. Cette action est irreversible.',
     updateAvailable: 'Mise a jour disponible',
+    newVersionAvailable: 'Nouvelle version {version} disponible!',
     download: 'Telecharger',
     youHaveLatest: 'Vous avez la derniere version.',
     unableToCheckUpdates: 'Impossible de verifier les mises a jour.',
+    checkingForUpdates: 'Verification en cours...',
 
     // Modal
     newAction: 'Nouvelle action',
@@ -419,6 +439,24 @@ export const TRANSLATIONS = {
     viewDetails: 'View details',
     response: 'Response',
 
+    // Popup (extension icon)
+    connecting: 'Connecting...',
+    ready: 'Ready',
+    offline: 'Offline',
+    notConfigured: 'Not configured',
+    askAnything: 'Ask a question or give an instruction...',
+    selectTextFirst: 'Select text on the page to use it',
+    translateTo: 'Translate to',
+    summarizePage: 'Summarize page',
+    send: 'Send',
+    documentation: 'Documentation',
+    support: 'Support',
+    correct: 'Correct',
+    summarize: 'Summarize',
+    explain: 'Explain',
+    professional: 'Pro',
+    style: 'Style',
+
     // Results page
     resultTitle: 'Result',
     copyResult: 'Copy',
@@ -452,9 +490,11 @@ export const TRANSLATIONS = {
     resetSection: 'Reset',
     resetWarning: 'Restore all default settings. This action is irreversible.',
     updateAvailable: 'Update available',
+    newVersionAvailable: 'New version {version} available!',
     download: 'Download',
     youHaveLatest: 'You have the latest version.',
     unableToCheckUpdates: 'Unable to check for updates.',
+    checkingForUpdates: 'Checking...',
 
     // Modal
     newAction: 'New action',
@@ -547,6 +587,11 @@ TRANSLATIONS.es = {
   settingsSaved: 'Configuracion guardada!', languageChanged: 'Idioma cambiado!',
   // Popup inline
   connectingToAI: 'Conectando con la IA...', viewDetails: 'Ver detalles', response: 'Respuesta',
+  // Popup (extension icon)
+  connecting: 'Conectando...', ready: 'Listo', offline: 'Sin conexion', notConfigured: 'No configurado',
+  askAnything: 'Haga una pregunta o de una instruccion...', selectTextFirst: 'Seleccione texto en la pagina para usarlo',
+  translateTo: 'Traducir a', summarizePage: 'Resumir pagina', send: 'Enviar', support: 'Apoyar',
+  correct: 'Corregir', summarize: 'Resumir', explain: 'Explicar', professional: 'Pro', style: 'Estilo',
   // Results
   resultTitle: 'Resultado', copyResult: 'Copiar', openInNewTab: 'Abrir en nueva pestana',
   refinementOptions: 'Opciones de refinamiento', customInstructions: 'Instrucciones personalizadas',
@@ -566,7 +611,8 @@ TRANSLATIONS.es = {
   reportProblem: 'Reportar un problema', credits: 'Creditos', developer: 'Desarrollador:', contact: 'Contacto:',
   license: 'Licencia:', freePersonalUse: 'uso personal gratuito', resetSection: 'Reinicializacion',
   resetWarning: 'Restaurar todos los ajustes por defecto. Esta accion es irreversible.',
-  updateAvailable: 'Actualizacion disponible', download: 'Descargar',
+  updateAvailable: 'Actualizacion disponible', newVersionAvailable: 'Nueva version {version} disponible!',
+  download: 'Descargar', checkingForUpdates: 'Verificando...',
   youHaveLatest: 'Tiene la ultima version.', unableToCheckUpdates: 'No se pueden verificar las actualizaciones.',
   newAction: 'Nueva accion', name: 'Nombre', context: 'Contexto', textSelection: 'Seleccion de texto',
   inputField: 'Campo de entrada', fullPage: 'Pagina completa', all: 'Todos',
@@ -644,6 +690,11 @@ TRANSLATIONS.it = {
   settingsSaved: 'Impostazioni salvate!', languageChanged: 'Lingua cambiata!',
   // Popup inline
   connectingToAI: 'Connessione all\'IA in corso...', viewDetails: 'Vedi dettagli', response: 'Risposta',
+  // Popup (extension icon)
+  connecting: 'Connessione...', ready: 'Pronto', offline: 'Offline', notConfigured: 'Non configurato',
+  askAnything: 'Fai una domanda o dai un\'istruzione...', selectTextFirst: 'Seleziona del testo sulla pagina per usarlo',
+  translateTo: 'Traduci in', summarizePage: 'Riassumi pagina', send: 'Invia', support: 'Supporta',
+  correct: 'Correggi', summarize: 'Riassumi', explain: 'Spiega', professional: 'Pro', style: 'Stile',
   // Results
   resultTitle: 'Risultato', copyResult: 'Copia', openInNewTab: 'Apri in nuova scheda',
   refinementOptions: 'Opzioni di perfezionamento', customInstructions: 'Istruzioni personalizzate',
@@ -663,7 +714,8 @@ TRANSLATIONS.it = {
   reportProblem: 'Segnala un problema', credits: 'Crediti', developer: 'Sviluppatore:', contact: 'Contatto:',
   license: 'Licenza:', freePersonalUse: 'uso personale gratuito', resetSection: 'Reimpostazione',
   resetWarning: 'Ripristina tutte le impostazioni predefinite. Questa azione e irreversibile.',
-  updateAvailable: 'Aggiornamento disponibile', download: 'Scarica',
+  updateAvailable: 'Aggiornamento disponibile', newVersionAvailable: 'Nuova versione {version} disponibile!',
+  download: 'Scarica', checkingForUpdates: 'Verifica in corso...',
   youHaveLatest: 'Hai l\'ultima versione.', unableToCheckUpdates: 'Impossibile verificare gli aggiornamenti.',
   newAction: 'Nuova azione', name: 'Nome', context: 'Contesto', textSelection: 'Selezione testo',
   inputField: 'Campo di input', fullPage: 'Pagina intera', all: 'Tutti',
@@ -741,6 +793,11 @@ TRANSLATIONS.pt = {
   settingsSaved: 'Configuracoes salvas!', languageChanged: 'Idioma alterado!',
   // Popup inline
   connectingToAI: 'Conectando com a IA...', viewDetails: 'Ver detalhes', response: 'Resposta',
+  // Popup (extension icon)
+  connecting: 'Conectando...', ready: 'Pronto', offline: 'Offline', notConfigured: 'Nao configurado',
+  askAnything: 'Faca uma pergunta ou de uma instrucao...', selectTextFirst: 'Selecione texto na pagina para usa-lo',
+  translateTo: 'Traduzir para', summarizePage: 'Resumir pagina', send: 'Enviar', support: 'Apoiar',
+  correct: 'Corrigir', summarize: 'Resumir', explain: 'Explicar', professional: 'Pro', style: 'Estilo',
   // Results
   resultTitle: 'Resultado', copyResult: 'Copiar', openInNewTab: 'Abrir em nova aba',
   refinementOptions: 'Opcoes de refinamento', customInstructions: 'Instrucoes personalizadas',
@@ -760,7 +817,8 @@ TRANSLATIONS.pt = {
   reportProblem: 'Reportar um problema', credits: 'Creditos', developer: 'Desenvolvedor:', contact: 'Contato:',
   license: 'Licenca:', freePersonalUse: 'uso pessoal gratuito', resetSection: 'Redefinicao',
   resetWarning: 'Restaurar todas as configuracoes padrao. Esta acao e irreversivel.',
-  updateAvailable: 'Atualizacao disponivel', download: 'Baixar',
+  updateAvailable: 'Atualizacao disponivel', newVersionAvailable: 'Nova versao {version} disponivel!',
+  download: 'Baixar', checkingForUpdates: 'Verificando...',
   youHaveLatest: 'Voce tem a versao mais recente.', unableToCheckUpdates: 'Nao foi possivel verificar atualizacoes.',
   newAction: 'Nova acao', name: 'Nome', context: 'Contexto', textSelection: 'Selecao de texto',
   inputField: 'Campo de entrada', fullPage: 'Pagina inteira', all: 'Todos',

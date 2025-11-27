@@ -1,6 +1,73 @@
 // Service Worker Background pour IA Helper
 // Gere les menus contextuels et la communication avec plusieurs providers IA
 
+// Traductions du menu contextuel
+const MENU_TRANSLATIONS = {
+  fr: {
+    openOptions: 'Ouvrir les options',
+    translation: 'Traduction',
+    summarizePage: 'Resumer cette page',
+    extractKeyPoints: 'Extraire les points essentiels',
+    myActions: 'Mes actions',
+    essentials: 'Essentiels',
+    practical: 'Pratique',
+    technical: 'Technique',
+    analysis: 'Analyse'
+  },
+  en: {
+    openOptions: 'Open options',
+    translation: 'Translation',
+    summarizePage: 'Summarize this page',
+    extractKeyPoints: 'Extract key points',
+    myActions: 'My actions',
+    essentials: 'Essentials',
+    practical: 'Practical',
+    technical: 'Technical',
+    analysis: 'Analysis'
+  },
+  es: {
+    openOptions: 'Abrir opciones',
+    translation: 'Traduccion',
+    summarizePage: 'Resumir esta pagina',
+    extractKeyPoints: 'Extraer puntos clave',
+    myActions: 'Mis acciones',
+    essentials: 'Esenciales',
+    practical: 'Practico',
+    technical: 'Tecnico',
+    analysis: 'Analisis'
+  },
+  it: {
+    openOptions: 'Apri opzioni',
+    translation: 'Traduzione',
+    summarizePage: 'Riassumi questa pagina',
+    extractKeyPoints: 'Estrai punti chiave',
+    myActions: 'Le mie azioni',
+    essentials: 'Essenziali',
+    practical: 'Pratico',
+    technical: 'Tecnico',
+    analysis: 'Analisi'
+  },
+  pt: {
+    openOptions: 'Abrir opcoes',
+    translation: 'Traducao',
+    summarizePage: 'Resumir esta pagina',
+    extractKeyPoints: 'Extrair pontos-chave',
+    myActions: 'Minhas acoes',
+    essentials: 'Essenciais',
+    practical: 'Pratico',
+    technical: 'Tecnico',
+    analysis: 'Analise'
+  }
+};
+
+// Langue courante pour les menus
+let interfaceLanguage = 'fr';
+
+// Fonction pour obtenir une traduction de menu
+function mt(key) {
+  return MENU_TRANSLATIONS[interfaceLanguage]?.[key] || MENU_TRANSLATIONS.fr[key] || key;
+}
+
 // Configuration par defaut
 const DEFAULT_CONFIG = {
   provider: 'ollama',
@@ -195,6 +262,8 @@ async function loadConfig() {
   return new Promise((resolve) => {
     chrome.storage.local.get(['config'], (result) => {
       config = result.config || DEFAULT_CONFIG;
+      // Charger la langue pour les menus
+      interfaceLanguage = config.interfaceLanguage || 'fr';
       resolve(config);
     });
   });
@@ -227,7 +296,7 @@ async function createContextMenus() {
     // === OPTIONS (toujours visible) ===
     chrome.contextMenus.create({
       id: 'open-options',
-      title: 'Ouvrir les options',
+      title: mt('openOptions'),
       parentId: 'ia-helper-main',
       contexts: ctx
     });
@@ -235,7 +304,7 @@ async function createContextMenus() {
     // === MENU TRADUCTION (toujours visible) ===
     chrome.contextMenus.create({
       id: 'translation-section',
-      title: 'Traduction',
+      title: mt('translation'),
       parentId: 'ia-helper-main',
       contexts: ctx
     });
@@ -266,14 +335,14 @@ async function createContextMenus() {
     // === ACTIONS DE PAGE (toujours visible) ===
     chrome.contextMenus.create({
       id: 'quick_summarize_page',
-      title: 'Resumer cette page',
+      title: mt('summarizePage'),
       parentId: 'ia-helper-main',
       contexts: ctx
     });
 
     chrome.contextMenus.create({
       id: 'quick_extract_main',
-      title: 'Extraire les points essentiels',
+      title: mt('extractKeyPoints'),
       parentId: 'ia-helper-main',
       contexts: ctx
     });
@@ -310,10 +379,11 @@ async function createContextMenus() {
       const categoryInfo = ACTION_CATEGORIES[category];
       const actions = actionsByCategory[category];
 
-      // Creer sous-menu de categorie
+      // Creer sous-menu de categorie avec traduction
+      const categoryTitle = mt(category) !== category ? mt(category) : (categoryInfo?.name || category);
       chrome.contextMenus.create({
         id: `category-${category}`,
-        title: categoryInfo?.name || category,
+        title: categoryTitle,
         parentId: 'ia-helper-main',
         contexts: ctx
       });
@@ -342,7 +412,7 @@ async function createContextMenus() {
 
       chrome.contextMenus.create({
         id: 'custom-actions-section',
-        title: 'Mes actions',
+        title: mt('myActions'),
         parentId: 'ia-helper-main',
         contexts: ctx
       });

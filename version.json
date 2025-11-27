@@ -1,9 +1,9 @@
 {
-  "version": "1.4.7",
+  "version": "1.4.8",
   "releaseDate": "2025-11-27",
   "minChromeVersion": "88",
-  "downloadUrl": "https://github.com/Gohanado/ia-helper/archive/refs/tags/v1.4.7.zip",
+  "downloadUrl": "https://github.com/Gohanado/ia-helper/archive/refs/tags/v1.4.8.zip",
   "changelogUrl": "https://github.com/Gohanado/ia-helper/blob/main/CHANGELOG.md",
-  "releaseNotes": "Results.html traduit - Boutons Close/Apply retires - Toggle reduce/expand traduit"
+  "releaseNotes": "Popup completement redesigne - Menu contextuel traduit - Messages mise a jour traduits"
 }
 

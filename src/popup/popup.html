@@ -10,130 +10,144 @@
   <div class="popup-container">
     <!-- Header -->
     <header class="popup-header">
-      <div class="logo-container">
+      <div class="logo-section">
         <img src="../../assets/icons/icon48.png" alt="IA Helper" class="logo">
-        <div class="title-container">
+        <div class="title-info">
           <h1>IA Helper</h1>
-          <span class="version">v1.0.0</span>
+          <span class="version" id="version">v1.4.8</span>
         </div>
       </div>
-      <div class="status-badge" id="status-badge">
+      <div class="status-indicator" id="status-indicator">
         <span class="status-dot"></span>
-        <span class="status-text">...</span>
+        <span class="status-text" data-i18n="connecting">Connexion...</span>
       </div>
     </header>
 
-    <!-- Main Content (tabs) -->
-    <nav class="popup-tabs">
-      <button class="tab-btn active" data-tab="actions">Actions</button>
-      <button class="tab-btn" data-tab="presets">Presets</button>
-      <button class="tab-btn" data-tab="translate">Traduire</button>
-    </nav>
+    <!-- Quick Prompt Section -->
+    <section class="quick-prompt-section">
+      <div class="prompt-input-wrapper">
+        <textarea
+          id="quick-prompt-input"
+          class="prompt-input"
+          data-i18n-placeholder="askAnything"
+          placeholder="Posez une question ou donnez une instruction..."
+          rows="2"
+        ></textarea>
+        <button class="send-btn" id="send-prompt-btn" data-i18n-title="send" title="Envoyer">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+          </svg>
+        </button>
+      </div>
+      <div class="prompt-hint" data-i18n="selectTextFirst">Selectionnez du texte sur la page pour l'utiliser</div>
+    </section>
 
-    <!-- Tab: Actions -->
-    <section class="tab-content active" id="tab-actions">
-      <div class="actions-grid-6">
-        <button class="action-card" data-action="correct_errors">
+    <!-- Quick Actions Grid -->
+    <section class="quick-actions-section">
+      <h3 class="section-title" data-i18n="quickActions">Actions rapides</h3>
+      <div class="actions-grid">
+        <button class="action-btn" data-action="correct_errors">
           <span class="action-icon">Aa</span>
-          <span class="action-name">Corriger</span>
+          <span class="action-label" data-i18n="correct">Corriger</span>
         </button>
-        <button class="action-card" data-action="summarize">
+        <button class="action-btn" data-action="summarize">
           <span class="action-icon">Rs</span>
-          <span class="action-name">Resumer</span>
+          <span class="action-label" data-i18n="summarize">Resumer</span>
         </button>
-        <button class="action-card" data-action="explain_simple">
-          <span class="action-icon">Ex</span>
-          <span class="action-name">Expliquer</span>
+        <button class="action-btn" data-action="explain_simple">
+          <span class="action-icon">?</span>
+          <span class="action-label" data-i18n="explain">Expliquer</span>
         </button>
-        <button class="action-card" data-action="reformat_mail_pro">
-          <span class="action-icon">Pr</span>
-          <span class="action-name">Pro</span>
+        <button class="action-btn" data-action="reformat_mail_pro">
+          <span class="action-icon">Pro</span>
+          <span class="action-label" data-i18n="professional">Pro</span>
         </button>
-        <button class="action-card" data-action="improve_style">
+        <button class="action-btn" data-action="improve_style">
           <span class="action-icon">St</span>
-          <span class="action-name">Style</span>
+          <span class="action-label" data-i18n="style">Style</span>
         </button>
-        <button class="action-card" data-action="expand_content">
-          <span class="action-icon">De</span>
-          <span class="action-name">Developper</span>
-        </button>
-      </div>
-
-      <div class="section-divider"></div>
-
-      <div class="page-actions">
-        <button class="page-action-btn" data-action="quick_summarize_page">
-          <span class="btn-icon">P</span>
-          <span>Resumer cette page</span>
-        </button>
-        <button class="page-action-btn" data-action="quick_extract_main">
-          <span class="btn-icon">L</span>
-          <span>Points cles de la page</span>
+        <button class="action-btn" data-action="expand_content">
+          <span class="action-icon">+</span>
+          <span class="action-label" data-i18n="expand">Developper</span>
         </button>
       </div>
     </section>
 
-    <!-- Tab: Presets -->
-    <section class="tab-content" id="tab-presets">
-      <div class="presets-list" id="presets-list">
-        <!-- Filled by JS -->
+    <!-- Translation Section -->
+    <section class="translation-section">
+      <h3 class="section-title" data-i18n="translateTo">Traduire vers</h3>
+      <div class="lang-pills">
+        <button class="lang-pill" data-lang="fr">FR</button>
+        <button class="lang-pill" data-lang="en">EN</button>
+        <button class="lang-pill" data-lang="es">ES</button>
+        <button class="lang-pill" data-lang="de">DE</button>
+        <button class="lang-pill" data-lang="it">IT</button>
+        <button class="lang-pill" data-lang="pt">PT</button>
+        <button class="lang-pill more-langs" id="more-langs-btn">...</button>
       </div>
-      <p class="presets-hint">Activez plus de presets dans les Options</p>
-    </section>
-
-    <!-- Tab: Translate -->
-    <section class="tab-content" id="tab-translate">
-      <div class="translate-grid">
-        <button class="lang-card" data-lang="fr"><span class="flag">FR</span>Francais</button>
-        <button class="lang-card" data-lang="en"><span class="flag">EN</span>English</button>
-        <button class="lang-card" data-lang="es"><span class="flag">ES</span>Espanol</button>
-        <button class="lang-card" data-lang="it"><span class="flag">IT</span>Italiano</button>
-        <button class="lang-card" data-lang="de"><span class="flag">DE</span>Deutsch</button>
-        <button class="lang-card" data-lang="pt"><span class="flag">PT</span>Portugues</button>
-        <button class="lang-card" data-lang="nl"><span class="flag">NL</span>Nederlands</button>
-        <button class="lang-card" data-lang="ru"><span class="flag">RU</span>Russkiy</button>
-        <button class="lang-card" data-lang="zh"><span class="flag">ZH</span>Zhongwen</button>
-        <button class="lang-card" data-lang="ja"><span class="flag">JA</span>Nihongo</button>
-        <button class="lang-card" data-lang="ar"><span class="flag">AR</span>Arabi</button>
-        <button class="lang-card" data-lang="ko"><span class="flag">KO</span>Hangugeo</button>
+      <div class="lang-pills-extended" id="lang-pills-extended" style="display:none;">
+        <button class="lang-pill" data-lang="nl">NL</button>
+        <button class="lang-pill" data-lang="ru">RU</button>
+        <button class="lang-pill" data-lang="zh">ZH</button>
+        <button class="lang-pill" data-lang="ja">JA</button>
+        <button class="lang-pill" data-lang="ko">KO</button>
+        <button class="lang-pill" data-lang="ar">AR</button>
       </div>
     </section>
 
-    <!-- Connection Info (collapsible) -->
-    <details class="connection-details">
-      <summary>
-        <span id="model-display">Modele: ...</span>
-      </summary>
-      <div class="connection-info">
-        <div class="info-row">
-          <span class="label">Serveur</span>
-          <span class="value" id="server-url">localhost:11434</span>
-        </div>
-        <div class="info-row">
-          <span class="label">Modele</span>
-          <span class="value" id="model-name">-</span>
-        </div>
-      </div>
-    </details>
+    <!-- Page Actions -->
+    <section class="page-actions-section">
+      <button class="page-action-btn" data-action="quick_summarize_page">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>
+        </svg>
+        <span data-i18n="summarizePage">Resumer la page</span>
+      </button>
+      <button class="page-action-btn" data-action="quick_extract_main">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 11l3 3L22 4"/>
+          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+        </svg>
+        <span data-i18n="extractKeyPoints">Points cles</span>
+      </button>
+    </section>
+
+    <!-- Model Info Bar -->
+    <div class="model-info-bar" id="model-info-bar">
+      <span class="provider-badge" id="provider-badge">Ollama</span>
+      <span class="model-name" id="model-name">-</span>
+    </div>
 
     <!-- Footer -->
     <footer class="popup-footer">
-      <button class="footer-btn" id="btn-options" title="Options">
-        <span class="footer-icon">Opt</span>
+      <button class="footer-btn" id="btn-options" data-i18n-title="options" title="Options">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
       </button>
-      <button class="footer-btn" id="btn-help" title="Documentation">
-        <span class="footer-icon">Doc</span>
+      <button class="footer-btn" id="btn-shortcuts" data-i18n-title="shortcuts" title="Raccourcis">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="4" width="20" height="16" rx="2"/>
+          <path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M8 12h8M6 16h.01M18 16h.01M10 16h4"/>
+        </svg>
       </button>
-      <a class="footer-btn" id="btn-bug" href="https://github.com/Gohanado/ia-helper/issues/new?template=bug_report.md" target="_blank" title="Signaler un bug">
-        <span class="footer-icon">Bug</span>
+      <a class="footer-btn" href="https://github.com/Gohanado/ia-helper" target="_blank" data-i18n-title="documentation" title="Documentation">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+        </svg>
       </a>
-      <a class="footer-btn support-btn" href="https://paypal.me/gohanado" target="_blank" title="Soutenir le projet">
-        <span class="footer-icon">Don</span>
+      <a class="footer-btn support" href="https://paypal.me/gohanado" target="_blank" data-i18n-title="support" title="Soutenir">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        </svg>
       </a>
     </footer>
   </div>
 
-  <script src="popup.js"></script>
+  <script src="popup.js" type="module"></script>
 </body>
 </html>
 

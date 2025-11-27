@@ -1617,7 +1617,7 @@ async function checkForUpdates() {
   const updateBanner = document.getElementById('update-banner');
 
   if (updateStatus) {
-    updateStatus.textContent = 'Verification en cours...';
+    updateStatus.textContent = t('checkingForUpdates', currentLang);
   }
 
   try {
@@ -1630,7 +1630,8 @@ async function checkForUpdates() {
     if (compareVersions(data.version, currentVersion) > 0) {
       // Mise a jour disponible
       if (updateStatus) {
-        updateStatus.innerHTML = `<strong style="color: var(--success);">Nouvelle version ${data.version} disponible!</strong><br><small>${data.releaseNotes || ''}</small>`;
+        const versionText = t('newVersionAvailable', currentLang).replace('{version}', data.version);
+        updateStatus.innerHTML = `<strong style="color: var(--success);">${versionText}</strong><br><small>${data.releaseNotes || ''}</small>`;
       }
       if (updateCard) {
         updateCard.classList.add('update-available');
@@ -1651,7 +1652,7 @@ async function checkForUpdates() {
       });
     } else {
       if (updateStatus) {
-        updateStatus.textContent = 'Vous avez la derniere version.';
+        updateStatus.textContent = t('youHaveLatest', currentLang);
       }
       if (updateBanner) {
         updateBanner.style.display = 'none';
@@ -1691,7 +1692,8 @@ async function loadUpdateStatus() {
       document.getElementById('update-link').href = result.updateAvailable.downloadUrl || 'https://github.com/Gohanado/ia-helper/releases/latest';
     }
     if (updateStatus) {
-      updateStatus.innerHTML = `<strong style="color: var(--success);">Nouvelle version ${result.updateAvailable.version} disponible!</strong>`;
+      const versionText = t('newVersionAvailable', currentLang).replace('{version}', result.updateAvailable.version);
+      updateStatus.innerHTML = `<strong style="color: var(--success);">${versionText}</strong>`;
     }
     if (updateCard) {
       updateCard.classList.add('update-available');
