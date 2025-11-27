@@ -791,34 +791,56 @@
     showNotification(`Copie en ${formatNames[format]}!`, 'success');
   }
 
-  // Generer la reponse pour une action via le background script
+  // Generer la reponse pour une action via le background script avec STREAMING
   async function generateActionResponse(element, content, systemPrompt) {
     try {
-      const response = await new Promise((resolve, reject) => {
-        chrome.runtime.sendMessage({
-          type: 'GENERATE_RESPONSE',
-          content: content,
-          systemPrompt: systemPrompt
-        }, (response) => {
-          if (chrome.runtime.lastError) {
-            reject(new Error(chrome.runtime.lastError.message));
-          } else if (response && response.error) {
-            reject(new Error(response.error));
-          } else {
-            resolve(response);
+      // Utiliser un port pour le streaming
+      const port = chrome.runtime.connect({ name: 'streaming' });
+
+      // Vider le contenu initial
+      element.innerHTML = '';
+      currentPopupResult = '';
+
+      // Creer le curseur de streaming
+      const cursor = document.createElement('span');
+      cursor.className = 'ia-action-cursor';
+      element.appendChild(cursor);
+
+      port.onMessage.addListener((message) => {
+        if (message.type === 'chunk') {
+          // Ajouter le texte avant le curseur
+          currentPopupResult += message.text;
+          element.textContent = currentPopupResult;
+          element.appendChild(cursor);
+
+          // Scroll vers le bas si necessaire
+          const responseArea = element.closest('.ia-action-response-area');
+          if (responseArea) {
+            responseArea.scrollTop = responseArea.scrollHeight;
           }
-        });
+        } else if (message.type === 'done') {
+          // Retirer le curseur
+          cursor.remove();
+          port.disconnect();
+        } else if (message.type === 'error') {
+          element.innerHTML = `<span class="ia-action-error">Erreur: ${message.error}</span>`;
+          port.disconnect();
+        }
       });
 
-      if (response && response.result) {
-        currentPopupResult = response.result;
-        element.textContent = response.result;
-        // Retirer le curseur une fois la reponse recue
-        const cursor = element.parentElement?.querySelector('.ia-action-cursor');
-        if (cursor) cursor.remove();
-      } else {
-        element.innerHTML = `<span class="ia-action-error">Aucune reponse recue</span>`;
-      }
+      port.onDisconnect.addListener(() => {
+        if (chrome.runtime.lastError) {
+          console.error('IA Helper: Port disconnected', chrome.runtime.lastError.message);
+        }
+      });
+
+      // Envoyer la demande de generation
+      port.postMessage({
+        type: 'GENERATE_STREAMING',
+        content: content,
+        systemPrompt: systemPrompt
+      });
+
     } catch (error) {
       console.error('IA Helper: Erreur generation', error);
       element.innerHTML = `<span class="ia-action-error">Erreur: ${error.message}</span>`;

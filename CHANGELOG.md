@@ -14,6 +14,17 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 
 ---
 
+## [1.4.4] - 2025-11-27
+
+### Ajoute
+- **Vrai streaming dans le popup**: La reponse s'affiche maintenant caractere par caractere en temps reel grace a chrome.runtime.connect
+- **Bouton Options**: Engrenage dans results.html pour acceder directement aux options de l'extension
+
+### Ameliore
+- **Scroll automatique**: Le popup scroll automatiquement vers le bas pendant le streaming
+
+---
+
 ## [1.4.3] - 2025-11-27
 
 ### Ajoute
@@ -255,7 +266,8 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 
 ---
 
-[Non publie]: https://github.com/Gohanado/ia-helper/compare/v1.4.3...HEAD
+[Non publie]: https://github.com/Gohanado/ia-helper/compare/v1.4.4...HEAD
+[1.4.4]: https://github.com/Gohanado/ia-helper/releases/tag/v1.4.4
 [1.4.3]: https://github.com/Gohanado/ia-helper/releases/tag/v1.4.3
 [1.4.2]: https://github.com/Gohanado/ia-helper/releases/tag/v1.4.2
 [1.4.1]: https://github.com/Gohanado/ia-helper/releases/tag/v1.4.1

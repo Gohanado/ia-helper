@@ -152,7 +152,12 @@ function setupEventListeners() {
   document.getElementById('btn-close').addEventListener('click', () => {
     window.close();
   });
-  
+
+  // Options
+  document.getElementById('btn-settings').addEventListener('click', () => {
+    chrome.runtime.openOptionsPage();
+  });
+
   // Refinement buttons
   document.getElementById('btn-regenerate').addEventListener('click', () => regenerate());
   document.getElementById('btn-shorter').addEventListener('click', () => refine('Fais une version plus courte et concise.'));

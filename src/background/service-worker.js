@@ -657,3 +657,146 @@ async function generateAIResponse(content, systemPrompt) {
   return result;
 }
 
+// Ecouter les connexions pour le streaming
+chrome.runtime.onConnect.addListener((port) => {
+  if (port.name === 'streaming') {
+    port.onMessage.addListener(async (message) => {
+      if (message.type === 'GENERATE_STREAMING') {
+        try {
+          await generateStreamingResponse(port, message.content, message.systemPrompt);
+        } catch (error) {
+          port.postMessage({ type: 'error', error: error.message });
+        }
+      }
+    });
+  }
+});
+
+// Generer une reponse IA avec streaming
+async function generateStreamingResponse(port, content, systemPrompt) {
+  await loadConfig();
+
+  const provider = config.provider || 'ollama';
+  const apiUrl = config.apiUrl || DEFAULT_CONFIG.apiUrl;
+  const apiKey = config.apiKey || '';
+  const model = config.selectedModel || '';
+
+  let response;
+
+  if (provider === 'ollama') {
+    response = await fetch(`${apiUrl}/api/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: model,
+        prompt: content,
+        system: systemPrompt,
+        stream: true
+      })
+    });
+  } else if (provider === 'openai' || provider === 'openrouter' || provider === 'custom') {
+    const baseUrl = provider === 'openai' ? 'https://api.openai.com/v1' :
+                    provider === 'openrouter' ? 'https://openrouter.ai/api/v1' : apiUrl;
+    response = await fetch(`${baseUrl}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: model,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: content }
+        ],
+        stream: true
+      })
+    });
+  } else if (provider === 'anthropic') {
+    response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: model,
+        max_tokens: 4096,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: content }],
+        stream: true
+      })
+    });
+  } else if (provider === 'groq') {
+    response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: model,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: content }
+        ],
+        stream: true
+      })
+    });
+  }
+
+  if (!response.ok) {
+    throw new Error(`Erreur API ${response.status}`);
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    const chunk = decoder.decode(value, { stream: true });
+    const lines = chunk.split('\n').filter(line => line.trim());
+
+    for (const line of lines) {
+      try {
+        // Format Ollama
+        if (provider === 'ollama') {
+          const json = JSON.parse(line);
+          if (json.response) {
+            port.postMessage({ type: 'chunk', text: json.response });
+          }
+        }
+        // Format OpenAI/Groq/OpenRouter (SSE)
+        else if (provider === 'openai' || provider === 'groq' || provider === 'openrouter' || provider === 'custom') {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6);
+            if (data === '[DONE]') continue;
+            const json = JSON.parse(data);
+            const text = json.choices?.[0]?.delta?.content || '';
+            if (text) {
+              port.postMessage({ type: 'chunk', text: text });
+            }
+          }
+        }
+        // Format Anthropic (SSE)
+        else if (provider === 'anthropic') {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6);
+            const json = JSON.parse(data);
+            if (json.type === 'content_block_delta' && json.delta?.text) {
+              port.postMessage({ type: 'chunk', text: json.delta.text });
+            }
+          }
+        }
+      } catch (e) {
+        // Ignorer les erreurs de parsing JSON
+      }
+    }
+  }
+
+  port.postMessage({ type: 'done' });
+}
+
