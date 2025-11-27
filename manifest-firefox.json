@@ -1,0 +1,67 @@
+{
+  "manifest_version": 3,
+  "name": "IA Helper",
+  "version": "1.5.0",
+  "description": "Assistant IA intelligent pour Firefox - Multi-providers (Ollama, OpenAI, Anthropic, Groq...) - 100% configurable",
+  "author": "Gohanado",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "ia-helper@badom.ch",
+      "strict_min_version": "109.0"
+    }
+  },
+  "icons": {
+    "16": "assets/icons/icon16.png",
+    "32": "assets/icons/icon32.png",
+    "48": "assets/icons/icon48.png",
+    "128": "assets/icons/icon128.png"
+  },
+  "permissions": [
+    "contextMenus",
+    "activeTab",
+    "storage",
+    "tabs",
+    "scripting"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "scripts": ["src/background/service-worker.js"],
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["src/content/content-script.js"],
+      "css": ["src/content/content-styles.css"],
+      "run_at": "document_end"
+    }
+  ],
+  "action": {
+    "default_popup": "src/popup/popup.html",
+    "default_icon": {
+      "16": "assets/icons/icon16.png",
+      "32": "assets/icons/icon32.png",
+      "48": "assets/icons/icon48.png",
+      "128": "assets/icons/icon128.png"
+    },
+    "default_title": "IA Helper"
+  },
+  "options_ui": {
+    "page": "src/options/options.html",
+    "open_in_tab": true
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "src/results/results.html",
+        "src/results/results.css",
+        "src/results/results.js",
+        "assets/icons/*"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
+

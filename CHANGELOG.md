@@ -20,10 +20,13 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 - **Reponse directe dans le champ de saisie**: Nouvelle option pour que l'IA reponde directement dans le champ actif
 - **Mode d'insertion**: Choisir entre "Remplacer le contenu" ou "Ajouter a la suite"
 - **Streaming dans le champ**: La reponse s'ecrit en temps reel dans le champ de saisie
+- **Support Firefox**: Extension maintenant disponible pour Firefox (MV3)
+- **Script de build**: Nouveau script `build.ps1` pour generer les packages Chrome et Firefox
 
 ### Corrige
 - **Quick prompt popup**: Le prompt rapide depuis le popup affiche maintenant correctement le popup de generation
 - **actionId pour custom_prompt**: Definition automatique de l'actionId pour les prompts personnalises
+- **Restauration contenu**: En cas d'erreur, le contenu original du champ est restaure
 
 ### Ameliore
 - **Traductions completes**: Nouvelles cles pour les options de reponse directe (5 langues)
