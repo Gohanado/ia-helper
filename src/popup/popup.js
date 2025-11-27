@@ -1,6 +1,12 @@
 // Popup Script - IA Helper v2
 
 document.addEventListener('DOMContentLoaded', async () => {
+  // Afficher la version depuis le manifest
+  const versionEl = document.querySelector('.version');
+  if (versionEl) {
+    versionEl.textContent = 'v' + chrome.runtime.getManifest().version;
+  }
+
   // Elements
   const statusBadge = document.getElementById('status-badge');
   const statusDot = statusBadge.querySelector('.status-dot');

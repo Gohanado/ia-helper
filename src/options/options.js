@@ -2,8 +2,8 @@
 
 import { t } from '../i18n/translations.js';
 
-// Version courante
-const VERSION = '1.1.0';
+// Version courante - lue depuis le manifest
+const VERSION = chrome.runtime.getManifest().version;
 const VERSION_URL = 'https://raw.githubusercontent.com/Gohanado/ia-helper/main/version.json';
 
 // Configuration par defaut
@@ -103,6 +103,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
 
   try {
+    // Mettre a jour les elements de version
+    const currentVersionEl = document.getElementById('current-version');
+    const aboutVersionEl = document.getElementById('about-version');
+    if (currentVersionEl) currentVersionEl.textContent = 'v' + VERSION;
+    if (aboutVersionEl) aboutVersionEl.textContent = 'Version ' + VERSION;
+
     await loadAllSettings();
     await loadEnabledActions();
     await loadCustomActions();
