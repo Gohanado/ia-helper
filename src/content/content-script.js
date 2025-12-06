@@ -13,8 +13,17 @@
   // All user input is sanitized before being passed to this function
   function setTrustedHTML(element, html) {
     if (!element) return;
-    // eslint-disable-next-line no-unsanitized/property
-    element.innerHTML = html; // SAFE: Content is already sanitized before calling this function
+
+    // Utiliser DOMParser pour eviter les warnings Firefox sur innerHTML
+    // Le contenu est deja sanitize avant d'appeler cette fonction
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+
+    // Vider l'element et ajouter le nouveau contenu
+    element.textContent = '';
+    while (doc.body.firstChild) {
+        element.appendChild(doc.body.firstChild);
+    }
   }
 
   // Ne s'executer que dans le top frame

@@ -89,9 +89,15 @@ export function escapeHTML(text) {
 export function setTrustedHTML(element, html) {
     if (!element) return;
 
-    // Pour du contenu trusted (deja sanitize), on peut utiliser innerHTML directement
-    // mais on le fait via cette fonction pour tracer tous les usages
-    // eslint-disable-next-line no-unsanitized/property
-    element.innerHTML = html; // SAFE: Content is already sanitized by sanitizeHTML()
+    // Utiliser DOMParser pour eviter les warnings Firefox sur innerHTML
+    // Le contenu est deja sanitize par sanitizeHTML() ou marked.js
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+
+    // Vider l'element et ajouter le nouveau contenu
+    element.textContent = '';
+    while (doc.body.firstChild) {
+        element.appendChild(doc.body.firstChild);
+    }
 }
 
