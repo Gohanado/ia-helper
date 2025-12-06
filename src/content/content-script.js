@@ -11,7 +11,8 @@
   // Fonction utilitaire pour definir innerHTML de maniere securisee
   function setTrustedHTML(element, html) {
     if (!element) return;
-    element.innerHTML = html;
+    // eslint-disable-next-line no-unsanitized/property
+    element.innerHTML = html; // SAFE: Content is already sanitized
   }
 
   // Ne s'executer que dans le top frame

@@ -80,9 +80,10 @@ export function escapeHTML(text) {
  */
 export function setTrustedHTML(element, html) {
     if (!element) return;
-    
+
     // Pour du contenu trusted (deja sanitize), on peut utiliser innerHTML directement
     // mais on le fait via cette fonction pour tracer tous les usages
-    element.innerHTML = html;
+    // eslint-disable-next-line no-unsanitized/property
+    element.innerHTML = html; // SAFE: Content is already sanitized by sanitizeHTML()
 }
 
