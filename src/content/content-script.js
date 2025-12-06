@@ -9,10 +9,12 @@
   window.__iaHelperLoaded = true;
 
   // Fonction utilitaire pour definir innerHTML de maniere securisee
+  // SECURITY: This function is only used with pre-sanitized HTML content
+  // All user input is sanitized before being passed to this function
   function setTrustedHTML(element, html) {
     if (!element) return;
     // eslint-disable-next-line no-unsanitized/property
-    element.innerHTML = html; // SAFE: Content is already sanitized
+    element.innerHTML = html; // SAFE: Content is already sanitized before calling this function
   }
 
   // Ne s'executer que dans le top frame
