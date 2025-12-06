@@ -1,9 +1,9 @@
 {
-  "version": "1.5.0",
-  "releaseDate": "2025-11-27",
+  "version": "1.9.0",
+  "releaseDate": "2025-12-06",
   "minChromeVersion": "88",
-  "downloadUrl": "https://github.com/Gohanado/ia-helper/archive/refs/tags/v1.5.0.zip",
+  "downloadUrl": "https://github.com/Gohanado/ia-helper/archive/refs/tags/v1.9.0.zip",
   "changelogUrl": "https://github.com/Gohanado/ia-helper/blob/main/CHANGELOG.md",
-  "releaseNotes": "Nouvelle feature: Reponse directe dans le champ de saisie avec mode remplacer/ajouter"
+  "releaseNotes": "Systeme d'agents personnalises avec parametres configurables (temperature, max tokens, system prompt, etc.)"
 }
 

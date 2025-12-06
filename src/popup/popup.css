@@ -91,6 +91,64 @@ body {
 .status-dot.connected { background: var(--success); animation: none; }
 .status-dot.error { background: var(--error); animation: none; }
 
+/* Chat Section */
+.chat-section {
+  margin-bottom: 12px;
+}
+
+.btn-open-chat {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.3) 100%);
+  border: 1px solid rgba(102, 126, 234, 0.4);
+  border-radius: 10px;
+  color: #667eea;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-open-chat::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.btn-open-chat:hover::before {
+  left: 100%;
+}
+
+.btn-open-chat:hover {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.4) 100%);
+  border-color: rgba(102, 126, 234, 0.6);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.btn-open-chat:active {
+  transform: translateY(0);
+}
+
+.btn-open-chat .arrow-icon {
+  transition: transform 0.2s ease;
+}
+
+.btn-open-chat:hover .arrow-icon {
+  transform: translateX(3px);
+}
+
 /* Quick Prompt Section */
 .quick-prompt-section {
   background: var(--bg-card);

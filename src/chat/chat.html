@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IA Helper - Chat</title>
+  <link rel="stylesheet" href="chat.css">
+</head>
+<body>
+  <div class="chat-app">
+    <!-- Sidebar - Historique des conversations -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <button class="btn-new-chat" id="btn-new-chat">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 5v14M5 12h14"/>
+          </svg>
+          <span data-i18n="newChat">Nouvelle conversation</span>
+        </button>
+      </div>
+      <div class="sidebar-search">
+        <input type="text" id="search-conversations" data-i18n-placeholder="searchConversations" placeholder="Rechercher...">
+      </div>
+      <div class="conversations-list" id="conversations-list">
+        <!-- Les conversations seront ajoutees dynamiquement -->
+      </div>
+      <div class="sidebar-footer">
+        <button class="btn-sidebar-action" id="btn-select-mode">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+          </svg>
+          <span data-i18n="selectMode">Selectionner</span>
+        </button>
+        <button class="btn-sidebar-action hidden" id="btn-delete-selected">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+          </svg>
+          <span data-i18n="deleteSelected">Supprimer</span>
+        </button>
+        <button class="btn-sidebar-action" id="btn-delete-all">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+          </svg>
+          <span data-i18n="deleteAll">Tout supprimer</span>
+        </button>
+        <button class="btn-sidebar-action" id="btn-settings">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+          <span data-i18n="options">Options</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Zone principale du chat -->
+    <main class="chat-main">
+      <!-- Header -->
+      <header class="chat-header">
+        <button class="btn-toggle-sidebar" id="btn-toggle-sidebar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 12h18M3 6h18M3 18h18"/>
+          </svg>
+        </button>
+        <div class="chat-title">
+          <h1 id="chat-title" data-i18n="chatWithAI">Chat avec l'IA</h1>
+          <div class="header-selectors">
+            <div class="agent-selector">
+              <button class="agent-badge" id="agent-badge">
+                <span class="agent-badge-icon">🤖</span>
+                <span class="agent-badge-name">Assistant General</span>
+              </button>
+              <div class="agent-dropdown" id="agent-dropdown">
+                <!-- Les agents seront ajoutes dynamiquement -->
+              </div>
+            </div>
+            <div class="model-selector">
+              <button class="model-badge" id="model-badge">-</button>
+              <div class="model-dropdown" id="model-dropdown">
+                <!-- Les modeles seront ajoutes dynamiquement -->
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="btn-icon" id="btn-export" data-i18n-title="exportChat" title="Exporter">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+          </button>
+          <button class="btn-icon btn-delete-chat" id="btn-delete-chat" data-i18n-title="deleteChat" title="Supprimer">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- Zone des messages -->
+      <div class="messages-container" id="messages-container">
+        <div class="messages-wrapper" id="messages-wrapper">
+          <!-- Message de bienvenue affiche quand aucune conversation -->
+          <div class="welcome-screen" id="welcome-screen">
+            <img src="../../assets/icons/icon128.png" alt="IA Helper" class="welcome-logo">
+            <h2 data-i18n="welcomeToChat">Bienvenue dans le Chat IA</h2>
+            <p data-i18n="welcomeDescription">Posez vos questions, discutez librement avec l'IA. Vos conversations sont sauvegardees localement.</p>
+            <div class="welcome-suggestions">
+              <button class="suggestion-chip" data-prompt="Explique-moi comment fonctionne l'intelligence artificielle">
+                <span data-i18n="suggestionAI">Comment fonctionne l'IA ?</span>
+              </button>
+              <button class="suggestion-chip" data-prompt="Aide-moi a rediger un email professionnel">
+                <span data-i18n="suggestionEmail">Rediger un email pro</span>
+              </button>
+              <button class="suggestion-chip" data-prompt="Donne-moi des idees pour un projet creatif">
+                <span data-i18n="suggestionIdeas">Idees creatives</span>
+              </button>
+            </div>
+          </div>
+          <!-- Les messages seront ajoutes ici -->
+        </div>
+      </div>
+
+      <!-- Zone de saisie -->
+      <div class="input-container">
+        <div class="control-buttons" id="control-buttons" style="display: none;">
+          <button class="btn-control btn-stop-generation" id="btn-stop-generation" data-i18n-title="stopGeneration" title="Arreter la generation">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="6" y="6" width="12" height="12" rx="2"/>
+            </svg>
+            <span data-i18n="stopGeneration">Arreter</span>
+          </button>
+          <button class="btn-control btn-stop-speech" id="btn-stop-speech" style="display: none;" data-i18n-title="stopSpeech" title="Arreter la lecture">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 5L6 9H2v6h4l5 4V5zM23 9l-6 6M17 9l6 6"/>
+            </svg>
+            <span data-i18n="stopSpeech">Arreter lecture</span>
+          </button>
+        </div>
+        <div class="input-wrapper">
+          <textarea
+            id="message-input"
+            class="message-input"
+            data-i18n-placeholder="typeMessage"
+            placeholder="Ecrivez votre message..."
+            rows="1"
+          ></textarea>
+          <button class="btn-send" id="btn-send" disabled>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+            </svg>
+          </button>
+        </div>
+        <div class="input-footer">
+          <span class="input-hint" data-i18n="inputHint">Entree pour envoyer, Shift+Entree pour nouvelle ligne</span>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="chat.js" type="module"></script>
+</body>
+</html>
+

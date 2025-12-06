@@ -31,6 +31,10 @@
           <span class="nav-icon">S</span>
           <span data-i18n="connection">Connexion</span>
         </button>
+        <button class="nav-item" data-section="agents">
+          <span class="nav-icon">A</span>
+          <span data-i18n="agents">Agents</span>
+        </button>
         <button class="nav-item" data-section="presets">
           <span class="nav-icon">P</span>
           <span data-i18n="presets">Actions</span>
@@ -163,8 +167,110 @@
           <p class="form-hint" data-i18n="responseLanguageHint">Cette option ne s'applique pas aux traductions specifiques.</p>
         </div>
 
+        <!-- Section Lecture Vocale -->
+        <div class="section-divider">
+          <h3 data-i18n="speechSettings">Lecture vocale</h3>
+        </div>
+
+        <div class="form-group">
+          <label class="toggle-label">
+            <input type="checkbox" id="speech-enabled" checked>
+            <span class="toggle-switch"></span>
+            <span class="toggle-text" data-i18n="enableSpeech">Activer la lecture vocale</span>
+          </label>
+          <p class="form-hint" data-i18n="enableSpeechHint">Affiche un bouton "Lire" pour ecouter les reponses de l'IA.</p>
+        </div>
+
+        <div class="form-group" id="speech-options">
+          <label for="speech-rate" data-i18n="speechRate">Vitesse de lecture</label>
+          <div class="range-with-value">
+            <input type="range" id="speech-rate" min="0.5" max="2" step="0.1" value="1">
+            <span id="speech-rate-value">1.0x</span>
+          </div>
+        </div>
+
+        <div class="form-group" id="speech-pitch-group">
+          <label for="speech-pitch" data-i18n="speechPitch">Tonalite</label>
+          <div class="range-with-value">
+            <input type="range" id="speech-pitch" min="0.5" max="2" step="0.1" value="1">
+            <span id="speech-pitch-value">1.0</span>
+          </div>
+          <div class="pitch-presets">
+            <button type="button" class="btn-pitch-preset" id="btn-pitch-low" data-pitch="0.5" data-rate="0.9">
+              <span data-i18n="pitchLow">Voix grave</span>
+            </button>
+            <button type="button" class="btn-pitch-preset" id="btn-pitch-high" data-pitch="1.8" data-rate="1.1">
+              <span data-i18n="pitchHigh">Voix aigue</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group" id="speech-voice-group">
+          <label for="speech-voice" data-i18n="voiceSelection">Voix</label>
+          <select id="speech-voice">
+            <option value="" data-i18n="voiceDefault">Par defaut (systeme)</option>
+          </select>
+          <p class="form-hint" data-i18n="voiceSelectionHint">Choisir une voix parmi celles disponibles sur votre systeme.</p>
+        </div>
+
+        <div class="form-group" id="speech-language-mode-group">
+          <label for="speech-language-mode" data-i18n="speechLanguageMode">Mode de langue de lecture</label>
+          <select id="speech-language-mode">
+            <option value="auto" data-i18n="speechLanguageModeAuto">Automatique (detecter la langue)</option>
+            <option value="fixed" data-i18n="speechLanguageModeFixed">Langue fixe</option>
+          </select>
+          <p class="form-hint" data-i18n="speechLanguageModeHint">En mode automatique, l'IA detecte la langue du texte. En mode fixe, le texte est traduit si necessaire.</p>
+        </div>
+
+        <div class="form-group" id="speech-fixed-language-group" style="display: none;">
+          <label for="speech-fixed-language" data-i18n="speechFixedLanguage">Langue de lecture fixe</label>
+          <select id="speech-fixed-language">
+            <option value="fr">Francais</option>
+            <option value="en">English</option>
+            <option value="es">Espanol</option>
+            <option value="it">Italiano</option>
+            <option value="pt">Portugues</option>
+          </select>
+          <p class="form-hint" data-i18n="speechFixedLanguageHint">Si le texte n'est pas dans cette langue, il sera traduit automatiquement avant la lecture.</p>
+        </div>
+
+        <div class="form-group" id="speech-test-group">
+          <button id="btn-test-speech" class="btn btn-secondary" data-i18n="testSpeech">Tester la voix</button>
+          <p class="form-hint" data-i18n="testSpeechHint">Ecouter un exemple avec les parametres actuels.</p>
+        </div>
+
         <div class="form-actions">
           <button id="btn-save-connection" class="btn btn-primary" data-i18n="save">Sauvegarder</button>
+        </div>
+      </section>
+
+      <!-- Section Agents -->
+      <section class="section" id="section-agents">
+        <div class="section-header-with-action">
+          <div>
+            <h2 data-i18n="agents">Agents IA Personnalises</h2>
+            <p class="section-desc" data-i18n="agentsDesc">Creez et gerez des agents IA avec des parametres specifiques (system prompt, temperature, etc.)</p>
+          </div>
+          <button id="btn-create-agent" class="btn btn-primary">
+            <span>+</span>
+            <span data-i18n="createAgent">Creer un agent</span>
+          </button>
+        </div>
+
+        <!-- Agents par defaut -->
+        <div class="agents-section">
+          <h3 data-i18n="builtinAgents">Agents pre-configures</h3>
+          <p class="form-hint" data-i18n="builtinAgentsHint">Agents optimises pour des taches specifiques. Vous pouvez les dupliquer pour les personnaliser.</p>
+          <div id="builtin-agents-grid" class="agents-grid"></div>
+        </div>
+
+        <!-- Agents personnalises -->
+        <div class="agents-section">
+          <h3 data-i18n="customAgents">Mes agents personnalises</h3>
+          <div id="custom-agents-grid" class="agents-grid"></div>
+          <div id="no-custom-agents" class="empty-state" style="display: none;">
+            <p data-i18n="noCustomAgents">Aucun agent personnalise. Cliquez sur "Creer un agent" pour commencer.</p>
+          </div>
         </div>
       </section>
 
@@ -419,6 +525,84 @@
       <div class="modal-footer">
         <button class="btn btn-secondary" id="modal-preset-cancel" data-i18n="cancel">Annuler</button>
         <button class="btn btn-primary" id="modal-preset-save" data-i18n="createThePreset">Creer le preset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Creer/Editer Agent -->
+  <div class="modal-overlay" id="modal-agent-overlay">
+    <div class="modal modal-large" id="modal-agent">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-agent-title" data-i18n="newAgent">Creer un agent</h3>
+        <button class="modal-close" id="modal-agent-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="agent-name" data-i18n="agentName">Nom de l'agent</label>
+          <input type="text" id="agent-name" data-i18n-placeholder="agentNamePlaceholder" placeholder="Ex: Assistant Marketing">
+        </div>
+        <div class="form-group">
+          <label for="agent-description" data-i18n="agentDescription">Description</label>
+          <input type="text" id="agent-description" data-i18n-placeholder="agentDescriptionPlaceholder" placeholder="Ex: Specialiste en marketing digital et creation de contenu">
+        </div>
+        <div class="form-group">
+          <label for="agent-icon" data-i18n="agentIcon">Icone (emoji)</label>
+          <input type="text" id="agent-icon" placeholder="🤖" maxlength="2">
+          <p class="form-hint" data-i18n="agentIconHint">Choisissez un emoji pour representer votre agent</p>
+        </div>
+        <div class="form-group">
+          <label for="agent-system-prompt" data-i18n="agentSystemPrompt">Instructions systeme (System Prompt)</label>
+          <textarea id="agent-system-prompt" rows="8" data-i18n-placeholder="agentSystemPromptPlaceholder" placeholder="Tu es un expert en marketing digital..."></textarea>
+          <p class="form-hint" data-i18n="agentSystemPromptHint">Definissez le role, le comportement et l'expertise de votre agent</p>
+        </div>
+        <div class="agent-params-grid">
+          <div class="form-group">
+            <label for="agent-temperature" data-i18n="agentTemperature">Temperature</label>
+            <div class="range-with-value">
+              <input type="range" id="agent-temperature" min="0" max="2" step="0.1" value="0.7">
+              <span id="agent-temperature-value">0.7</span>
+            </div>
+            <p class="form-hint" data-i18n="agentTemperatureHint">0 = precis, 2 = creatif</p>
+          </div>
+          <div class="form-group">
+            <label for="agent-max-tokens" data-i18n="agentMaxTokens">Tokens max</label>
+            <input type="number" id="agent-max-tokens" min="256" max="32768" step="256" value="4096">
+            <p class="form-hint" data-i18n="agentMaxTokensHint">Longueur maximale de la reponse</p>
+          </div>
+          <div class="form-group">
+            <label for="agent-top-p" data-i18n="agentTopP">Top P</label>
+            <div class="range-with-value">
+              <input type="range" id="agent-top-p" min="0" max="1" step="0.05" value="1">
+              <span id="agent-top-p-value">1.0</span>
+            </div>
+            <p class="form-hint" data-i18n="agentTopPHint">Diversite du vocabulaire</p>
+          </div>
+          <div class="form-group">
+            <label for="agent-frequency-penalty" data-i18n="agentFrequencyPenalty">Frequency Penalty</label>
+            <div class="range-with-value">
+              <input type="range" id="agent-frequency-penalty" min="0" max="2" step="0.1" value="0">
+              <span id="agent-frequency-penalty-value">0.0</span>
+            </div>
+            <p class="form-hint" data-i18n="agentFrequencyPenaltyHint">Penalite pour repetitions</p>
+          </div>
+          <div class="form-group">
+            <label for="agent-presence-penalty" data-i18n="agentPresencePenalty">Presence Penalty</label>
+            <div class="range-with-value">
+              <input type="range" id="agent-presence-penalty" min="0" max="2" step="0.1" value="0">
+              <span id="agent-presence-penalty-value">0.0</span>
+            </div>
+            <p class="form-hint" data-i18n="agentPresencePenaltyHint">Penalite pour sujets recurrents</p>
+          </div>
+          <div class="form-group">
+            <label for="agent-model" data-i18n="agentModel">Modele specifique (optionnel)</label>
+            <input type="text" id="agent-model" placeholder="Laisser vide pour utiliser le modele par defaut">
+            <p class="form-hint" data-i18n="agentModelHint">Modele a utiliser pour cet agent uniquement</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="modal-agent-cancel" data-i18n="cancel">Annuler</button>
+        <button class="btn btn-primary" id="modal-agent-save" data-i18n="save">Sauvegarder</button>
       </div>
     </div>
   </div>

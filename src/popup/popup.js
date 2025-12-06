@@ -104,6 +104,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // Footer buttons
+  document.getElementById('btn-chat')?.addEventListener('click', () => {
+    chrome.tabs.create({ url: chrome.runtime.getURL('src/chat/chat.html') });
+  });
+
   document.getElementById('btn-options')?.addEventListener('click', () => {
     chrome.runtime.openOptionsPage();
   });

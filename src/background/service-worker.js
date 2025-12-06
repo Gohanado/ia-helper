@@ -727,62 +727,126 @@ async function generateAIResponse(content, systemPrompt) {
   return result;
 }
 
+// Map pour stocker les AbortControllers actifs
+const activeRequests = new Map();
+
 // Ecouter les connexions pour le streaming
 chrome.runtime.onConnect.addListener((port) => {
   if (port.name === 'streaming') {
+    const portId = Date.now() + Math.random();
+
     port.onMessage.addListener(async (message) => {
       if (message.type === 'GENERATE_STREAMING') {
         try {
-          await generateStreamingResponse(port, message.content, message.systemPrompt);
+          const abortController = new AbortController();
+          activeRequests.set(portId, abortController);
+          await generateStreamingResponse(
+            port,
+            message.content,
+            message.systemPrompt,
+            message.agentParams || {},
+            abortController.signal
+          );
+          activeRequests.delete(portId);
         } catch (error) {
-          port.postMessage({ type: 'error', error: error.message });
+          activeRequests.delete(portId);
+          if (error.name === 'AbortError') {
+            port.postMessage({ type: 'aborted' });
+          } else {
+            port.postMessage({ type: 'error', error: error.message });
+          }
         }
+      }
+    });
+
+    port.onDisconnect.addListener(() => {
+      // Annuler la requete si le port est deconnecte
+      const abortController = activeRequests.get(portId);
+      if (abortController) {
+        abortController.abort();
+        activeRequests.delete(portId);
       }
     });
   }
 });
 
 // Generer une reponse IA avec streaming
-async function generateStreamingResponse(port, content, systemPrompt) {
+async function generateStreamingResponse(port, content, systemPrompt, agentParams = {}, signal) {
   await loadConfig();
 
   const provider = config.provider || 'ollama';
   const apiUrl = config.apiUrl || DEFAULT_CONFIG.apiUrl;
   const apiKey = config.apiKey || '';
-  const model = config.selectedModel || '';
+  const model = agentParams.model || config.selectedModel || '';
+
+  // Parametres de l'agent avec valeurs par defaut
+  const temperature = agentParams.temperature ?? 0.7;
+  const maxTokens = agentParams.maxTokens ?? 4096;
+  const topP = agentParams.topP ?? 1.0;
+  const frequencyPenalty = agentParams.frequencyPenalty ?? 0;
+  const presencePenalty = agentParams.presencePenalty ?? 0;
 
   let response;
 
   if (provider === 'ollama') {
+    const requestBody = {
+      model: model,
+      prompt: content,
+      system: systemPrompt,
+      stream: true,
+      options: {
+        temperature: temperature,
+        num_predict: maxTokens,
+        top_p: topP,
+        frequency_penalty: frequencyPenalty,
+        presence_penalty: presencePenalty
+      }
+    };
+
     response = await fetch(`${apiUrl}/api/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: model,
-        prompt: content,
-        system: systemPrompt,
-        stream: true
-      })
+      body: JSON.stringify(requestBody),
+      signal: signal
     });
   } else if (provider === 'openai' || provider === 'openrouter' || provider === 'custom') {
     const baseUrl = provider === 'openai' ? 'https://api.openai.com/v1' :
                     provider === 'openrouter' ? 'https://openrouter.ai/api/v1' : apiUrl;
+
+    const requestBody = {
+      model: model,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: content }
+      ],
+      temperature: temperature,
+      max_tokens: maxTokens,
+      top_p: topP,
+      frequency_penalty: frequencyPenalty,
+      presence_penalty: presencePenalty,
+      stream: true
+    };
+
     response = await fetch(`${baseUrl}/chat/completions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`
       },
-      body: JSON.stringify({
-        model: model,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: content }
-        ],
-        stream: true
-      })
+      body: JSON.stringify(requestBody),
+      signal: signal
     });
   } else if (provider === 'anthropic') {
+    const requestBody = {
+      model: model,
+      max_tokens: maxTokens,
+      temperature: temperature,
+      top_p: topP,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: content }],
+      stream: true
+    };
+
     response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -790,29 +854,32 @@ async function generateStreamingResponse(port, content, systemPrompt) {
         'x-api-key': apiKey,
         'anthropic-version': '2023-06-01'
       },
-      body: JSON.stringify({
-        model: model,
-        max_tokens: 4096,
-        system: systemPrompt,
-        messages: [{ role: 'user', content: content }],
-        stream: true
-      })
+      body: JSON.stringify(requestBody),
+      signal: signal
     });
   } else if (provider === 'groq') {
+    const requestBody = {
+      model: model,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: content }
+      ],
+      temperature: temperature,
+      max_tokens: maxTokens,
+      top_p: topP,
+      frequency_penalty: frequencyPenalty,
+      presence_penalty: presencePenalty,
+      stream: true
+    };
+
     response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`
       },
-      body: JSON.stringify({
-        model: model,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: content }
-        ],
-        stream: true
-      })
+      body: JSON.stringify(requestBody),
+      signal: signal
     });
   }
 
@@ -822,6 +889,7 @@ async function generateStreamingResponse(port, content, systemPrompt) {
 
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
+  let isInThinking = false;
 
   while (true) {
     const { done, value } = await reader.read();
@@ -845,9 +913,27 @@ async function generateStreamingResponse(port, content, systemPrompt) {
             const data = line.slice(6);
             if (data === '[DONE]') continue;
             const json = JSON.parse(data);
-            const text = json.choices?.[0]?.delta?.content || '';
+
+            // Detecter le thinking (certains modeles utilisent un role special)
+            const choice = json.choices?.[0];
+            if (choice?.delta?.role === 'reasoning' || choice?.message?.role === 'reasoning') {
+              isInThinking = true;
+            }
+
+            const text = choice?.delta?.content || '';
             if (text) {
-              port.postMessage({ type: 'chunk', text: text });
+              // Envoyer avec le type approprie
+              port.postMessage({
+                type: 'chunk',
+                text: text,
+                isThinking: isInThinking
+              });
+            }
+
+            // Detecter la fin du thinking
+            if (choice?.finish_reason === 'stop' && isInThinking) {
+              isInThinking = false;
+              port.postMessage({ type: 'thinking_end' });
             }
           }
         }

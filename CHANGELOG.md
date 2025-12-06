@@ -9,8 +9,240 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 
 ### A venir
 - Systeme de logging et debug avance
-- Historique des actions
 - Mode sombre/clair automatique
+- System instructions personnalisees
+
+---
+
+## [1.9.0] - 2025-12-06
+
+### Ajoute
+- **Systeme d'agents personnalises**: Gestion complete d'agents IA configurables
+  - Interface de gestion dans les options avec grille d'agents
+  - 6 agents integres par defaut (Assistant General, Developpeur, Redacteur, Traducteur, Analyste, Enseignant, Creatif)
+  - Creation d'agents personnalises avec tous les parametres
+  - Configuration complete: nom, description, icone, system prompt
+  - Parametres avances: temperature, max tokens, top_p, frequency penalty, presence penalty
+  - Selection du modele par agent
+  - Actions: creer, modifier, dupliquer, supprimer
+  - Selecteur d'agent dans le header du chat
+  - Dropdown avec sections agents integres et personnalises
+  - Badge affichant l'agent actuel avec icone
+  - Sauvegarde de l'agent utilise dans chaque conversation
+  - Application automatique des parametres de l'agent aux requetes API
+  - Support de tous les providers (Ollama, OpenAI, Anthropic, Groq, OpenRouter, Custom)
+
+### Corrige
+- **Code blocks**: Correction du debordement horizontal
+  - Ajout de scroll horizontal pour le code long
+  - Limitation de la largeur max a 100%
+  - Prevention du debordement du conteneur parent
+- **Blockquotes**: Reduction de l'espacement vertical
+  - Marge reduite de 12px a 6px pour un affichage plus compact
+
+---
+
+## [1.8.4] - 2025-12-06
+
+### Corrige
+- **Parser Markdown ameliore**: Correction du rendu des tableaux et du contenu formate
+  - Fix des placeholders utilisant § au lieu de _ pour eviter conflits avec italic
+  - Parser le contenu des cellules de tableau (inline code, bold, italic, links)
+  - Restauration correcte des blocs proteges (code blocks et tableaux)
+  - Boutons "Copier" correctement affiches dans les tableaux
+  - Suppression des espaces/indentation dans les templates HTML pour eviter problemes d'affichage
+
+---
+
+## [1.8.3] - 2025-12-06
+
+### Ajoute
+- **Code blocks ameliores**: Affichage professionnel avec bouton copie
+  - Header avec nom du langage
+  - Bouton copie pour chaque code block
+  - Feedback visuel lors de la copie
+  - Styles dedies avec fond colore et bordures
+  - Nettoyage automatique du code (trim)
+- **Selecteur de modele dans header**: Changement rapide de modele IA
+  - Dropdown avec liste des modeles disponibles
+  - Badge cliquable affichant le modele actuel
+  - Mise a jour instantanee de la config
+  - Support tous les providers (Ollama, OpenAI, Anthropic, Groq, OpenRouter, Custom)
+  - Modeles par defaut pour chaque provider
+  - Message si aucun modele disponible
+- **Selection multiple conversations**: Gestion en masse
+  - Bouton "Selectionner" pour activer le mode selection
+  - Checkboxes sur chaque conversation
+  - Bouton "Supprimer (X)" affichant le nombre de selections
+  - Confirmation avant suppression
+  - Traductions dans les 5 langues
+
+### Ameliore
+- **Header chat**: Texte decale pour eviter le hamburger en mode collapse
+  - Margin-left de 48px quand sidebar collapsed
+  - Animation fluide
+- **Code blocks**: Header ultra-compact et elegant
+  - Padding reduit: 3px 8px
+  - Hauteur minimale: 24px
+  - Taille police: 9px
+  - Bouton copie: 18px hauteur
+  - Meilleure lisibilite
+  - Traitement en priorite pour eviter conflits avec autres regex
+- **Inline code**: Bouton copie discret au survol
+  - Apparait seulement au hover
+  - Design minimaliste
+  - Feedback visuel lors de la copie
+
+### Corrige
+- **Bouton tout supprimer**: Variable corrigee (conversations au lieu de conversationsData)
+- **Selecteur modele**: Utilisation correcte de config.provider au lieu de config.selectedProvider
+- **Modeles Ollama**: Fetch dynamique des modeles depuis l'API Ollama
+- **Modeles OpenRouter**: Liste complete des modeles disponibles
+- **Markdown rendering COMPLET**: Systeme de placeholders pour eviter conflits
+  - Code blocks extraits AVANT escapeHtml()
+  - Inline code extrait AVANT escapeHtml()
+  - HTML echappe seulement pour le texte normal
+  - Placeholders restaures a la fin
+  - Tous les elements Markdown rendus correctement
+- **Dropdown menus**: Fermeture correcte quand on clique ailleurs
+  - Copy dropdown
+  - Model dropdown
+
+---
+
+## [1.8.2] - 2025-12-06
+
+### Ajoute
+- **Support LaTeX**: Affichage des formules mathematiques
+  - Formules inline avec `\( ... \)`
+  - Formules block avec `\[ ... \]`
+  - Styles dedies avec police serif et fond colore
+- **Options de copie multiples**: Menu deroulant pour choisir le format de copie
+  - Copier en texte brut (sans formatage)
+  - Copier en Markdown (avec formatage original)
+  - Menu dropdown elegant avec animation
+- **Suppression en masse**: Bouton pour supprimer toutes les conversations
+  - Bouton "Tout supprimer" dans le footer du sidebar
+  - Confirmation avant suppression
+  - Traductions dans les 5 langues
+
+### Ameliore
+- **Sidebar collapse**: Toute la page se deplace maintenant a gauche
+  - Le chat-main utilise margin-left negatif
+  - Animation fluide et coherente
+  - Plus de vide a droite du header
+
+### Corrige
+- **Header chat**: Se deplace correctement avec toute la page quand sidebar collapse
+- **Menu copie**: Fermeture automatique du dropdown quand on clique ailleurs
+
+---
+
+## [1.8.1] - 2025-12-06
+
+### Ajoute
+- **Support Markdown complet**: Tous les elements Markdown sont maintenant supportes
+  - Headers (h1-h6) avec styles differencies
+  - Horizontal rules (---, ***, ___)
+  - Blockquotes avec bordure gauche coloree
+  - Strikethrough (~~texte~~)
+  - Links avec hover effect
+  - Images avec bordure arrondie
+  - Task lists (- [ ] et - [x])
+  - Bold et italic avec ** ou __ et * ou _
+  - Code blocks avec support du langage
+
+### Ameliore
+- **Sidebar collapse**: Le sidebar disparait maintenant completement
+  - Bouton hamburger reste visible en position fixe
+  - Animation fluide avec opacity
+  - Header s'adapte automatiquement (padding-left)
+- **Boutons de controle**: Gestion intelligente de l'affichage
+  - Bouton "Arreter generation" masque pendant la lecture vocale seule
+  - Bouton "Arreter lecture" visible uniquement pendant la lecture
+  - Pas de confusion entre les deux actions
+- **TTS Markdown**: Suppression complete des emojis et tableaux
+  - Tous les ranges Unicode d'emojis retires
+  - Tableaux Markdown completement supprimes du texte lu
+  - Lecture encore plus naturelle
+
+### Corrige
+- **Bouton stop generation**: N'apparait plus pendant la lecture vocale seule
+- **Header chat**: Se deplace correctement a gauche quand sidebar collapse
+- **Affichage tableaux**: Les tableaux Markdown s'affichent en HTML propre
+- **Emojis TTS**: Les emojis ne sont plus lus par la synthese vocale
+
+---
+
+## [1.8.0] - 2025-12-06
+
+### Ajoute
+- **Support du thinking**: Affichage separe de la reflexion de l'IA pour les modeles compatibles (gpt-oss, etc.)
+  - Section "Reflexion" distincte avant la reponse
+  - Streaming en temps reel du thinking et de la reponse
+  - Design visuel different pour distinguer thinking et reponse
+- **Boutons de controle**: Nouveaux boutons pour controler la generation et la lecture
+  - Bouton "Arreter" pour stopper la generation en cours
+  - Bouton "Arreter lecture" pour stopper la synthese vocale
+  - Signal d'abort envoye au serveur LLM pour economiser les ressources
+- **Nettoyage Markdown pour TTS**: Le texte lu par la synthese vocale ne contient plus de Markdown
+  - Suppression des balises de code, headers, bold, italic, liens, etc.
+  - Lecture plus naturelle et fluide
+
+### Ameliore
+- **Sidebar collapsible**: Le sidebar reste partiellement visible quand reduit (50px)
+  - Bouton toggle toujours accessible
+  - Pas de sortie complete de l'ecran
+- **Auto-scroll intelligent**: L'utilisateur peut scroller manuellement pendant la generation
+  - Detection du scroll manuel
+  - Auto-scroll desactive si l'utilisateur remonte
+  - Reactivation automatique si l'utilisateur scrolle vers le bas
+- **Gestion des erreurs**: Meilleure gestion des annulations et erreurs de generation
+
+### Corrige
+- **Sidebar**: Le sidebar ne sort plus completement de l'ecran quand reduit
+- **TTS**: La lecture vocale ne lit plus le Markdown brut
+- **Streaming**: Les reponses s'affichent maintenant progressivement en temps reel
+- **Abort**: L'annulation de generation stoppe maintenant aussi le serveur LLM
+
+---
+
+## [1.7.0] - 2025-12-06
+
+### Ajoute
+- **Chat IA complet**: Nouvelle interface de chat accessible depuis le popup
+  - Conversations libres avec l'IA sans selection de texte
+  - Historique des conversations sauvegarde localement
+  - Sidebar avec liste des conversations
+  - Recherche dans les conversations
+  - Export des conversations en fichier texte
+  - Suppression des conversations
+  - Memoire du contexte pendant la conversation
+  - Streaming des reponses en temps reel
+  - Suggestions de prompts pour demarrer
+  - Support TTS (lecture vocale) des reponses
+  - Copie des reponses en un clic
+- **Bouton Chat dans le popup**: Acces rapide au chat depuis l'icone de l'extension
+- **Traductions Chat**: Interface du chat traduite en 5 langues (FR, EN, ES, IT, PT)
+
+### Ameliore
+- **Options TTS**: Selecteur de voix avec liste des voix systeme disponibles
+- **Presets de tonalite**: Boutons "Voix grave" et "Voix aigue" pour ajuster le pitch
+- **Test de voix multilingue**: Le texte de test s'adapte a la langue de la voix selectionnee
+
+---
+
+## [1.6.0] - 2025-12-05
+
+### Ajoute
+- **Lecture vocale (Text-to-Speech)**: Nouveau bouton "Lire" pour ecouter les reponses de l'IA
+  - Disponible dans le popup inline, le quick prompt et la page de resultats
+  - Support multi-langues (FR, EN, ES, IT, PT)
+  - Bouton "Stop" pour arreter la lecture en cours
+  - Nettoyage automatique du Markdown pour une lecture fluide
+
+### Corrige
+- **Conformite Chrome Web Store**: Permission "tabs" retiree du manifest (non necessaire avec activeTab)
 
 ---
 

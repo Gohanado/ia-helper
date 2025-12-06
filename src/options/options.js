@@ -1,6 +1,7 @@
 // Options Page Script - IA Helper
 
 import { t } from '../i18n/translations.js';
+import { DEFAULT_AGENT, BUILTIN_AGENTS, BUILTIN_AGENTS_LIST, createCustomAgent } from '../config/agents.js';
 
 // Version courante - lue depuis le manifest
 const VERSION = chrome.runtime.getManifest().version;
@@ -17,7 +18,13 @@ const DEFAULT_CONFIG = {
   directInputEnabled: false,
   directInputMode: 'replace',
   interfaceLanguage: 'fr',
-  responseLanguage: 'fr'
+  responseLanguage: 'fr',
+  speechEnabled: true,
+  speechRate: 1.0,
+  speechPitch: 1.0,
+  speechVoiceName: '',
+  speechLanguageMode: 'auto',
+  speechFixedLanguage: 'fr'
 };
 
 // Providers supportes
@@ -90,6 +97,11 @@ let enabledActions = [...DEFAULT_ENABLED_ACTIONS];
 let customPresets = [];
 let currentLang = 'fr';
 
+// Agents
+let customAgents = [];
+let selectedAgent = null;
+let editingAgentId = null;
+
 // Elements DOM (initialises apres DOMContentLoaded)
 let elements = {};
 
@@ -111,8 +123,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     connectionStatus: document.getElementById('connection-status'),
     directInputEnabled: document.getElementById('direct-input-enabled'),
     directInputMode: document.getElementById('direct-input-mode'),
-    directInputModeGroup: document.getElementById('direct-input-mode-group')
+    directInputModeGroup: document.getElementById('direct-input-mode-group'),
+    speechEnabled: document.getElementById('speech-enabled'),
+    speechRate: document.getElementById('speech-rate'),
+    speechRateValue: document.getElementById('speech-rate-value'),
+    speechPitch: document.getElementById('speech-pitch'),
+    speechPitchValue: document.getElementById('speech-pitch-value'),
+    speechOptions: document.getElementById('speech-options'),
+    speechTestGroup: document.getElementById('speech-test-group'),
+    btnTestSpeech: document.getElementById('btn-test-speech'),
+    speechVoice: document.getElementById('speech-voice'),
+    speechVoiceGroup: document.getElementById('speech-voice-group'),
+    speechLanguageMode: document.getElementById('speech-language-mode'),
+    speechLanguageModeGroup: document.getElementById('speech-language-mode-group'),
+    speechFixedLanguage: document.getElementById('speech-fixed-language'),
+    speechFixedLanguageGroup: document.getElementById('speech-fixed-language-group'),
+    btnPitchLow: document.getElementById('btn-pitch-low'),
+    btnPitchHigh: document.getElementById('btn-pitch-high')
   };
+
+  // Charger les voix disponibles
+  loadAvailableVoices();
 
   try {
     // Mettre a jour les elements de version
@@ -125,12 +156,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadEnabledActions();
     await loadCustomActions();
     await loadShortcuts();
+    await loadCustomAgents();
     applyTranslations();
     setupNavigation();
     setupEventListeners();
     setupProviderListeners();
+    setupAgentsListeners();
     renderActionsGrid();
     renderShortcutsList();
+    renderAgentsGrids();
     refreshModels();
 
     // Initialiser le systeme de mise a jour (en dernier, non-bloquant)
@@ -183,6 +217,28 @@ async function loadAllSettings() {
       if (elements.interfaceLanguage) elements.interfaceLanguage.value = config.interfaceLanguage || 'fr';
       if (elements.responseLanguage) elements.responseLanguage.value = config.responseLanguage || 'auto';
 
+      // Options de lecture vocale
+      if (elements.speechEnabled) elements.speechEnabled.checked = config.speechEnabled !== false;
+      if (elements.speechRate) {
+        elements.speechRate.value = config.speechRate || 1.0;
+        if (elements.speechRateValue) elements.speechRateValue.textContent = (config.speechRate || 1.0).toFixed(1) + 'x';
+      }
+      if (elements.speechPitch) {
+        elements.speechPitch.value = config.speechPitch || 1.0;
+        if (elements.speechPitchValue) elements.speechPitchValue.textContent = (config.speechPitch || 1.0).toFixed(1);
+      }
+
+      // Options TTS avancees
+      if (elements.speechLanguageMode) {
+        elements.speechLanguageMode.value = config.speechLanguageMode || 'auto';
+      }
+      if (elements.speechFixedLanguage) {
+        elements.speechFixedLanguage.value = config.speechFixedLanguage || 'fr';
+      }
+      // La voix sera selectionnee dans loadAvailableVoices() apres chargement des voix
+
+      updateSpeechOptionsVisibility();
+
       // Afficher/masquer le mode d'insertion selon l'etat du toggle
       updateDirectInputModeVisibility();
 
@@ -197,6 +253,205 @@ function updateDirectInputModeVisibility() {
   if (elements.directInputModeGroup && elements.directInputEnabled) {
     elements.directInputModeGroup.style.display = elements.directInputEnabled.checked ? 'block' : 'none';
   }
+}
+
+// Afficher/masquer les options de lecture vocale
+function updateSpeechOptionsVisibility() {
+  const isEnabled = elements.speechEnabled?.checked;
+  const speechOptionsEls = document.querySelectorAll('#speech-options, #speech-pitch-group, #speech-test-group, #speech-voice-gender-group, #speech-language-mode-group');
+  speechOptionsEls.forEach(el => {
+    if (el) el.style.display = isEnabled ? 'block' : 'none';
+  });
+
+  // Afficher/masquer le selecteur de langue fixe selon le mode
+  updateSpeechFixedLanguageVisibility();
+}
+
+// Afficher/masquer le selecteur de langue fixe
+function updateSpeechFixedLanguageVisibility() {
+  if (elements.speechFixedLanguageGroup && elements.speechLanguageMode) {
+    const showFixed = elements.speechLanguageMode.value === 'fixed' && elements.speechEnabled?.checked;
+    elements.speechFixedLanguageGroup.style.display = showFixed ? 'block' : 'none';
+  }
+}
+
+// Charger les voix disponibles dans le selecteur
+function loadAvailableVoices() {
+  const populateVoices = () => {
+    const voices = window.speechSynthesis.getVoices();
+    if (!elements.speechVoice || voices.length === 0) return;
+
+    // Vider le selecteur sauf la premiere option (defaut)
+    while (elements.speechVoice.options.length > 1) {
+      elements.speechVoice.remove(1);
+    }
+
+    // Grouper les voix par langue
+    const voicesByLang = {};
+    voices.forEach(voice => {
+      const lang = voice.lang.split('-')[0];
+      if (!voicesByLang[lang]) voicesByLang[lang] = [];
+      voicesByLang[lang].push(voice);
+    });
+
+    // Ajouter les voix au selecteur, groupees par langue
+    const langOrder = ['fr', 'en', 'es', 'it', 'pt'];
+    const addedLangs = new Set();
+
+    // D'abord les langues prioritaires
+    langOrder.forEach(lang => {
+      if (voicesByLang[lang]) {
+        addedLangs.add(lang);
+        voicesByLang[lang].forEach(voice => {
+          const option = document.createElement('option');
+          option.value = voice.name;
+          option.textContent = `${voice.name} (${voice.lang})`;
+          elements.speechVoice.appendChild(option);
+        });
+      }
+    });
+
+    // Puis les autres langues
+    Object.keys(voicesByLang).sort().forEach(lang => {
+      if (!addedLangs.has(lang)) {
+        voicesByLang[lang].forEach(voice => {
+          const option = document.createElement('option');
+          option.value = voice.name;
+          option.textContent = `${voice.name} (${voice.lang})`;
+          elements.speechVoice.appendChild(option);
+        });
+      }
+    });
+
+    // Restaurer la selection sauvegardee
+    if (config.speechVoiceName && elements.speechVoice) {
+      elements.speechVoice.value = config.speechVoiceName;
+    }
+  };
+
+  // Les voix peuvent ne pas etre chargees immediatement
+  if (window.speechSynthesis.getVoices().length > 0) {
+    populateVoices();
+  }
+  window.speechSynthesis.addEventListener('voiceschanged', populateVoices);
+}
+
+// Obtenir une voix par son nom
+function getVoiceByName(voiceName) {
+  if (!voiceName) return null;
+  const voices = window.speechSynthesis.getVoices();
+  return voices.find(v => v.name === voiceName) || null;
+}
+
+// Variable pour stocker l'utterance de test en cours
+let testSpeechUtterance = null;
+
+// Mapping des langues
+const LANG_MAP = { fr: 'fr-FR', en: 'en-US', es: 'es-ES', it: 'it-IT', pt: 'pt-BR' };
+
+// Tester la lecture vocale avec les parametres actuels
+function testSpeech() {
+  if (!('speechSynthesis' in window)) {
+    showNotification(t('speechNotSupported', currentLang) || 'Speech not supported', 'error');
+    return;
+  }
+
+  // Si deja en lecture, arreter
+  if (testSpeechUtterance && window.speechSynthesis.speaking) {
+    window.speechSynthesis.cancel();
+    elements.btnTestSpeech.textContent = t('testSpeech', currentLang);
+    elements.btnTestSpeech.classList.remove('speaking');
+    testSpeechUtterance = null;
+    return;
+  }
+
+  // Texte de test selon la langue
+  const testTexts = {
+    fr: 'Bonjour, ceci est un test de lecture vocale. Vous pouvez ajuster la vitesse et la tonalite selon vos preferences.',
+    en: 'Hello, this is a speech test. You can adjust the speed and pitch according to your preferences.',
+    es: 'Hola, esta es una prueba de voz. Puede ajustar la velocidad y el tono segun sus preferencias.',
+    it: 'Ciao, questo e un test vocale. Puoi regolare la velocita e il tono secondo le tue preferenze.',
+    pt: 'Ola, este e um teste de voz. Voce pode ajustar a velocidade e o tom de acordo com suas preferencias.',
+    de: 'Hallo, dies ist ein Sprachtest. Sie koennen die Geschwindigkeit und Tonhoehe nach Ihren Wuenschen anpassen.',
+    nl: 'Hallo, dit is een spraaktest. U kunt de snelheid en toonhoogte naar wens aanpassen.',
+    ru: 'Zdravstvuyte, eto test golosa. Vy mozhete nastroit skorost i ton po svoim predpochteniyam.',
+    zh: 'Nin hao, zhe shi yuyin ceshi. Nin keyi genju ziji de xihao tiaozheng sudu he yindiao.',
+    ja: 'Konnichiwa, kore wa onsei tesuto desu. Sokudo to pitchi wo okonomi ni awasete chousei dekimasu.',
+    ko: 'Annyeonghaseyo, igeos-eun eumseong teseuteui ibnida. Sokdowa tongeul wonhaneun daelo jojeonhal su issseubnida.',
+    ar: 'Marhaba, hadha ikhtbar sawti. Yumkinuk taadil alsura walnabra hasab tafdilatik.',
+    hi: 'Namaste, yah ek awaaz ka pareekshan hai. Aap apni pasand ke anusaar gati aur swar ko samayojit kar sakte hain.',
+    pl: 'Czesc, to jest test glosu. Mozesz dostosowac predkosc i ton wedlug wlasnych preferencji.',
+    tr: 'Merhaba, bu bir ses testidir. Hizi ve tonu tercihlerinize gore ayarlayabilirsiniz.',
+    sv: 'Hej, det har ar ett rosttest. Du kan justera hastigheten och tonhoejden efter dina oenskemael.',
+    da: 'Hej, dette er en stemmetest. Du kan justere hastigheden og tonehojden efter dine praeferencer.',
+    no: 'Hei, dette er en stemmetest. Du kan justere hastigheten og tonehoyden etter dine preferanser.',
+    fi: 'Hei, tama on aanitesti. Voit saataa nopeutta ja aanenkorkeutta mieltymystesi mukaan.',
+    cs: 'Ahoj, toto je hlasovy test. Muzete upravit rychlost a vysku podle svych preferencí.',
+    el: 'Geia sas, afto einai ena test fonis. Mporite na prosamoste tin tachytita kai ton tono kata tis protimiseis sas.',
+    he: 'Shalom, ze bdikhat kol. Ata yachol lehatim et hamehirut vehatonaliyut lefi hahaafahot shelcha.',
+    th: 'Sawatdee, nee khue karn thotsob siang. Khun samard prab khwam rew lae siang tam thi khun tongkarn.',
+    vi: 'Xin chao, day la bai kiem tra giong noi. Ban co the dieu chinh toc do va am theo so thich cua minh.',
+    id: 'Halo, ini adalah tes suara. Anda dapat menyesuaikan kecepatan dan nada sesuai preferensi Anda.',
+    ms: 'Halo, ini adalah ujian suara. Anda boleh melaraskan kelajuan dan nada mengikut pilihan anda.',
+    uk: 'Pryvit, tse test holosu. Vy mozhete nalashtuvatyi shvydkist i ton vidpovidno do vashykh upodoban.',
+    ro: 'Buna, acesta este un test vocal. Puteti ajusta viteza si tonul conform preferintelor dumneavoastra.',
+    hu: 'Szia, ez egy hangteszt. A sebesseg es a hangmagassag a preferenciaidnak megfeleloen allithato.',
+    bg: 'Zdravey, tova e glasov test. Mozhete da nastrayte skorostta i tona spored vashhite predpochtaniya.',
+    ca: 'Hola, aixo es una prova de veu. Podeu ajustar la velocitat i el to segons les vostres preferencies.'
+  };
+
+  // Determiner la langue a utiliser : priorite a la voix selectionnee
+  let testLang = currentLang;
+  let selectedVoice = null;
+  const selectedVoiceName = elements.speechVoice?.value;
+
+  if (selectedVoiceName) {
+    selectedVoice = getVoiceByName(selectedVoiceName);
+    if (selectedVoice && selectedVoice.lang) {
+      // Extraire le code langue (ex: "fr-FR" -> "fr", "en-US" -> "en")
+      const voiceLangCode = selectedVoice.lang.split('-')[0].toLowerCase();
+      // Utiliser cette langue si un texte de test existe
+      if (testTexts[voiceLangCode]) {
+        testLang = voiceLangCode;
+      }
+    }
+  }
+
+  const text = testTexts[testLang] || testTexts['fr'];
+  testSpeechUtterance = new SpeechSynthesisUtterance(text);
+
+  // Appliquer la langue de la voix selectionnee ou fallback
+  if (selectedVoice) {
+    testSpeechUtterance.lang = selectedVoice.lang;
+    testSpeechUtterance.voice = selectedVoice;
+  } else {
+    testSpeechUtterance.lang = LANG_MAP[currentLang] || 'fr-FR';
+  }
+
+  // Appliquer les parametres actuels des sliders
+  testSpeechUtterance.rate = parseFloat(elements.speechRate?.value) || 1.0;
+  testSpeechUtterance.pitch = parseFloat(elements.speechPitch?.value) || 1.0;
+
+  // Evenements
+  testSpeechUtterance.onstart = () => {
+    elements.btnTestSpeech.textContent = t('stopSpeaking', currentLang) || 'Stop';
+    elements.btnTestSpeech.classList.add('speaking');
+  };
+
+  testSpeechUtterance.onend = () => {
+    elements.btnTestSpeech.textContent = t('testSpeech', currentLang);
+    elements.btnTestSpeech.classList.remove('speaking');
+    testSpeechUtterance = null;
+  };
+
+  testSpeechUtterance.onerror = () => {
+    elements.btnTestSpeech.textContent = t('testSpeech', currentLang);
+    elements.btnTestSpeech.classList.remove('speaking');
+    testSpeechUtterance = null;
+  };
+
+  // Lancer la lecture
+  window.speechSynthesis.speak(testSpeechUtterance);
 }
 
 // Charger les actions personnalisees
@@ -314,6 +569,63 @@ function setupEventListeners() {
   elements.directInputEnabled?.addEventListener('change', () => {
     updateDirectInputModeVisibility();
   });
+
+  // Speech toggle - afficher/masquer les options
+  elements.speechEnabled?.addEventListener('change', () => {
+    updateSpeechOptionsVisibility();
+  });
+
+  // Speech rate slider
+  elements.speechRate?.addEventListener('input', () => {
+    const value = parseFloat(elements.speechRate.value);
+    if (elements.speechRateValue) elements.speechRateValue.textContent = value.toFixed(1) + 'x';
+  });
+
+  // Speech pitch slider
+  elements.speechPitch?.addEventListener('input', () => {
+    const value = parseFloat(elements.speechPitch.value);
+    if (elements.speechPitchValue) elements.speechPitchValue.textContent = value.toFixed(1);
+    // Retirer les classes active des presets si changement manuel
+    elements.btnPitchLow?.classList.remove('active');
+    elements.btnPitchHigh?.classList.remove('active');
+  });
+
+  // Speech language mode - afficher/masquer langue fixe
+  elements.speechLanguageMode?.addEventListener('change', () => {
+    updateSpeechFixedLanguageVisibility();
+  });
+
+  // Boutons preset tonalite grave/aigue
+  elements.btnPitchLow?.addEventListener('click', () => {
+    setPitchPreset(0.5, 0.9, 'low');
+  });
+  elements.btnPitchHigh?.addEventListener('click', () => {
+    setPitchPreset(1.8, 1.1, 'high');
+  });
+
+  // Bouton de test de lecture vocale
+  elements.btnTestSpeech?.addEventListener('click', testSpeech);
+}
+
+// Appliquer un preset de tonalite (pitch + rate pour un effet plus prononce)
+function setPitchPreset(pitchValue, rateValue, type) {
+  // Ajuster le pitch
+  if (elements.speechPitch) {
+    elements.speechPitch.value = pitchValue;
+    if (elements.speechPitchValue) {
+      elements.speechPitchValue.textContent = pitchValue.toFixed(1);
+    }
+  }
+  // Ajuster le rate aussi pour un effet plus naturel
+  if (elements.speechRate) {
+    elements.speechRate.value = rateValue;
+    if (elements.speechRateValue) {
+      elements.speechRateValue.textContent = rateValue.toFixed(1) + 'x';
+    }
+  }
+  // Mettre a jour les boutons actifs
+  elements.btnPitchLow?.classList.toggle('active', type === 'low');
+  elements.btnPitchHigh?.classList.toggle('active', type === 'high');
 }
 
 // Tester la connexion
@@ -441,6 +753,12 @@ async function saveConnectionSettings() {
   config.directInputMode = elements.directInputMode?.value || 'replace';
   config.interfaceLanguage = elements.interfaceLanguage?.value || 'fr';
   config.responseLanguage = elements.responseLanguage?.value || 'auto';
+  config.speechEnabled = elements.speechEnabled?.checked !== false;
+  config.speechRate = parseFloat(elements.speechRate?.value) || 1.0;
+  config.speechPitch = parseFloat(elements.speechPitch?.value) || 1.0;
+  config.speechLanguageMode = elements.speechLanguageMode?.value || 'auto';
+  config.speechFixedLanguage = elements.speechFixedLanguage?.value || 'fr';
+  config.speechVoiceName = elements.speechVoice?.value || '';
 
   await saveConfig();
 
@@ -1758,4 +2076,318 @@ function initUpdateSystem() {
 
   // Charger le statut des mises a jour
   loadUpdateStatus();
+}
+
+// ========== AGENTS PERSONNALISES ==========
+
+// Charger les agents personnalises
+async function loadCustomAgents() {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(['customAgents', 'selectedAgent'], (result) => {
+      customAgents = result.customAgents || [];
+      selectedAgent = result.selectedAgent || DEFAULT_AGENT.id;
+      resolve();
+    });
+  });
+}
+
+// Sauvegarder les agents personnalises
+async function saveCustomAgents() {
+  return new Promise((resolve) => {
+    chrome.storage.local.set({ customAgents }, resolve);
+  });
+}
+
+// Sauvegarder l'agent selectionne
+async function saveSelectedAgent() {
+  return new Promise((resolve) => {
+    chrome.storage.local.set({ selectedAgent }, resolve);
+  });
+}
+
+// Afficher les grilles d'agents
+function renderAgentsGrids() {
+  renderBuiltinAgents();
+  renderCustomAgents();
+}
+
+// Afficher les agents built-in
+function renderBuiltinAgents() {
+  const grid = document.getElementById('builtin-agents-grid');
+  if (!grid) return;
+
+  grid.innerHTML = '';
+
+  BUILTIN_AGENTS_LIST.forEach(agent => {
+    const card = createAgentCard(agent, false);
+    grid.appendChild(card);
+  });
+}
+
+// Afficher les agents personnalises
+function renderCustomAgents() {
+  const grid = document.getElementById('custom-agents-grid');
+  const emptyState = document.getElementById('no-custom-agents');
+  if (!grid) return;
+
+  grid.innerHTML = '';
+
+  if (customAgents.length === 0) {
+    if (emptyState) emptyState.style.display = 'block';
+    grid.style.display = 'none';
+  } else {
+    if (emptyState) emptyState.style.display = 'none';
+    grid.style.display = 'grid';
+
+    customAgents.forEach(agent => {
+      const card = createAgentCard(agent, true);
+      grid.appendChild(card);
+    });
+  }
+}
+
+// Creer une carte d'agent
+function createAgentCard(agent, isCustom) {
+  const card = document.createElement('div');
+  card.className = 'agent-card';
+  card.dataset.agentId = agent.id;
+
+  const isDefault = agent.id === DEFAULT_AGENT.id;
+
+  card.innerHTML = `
+    ${isDefault ? '<div class="agent-badge">Par defaut</div>' : ''}
+    <div class="agent-card-header">
+      <div class="agent-icon">${agent.icon || '🤖'}</div>
+      <div class="agent-info">
+        <div class="agent-name">${agent.name}</div>
+        <div class="agent-description">${agent.description}</div>
+      </div>
+    </div>
+    <div class="agent-params">
+      <div class="agent-param">
+        <span class="agent-param-label">Temp:</span>
+        <span class="agent-param-value">${agent.temperature}</span>
+      </div>
+      <div class="agent-param">
+        <span class="agent-param-label">Tokens:</span>
+        <span class="agent-param-value">${agent.maxTokens}</span>
+      </div>
+      <div class="agent-param">
+        <span class="agent-param-label">Top P:</span>
+        <span class="agent-param-value">${agent.topP}</span>
+      </div>
+    </div>
+    <div class="agent-actions">
+      ${isCustom ? `
+        <button class="agent-action-btn" data-action="edit" data-agent-id="${agent.id}">Modifier</button>
+        <button class="agent-action-btn danger" data-action="delete" data-agent-id="${agent.id}">Supprimer</button>
+      ` : `
+        <button class="agent-action-btn" data-action="duplicate" data-agent-id="${agent.id}">Dupliquer</button>
+      `}
+    </div>
+  `;
+
+  return card;
+}
+
+// Configurer les event listeners pour les agents
+function setupAgentsListeners() {
+  // Bouton creer agent
+  const btnCreateAgent = document.getElementById('btn-create-agent');
+  if (btnCreateAgent) {
+    btnCreateAgent.addEventListener('click', () => openAgentModal());
+  }
+
+  // Modal agent
+  const modalOverlay = document.getElementById('modal-agent-overlay');
+  const modalClose = document.getElementById('modal-agent-close');
+  const modalCancel = document.getElementById('modal-agent-cancel');
+  const modalSave = document.getElementById('modal-agent-save');
+
+  if (modalClose) modalClose.addEventListener('click', closeAgentModal);
+  if (modalCancel) modalCancel.addEventListener('click', closeAgentModal);
+  if (modalSave) modalSave.addEventListener('click', saveAgent);
+  if (modalOverlay) {
+    modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) closeAgentModal();
+    });
+  }
+
+  // Sliders
+  setupAgentSliders();
+
+  // Event delegation pour les actions des cartes
+  document.addEventListener('click', (e) => {
+    const actionBtn = e.target.closest('.agent-action-btn');
+    if (!actionBtn) return;
+
+    const action = actionBtn.dataset.action;
+    const agentId = actionBtn.dataset.agentId;
+
+    if (action === 'edit') {
+      editAgent(agentId);
+    } else if (action === 'delete') {
+      deleteAgent(agentId);
+    } else if (action === 'duplicate') {
+      duplicateAgent(agentId);
+    }
+  });
+}
+
+// Configurer les sliders du modal agent
+function setupAgentSliders() {
+  const sliders = [
+    { id: 'agent-temperature', valueId: 'agent-temperature-value', decimals: 1 },
+    { id: 'agent-top-p', valueId: 'agent-top-p-value', decimals: 2 },
+    { id: 'agent-frequency-penalty', valueId: 'agent-frequency-penalty-value', decimals: 1 },
+    { id: 'agent-presence-penalty', valueId: 'agent-presence-penalty-value', decimals: 1 }
+  ];
+
+  sliders.forEach(({ id, valueId, decimals }) => {
+    const slider = document.getElementById(id);
+    const valueDisplay = document.getElementById(valueId);
+    if (slider && valueDisplay) {
+      slider.addEventListener('input', () => {
+        valueDisplay.textContent = parseFloat(slider.value).toFixed(decimals);
+      });
+    }
+  });
+}
+
+// Ouvrir le modal agent (creation ou edition)
+function openAgentModal(agent = null) {
+  const modal = document.getElementById('modal-agent-overlay');
+  const title = document.getElementById('modal-agent-title');
+  if (!modal) return;
+
+  editingAgentId = agent ? agent.id : null;
+
+  // Titre du modal
+  if (title) {
+    title.textContent = agent ? 'Modifier l\'agent' : 'Creer un agent';
+  }
+
+  // Remplir les champs
+  document.getElementById('agent-name').value = agent?.name || '';
+  document.getElementById('agent-description').value = agent?.description || '';
+  document.getElementById('agent-icon').value = agent?.icon || '🤖';
+  document.getElementById('agent-system-prompt').value = agent?.systemPrompt || '';
+  document.getElementById('agent-temperature').value = agent?.temperature ?? 0.7;
+  document.getElementById('agent-max-tokens').value = agent?.maxTokens ?? 4096;
+  document.getElementById('agent-top-p').value = agent?.topP ?? 1.0;
+  document.getElementById('agent-frequency-penalty').value = agent?.frequencyPenalty ?? 0;
+  document.getElementById('agent-presence-penalty').value = agent?.presencePenalty ?? 0;
+  document.getElementById('agent-model').value = agent?.model || '';
+
+  // Mettre a jour les affichages des sliders
+  document.getElementById('agent-temperature-value').textContent = (agent?.temperature ?? 0.7).toFixed(1);
+  document.getElementById('agent-top-p-value').textContent = (agent?.topP ?? 1.0).toFixed(2);
+  document.getElementById('agent-frequency-penalty-value').textContent = (agent?.frequencyPenalty ?? 0).toFixed(1);
+  document.getElementById('agent-presence-penalty-value').textContent = (agent?.presencePenalty ?? 0).toFixed(1);
+
+  modal.style.display = 'flex';
+}
+
+// Fermer le modal agent
+function closeAgentModal() {
+  const modal = document.getElementById('modal-agent-overlay');
+  if (modal) modal.style.display = 'none';
+  editingAgentId = null;
+}
+
+// Sauvegarder un agent
+async function saveAgent() {
+  const name = document.getElementById('agent-name').value.trim();
+  const description = document.getElementById('agent-description').value.trim();
+  const icon = document.getElementById('agent-icon').value.trim();
+  const systemPrompt = document.getElementById('agent-system-prompt').value.trim();
+  const temperature = parseFloat(document.getElementById('agent-temperature').value);
+  const maxTokens = parseInt(document.getElementById('agent-max-tokens').value);
+  const topP = parseFloat(document.getElementById('agent-top-p').value);
+  const frequencyPenalty = parseFloat(document.getElementById('agent-frequency-penalty').value);
+  const presencePenalty = parseFloat(document.getElementById('agent-presence-penalty').value);
+  const model = document.getElementById('agent-model').value.trim();
+
+  // Validation
+  if (!name) {
+    showNotification('Le nom de l\'agent est requis', 'error');
+    return;
+  }
+
+  if (!systemPrompt) {
+    showNotification('Les instructions systeme sont requises', 'error');
+    return;
+  }
+
+  // Creer ou mettre a jour l'agent
+  const agentData = {
+    id: editingAgentId || 'custom_agent_' + Date.now(),
+    name,
+    description,
+    icon: icon || '🤖',
+    systemPrompt,
+    temperature,
+    maxTokens,
+    topP,
+    frequencyPenalty,
+    presencePenalty,
+    model
+  };
+
+  if (editingAgentId) {
+    // Modification
+    const index = customAgents.findIndex(a => a.id === editingAgentId);
+    if (index !== -1) {
+      customAgents[index] = createCustomAgent(agentData);
+    }
+  } else {
+    // Creation
+    customAgents.push(createCustomAgent(agentData));
+  }
+
+  await saveCustomAgents();
+  renderCustomAgents();
+  closeAgentModal();
+  showNotification(editingAgentId ? 'Agent modifie avec succes' : 'Agent cree avec succes', 'success');
+}
+
+// Editer un agent
+function editAgent(agentId) {
+  const agent = customAgents.find(a => a.id === agentId);
+  if (agent) {
+    openAgentModal(agent);
+  }
+}
+
+// Supprimer un agent
+async function deleteAgent(agentId) {
+  if (!confirm('Etes-vous sur de vouloir supprimer cet agent ?')) return;
+
+  customAgents = customAgents.filter(a => a.id !== agentId);
+  await saveCustomAgents();
+  renderCustomAgents();
+  showNotification('Agent supprime avec succes', 'success');
+}
+
+// Dupliquer un agent (built-in ou custom)
+function duplicateAgent(agentId) {
+  // Chercher dans les built-in
+  let agent = BUILTIN_AGENTS[agentId];
+
+  // Si pas trouve, chercher dans les custom
+  if (!agent) {
+    agent = customAgents.find(a => a.id === agentId);
+  }
+
+  if (agent) {
+    // Creer une copie avec un nouveau nom
+    const duplicatedAgent = {
+      ...agent,
+      id: null, // Sera genere lors de la sauvegarde
+      name: agent.name + ' (copie)',
+      isCustom: true,
+      isDefault: false
+    };
+    openAgentModal(duplicatedAgent);
+  }
 }

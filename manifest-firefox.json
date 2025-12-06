@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "IA Helper",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Assistant IA intelligent pour Firefox - Multi-providers (Ollama, OpenAI, Anthropic, Groq...) - 100% configurable",
   "author": "Gohanado",
   "browser_specific_settings": {
@@ -20,7 +20,6 @@
     "contextMenus",
     "activeTab",
     "storage",
-    "tabs",
     "scripting"
   ],
   "host_permissions": [

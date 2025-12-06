@@ -8,12 +8,22 @@ let currentLang = 'fr';
 let config = {
   ollamaUrl: 'http://localhost:11434',
   selectedModel: '',
-  interfaceLanguage: 'fr'
+  interfaceLanguage: 'fr',
+  speechEnabled: true,
+  speechRate: 1.0,
+  speechPitch: 1.0,
+  speechVoiceName: '',
+  speechLanguageMode: 'auto',
+  speechFixedLanguage: 'fr'
 };
 
 let pendingResult = null;
 let currentResult = '';
 let startTime = 0;
+
+// Variables TTS
+let isSpeaking = false;
+let currentSpeechUtterance = null;
 
 // Elements DOM
 const elements = {
@@ -83,6 +93,209 @@ function applyTranslations() {
     const key = el.getAttribute('data-i18n-title');
     el.title = t(key, currentLang);
   });
+}
+
+// Nettoyer le texte Markdown pour la lecture
+function cleanTextForSpeech(text) {
+  return text
+    .replace(/#{1,6}\s/g, '')           // Titres
+    .replace(/\*\*(.+?)\*\*/g, '$1')    // Gras
+    .replace(/\*(.+?)\*/g, '$1')        // Italique
+    .replace(/__(.+?)__/g, '$1')        // Gras alt
+    .replace(/_(.+?)_/g, '$1')          // Italique alt
+    .replace(/`{3}[\s\S]*?`{3}/g, '')   // Blocs de code
+    .replace(/`(.+?)`/g, '$1')          // Code inline
+    .replace(/^[-*+]\s/gm, '')          // Listes
+    .replace(/^\d+\.\s/gm, '')          // Listes numerotees
+    .replace(/\[(.+?)\]\(.+?\)/g, '$1') // Liens
+    .replace(/!\[.*?\]\(.+?\)/g, '')    // Images
+    .replace(/>\s/g, '')                // Citations
+    .trim();
+}
+
+// Mapping des langues pour la synthese vocale
+const LANG_MAP = { fr: 'fr-FR', en: 'en-US', es: 'es-ES', it: 'it-IT', pt: 'pt-BR' };
+const LANG_NAMES = { fr: 'French', en: 'English', es: 'Spanish', it: 'Italian', pt: 'Portuguese' };
+
+// Detecter la langue d'un texte via l'IA
+async function detectLanguage(text) {
+  return new Promise((resolve) => {
+    const sampleText = text.substring(0, 500);
+    const prompt = `Detect the language of this text and respond with ONLY the language code (fr, en, es, it, or pt). If uncertain, respond with "fr". Text: "${sampleText}"`;
+
+    const port = chrome.runtime.connect({ name: 'ollama-stream' });
+    let response = '';
+
+    port.onMessage.addListener((msg) => {
+      if (msg.type === 'chunk') {
+        response += msg.content || '';
+      } else if (msg.type === 'done' || msg.type === 'error') {
+        port.disconnect();
+        const langCode = response.toLowerCase().trim().match(/^(fr|en|es|it|pt)/);
+        resolve(langCode ? langCode[1] : 'fr');
+      }
+    });
+
+    port.postMessage({
+      type: 'generate',
+      config: {
+        provider: config.provider,
+        apiUrl: config.apiUrl,
+        apiKey: config.apiKey,
+        selectedModel: config.selectedModel,
+        streamingEnabled: false
+      },
+      prompt: prompt,
+      systemPrompt: 'You are a language detection assistant. Respond only with a language code.'
+    });
+
+    setTimeout(() => { port.disconnect(); resolve('fr'); }, 10000);
+  });
+}
+
+// Traduire un texte dans une langue cible via l'IA
+async function translateText(text, targetLang) {
+  return new Promise((resolve) => {
+    const targetLangName = LANG_NAMES[targetLang] || 'French';
+    const prompt = `Translate the following text to ${targetLangName}. Respond ONLY with the translation, no explanations:\n\n${text}`;
+
+    const port = chrome.runtime.connect({ name: 'ollama-stream' });
+    let response = '';
+
+    port.onMessage.addListener((msg) => {
+      if (msg.type === 'chunk') {
+        response += msg.content || '';
+      } else if (msg.type === 'done' || msg.type === 'error') {
+        port.disconnect();
+        resolve(response.trim() || text);
+      }
+    });
+
+    port.postMessage({
+      type: 'generate',
+      config: {
+        provider: config.provider,
+        apiUrl: config.apiUrl,
+        apiKey: config.apiKey,
+        selectedModel: config.selectedModel,
+        streamingEnabled: false
+      },
+      prompt: prompt,
+      systemPrompt: 'You are a professional translator. Translate accurately.'
+    });
+
+    setTimeout(() => { port.disconnect(); resolve(text); }, 30000);
+  });
+}
+
+// Obtenir une voix par son nom, ou une voix par defaut pour la langue
+function getVoiceByNameOrLang(voiceName, langCode) {
+  const voices = window.speechSynthesis.getVoices();
+
+  // Si un nom de voix est specifie, le chercher
+  if (voiceName) {
+    const namedVoice = voices.find(v => v.name === voiceName);
+    if (namedVoice) return namedVoice;
+  }
+
+  // Sinon, chercher une voix pour la langue cible
+  const targetLang = LANG_MAP[langCode] || 'fr-FR';
+  const langPrefix = targetLang.split('-')[0];
+
+  const langVoices = voices.filter(v =>
+    v.lang.startsWith(langPrefix) || v.lang === targetLang
+  );
+
+  return langVoices.length > 0 ? langVoices[0] : null;
+}
+
+// Lancer/arreter la lecture vocale
+async function toggleSpeech() {
+  const speakBtn = document.getElementById('btn-speak');
+
+  if (!('speechSynthesis' in window)) {
+    showNotification(t('speechNotSupported', currentLang) || 'Speech not supported', 'error');
+    return;
+  }
+
+  if (isSpeaking) {
+    // Arreter la lecture
+    window.speechSynthesis.cancel();
+    isSpeaking = false;
+    speakBtn.classList.remove('speaking');
+    speakBtn.title = t('speak', currentLang);
+    return;
+  }
+
+  const cleanText = cleanTextForSpeech(currentResult);
+  if (!cleanText) {
+    showNotification(t('noTextToRead', currentLang) || 'No text to read', 'error');
+    return;
+  }
+
+  // Determiner la langue et le texte a lire
+  let textToRead = cleanText;
+  let targetLang = config.speechFixedLanguage || 'fr';
+
+  if (config.speechLanguageMode === 'auto') {
+    // Mode automatique: detecter la langue du texte
+    speakBtn.classList.add('speaking');
+    speakBtn.title = t('detectingLanguage', currentLang) || 'Detecting...';
+    try {
+      targetLang = await detectLanguage(cleanText);
+    } catch (e) {
+      targetLang = config.interfaceLanguage || 'fr';
+    }
+  } else {
+    // Mode fixe: verifier si traduction necessaire
+    speakBtn.classList.add('speaking');
+    speakBtn.title = t('detectingLanguage', currentLang) || 'Detecting...';
+    try {
+      const detectedLang = await detectLanguage(cleanText);
+      if (detectedLang !== targetLang) {
+        speakBtn.title = t('translatingText', currentLang) || 'Translating...';
+        textToRead = await translateText(cleanText, targetLang);
+      }
+    } catch (e) {
+      // En cas d'erreur, lire le texte original
+    }
+  }
+
+  // Creer l'utterance
+  currentSpeechUtterance = new SpeechSynthesisUtterance(textToRead);
+  currentSpeechUtterance.lang = LANG_MAP[targetLang] || 'fr-FR';
+
+  // Vitesse et pitch (depuis les options)
+  currentSpeechUtterance.rate = config.speechRate || 1.0;
+  currentSpeechUtterance.pitch = config.speechPitch || 1.0;
+
+  // Selectionner la voix sauvegardee ou par defaut pour la langue
+  const voice = getVoiceByNameOrLang(config.speechVoiceName, targetLang);
+  if (voice) {
+    currentSpeechUtterance.voice = voice;
+  }
+
+  // Evenements
+  currentSpeechUtterance.onstart = () => {
+    isSpeaking = true;
+    speakBtn.classList.add('speaking');
+    speakBtn.title = t('stopSpeaking', currentLang);
+  };
+
+  currentSpeechUtterance.onend = () => {
+    isSpeaking = false;
+    speakBtn.classList.remove('speaking');
+    speakBtn.title = t('speak', currentLang);
+  };
+
+  currentSpeechUtterance.onerror = () => {
+    isSpeaking = false;
+    speakBtn.classList.remove('speaking');
+    speakBtn.title = t('speak', currentLang);
+  };
+
+  // Lancer la lecture
+  window.speechSynthesis.speak(currentSpeechUtterance);
 }
 
 // Charger la configuration
@@ -175,6 +388,14 @@ function setupEventListeners() {
   document.getElementById('btn-settings').addEventListener('click', () => {
     chrome.runtime.openOptionsPage();
   });
+
+  // Lecture vocale (si activee)
+  const speakBtn = document.getElementById('btn-speak');
+  if (config.speechEnabled !== false) {
+    speakBtn.addEventListener('click', toggleSpeech);
+  } else {
+    speakBtn.style.display = 'none';
+  }
 
   // Refinement buttons - prompts sont en anglais pour l'IA
   document.getElementById('btn-regenerate').addEventListener('click', () => regenerate());
