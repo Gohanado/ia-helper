@@ -43,18 +43,29 @@ Copy-Item -Path "src" -Destination $firefoxDir -Recurse
 Copy-Item -Path "assets" -Destination $firefoxDir -Recurse
 
 # Modifier le manifest pour Firefox
-$firefoxManifest = Get-Content "$firefoxDir/manifest.json" | ConvertFrom-Json
+$firefoxManifestContent = Get-Content "$firefoxDir/manifest.json" -Raw
+$firefoxManifest = $firefoxManifestContent | ConvertFrom-Json
 
 # Ajouter les cles specifiques Firefox
 $firefoxManifest | Add-Member -NotePropertyName "browser_specific_settings" -NotePropertyValue @{
     gecko = @{
-        id = "ia-helper@badom.ch"
+        id = "{ia-helper@badom.ch}"
         strict_min_version = "109.0"
     }
 } -Force
 
-# Sauvegarder le manifest modifie
-$firefoxManifest | ConvertTo-Json -Depth 10 | Set-Content "$firefoxDir/manifest.json"
+# Firefox MV3 necessite scripts au lieu de service_worker
+$firefoxManifest.background = @{
+    scripts = @("src/background/service-worker.js")
+    type = "module"
+}
+
+# Sauvegarder le manifest modifie avec encodage UTF8 sans BOM
+$jsonOutput = $firefoxManifest | ConvertTo-Json -Depth 10
+# Remplacer les caracteres echappes Unicode
+$jsonOutput = $jsonOutput -replace '\\u003c', '<' -replace '\\u003e', '>'
+$Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
+[System.IO.File]::WriteAllLines("$firefoxDir/manifest.json", $jsonOutput, $Utf8NoBomEncoding)
 
 # Creer le ZIP Firefox
 $firefoxZip = "dist/ia-helper-firefox-v$version.zip"
