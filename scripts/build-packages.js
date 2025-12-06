@@ -64,7 +64,11 @@ createZip(chromeZip, '.', null)
             manifest.browser_specific_settings = {
                 gecko: {
                     id: "ia-helper@badom.ch",
-                    strict_min_version: "109.0"
+                    strict_min_version: "140.0",
+                    data_collection_permissions: {
+                        telemetry: false,
+                        usage_data: false
+                    }
                 }
             };
 
@@ -72,11 +76,6 @@ createZip(chromeZip, '.', null)
             manifest.background = {
                 scripts: ["src/background/service-worker.js"]
             };
-
-            // Ajouter data_collection_permissions (requis pour Firefox)
-            if (!manifest.browser_specific_settings.gecko.data_collection_permissions) {
-                manifest.browser_specific_settings.gecko.data_collection_permissions = false;
-            }
 
             return manifest;
         });

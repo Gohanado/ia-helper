@@ -292,7 +292,7 @@ function createAgentOption(agent) {
       <div class="agent-option-name">${agent.name}</div>
       <div class="agent-option-description">${agent.description}</div>
     </div>
-  `;
+  `);
 
   return btn;
 }
@@ -451,7 +451,7 @@ function renderMessages(messages) {
 
 function createMessageElement(msg, t) {
   const div = document.createElement('div');
-  div.className = `message ${msg.role}`;
+  div.className = `message ${msg.role}`);
 
   const isUser = msg.role === 'user';
   const authorName = isUser ? (t.you || 'Vous') : 'IA';
@@ -472,7 +472,7 @@ function createMessageElement(msg, t) {
         <div class="thinking-content">${formatMessageContent(msg.thinking)}</div>
       </div>
       <div class="response-content">${formatMessageContent(msg.content)}</div>
-    `;
+    `);
   } else {
     messageTextContent = formatMessageContent(msg.content);
   }
@@ -513,7 +513,7 @@ function createMessageElement(msg, t) {
         </div>
       ` : ''}
     </div>
-  `;
+  `);
 
   return div;
 }
@@ -531,10 +531,10 @@ function formatMessageContent(content) {
     const codeId = 'code-' + Math.random().toString(36).substr(2, 9);
     const cleanCode = escapeHtml(code.trim()); // Echapper SEULEMENT le code
 
-    const block = `<div class="code-block-wrapper"><div class="code-block-header"><span class="code-lang">${lang || 'code'}</span><button class="btn-copy-code" data-code-id="${codeId}"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copier</button></div><pre><code id="${codeId}" class="language-${lang}">${cleanCode}</code></pre></div>`;
+    const block = `<div class="code-block-wrapper"><div class="code-block-header"><span class="code-lang">${lang || 'code'}</span><button class="btn-copy-code" data-code-id="${codeId}"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copier</button></div><pre><code id="${codeId}" class="language-${lang}">${cleanCode}</code></pre></div>`);
 
     // Utiliser § au lieu de _ pour eviter les conflits avec italic
-    const placeholder = `§§§PROTECTEDBLOCK${blockIndex}§§§`;
+    const placeholder = `§§§PROTECTEDBLOCK${blockIndex}§§§`);
     protectedBlocks[blockIndex] = block;
     blockIndex++;
     return placeholder;
@@ -551,7 +551,7 @@ function formatMessageContent(content) {
       // Inline code
       cellContent = cellContent.replace(/`([^`]+)`/g, (m, code) => {
         const codeId = 'inline-' + Math.random().toString(36).substr(2, 9);
-        return `<code id="${codeId}">${escapeHtml(code)}</code>`;
+        return `<code id="${codeId}">${escapeHtml(code)}</code>`);
       });
       // Bold
       cellContent = cellContent.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
@@ -561,7 +561,7 @@ function formatMessageContent(content) {
       cellContent = cellContent.replace(/_([^_]+)_/g, '<em>$1</em>');
       // Links
       cellContent = cellContent.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
-      return `<th>${cellContent}</th>`;
+      return `<th>${cellContent}</th>`);
     }).join('');
 
     // Parser le contenu des cellules de lignes
@@ -571,7 +571,7 @@ function formatMessageContent(content) {
         // Inline code
         cellContent = cellContent.replace(/`([^`]+)`/g, (m, code) => {
           const codeId = 'inline-' + Math.random().toString(36).substr(2, 9);
-          return `<code id="${codeId}">${escapeHtml(code)}</code>`;
+          return `<code id="${codeId}">${escapeHtml(code)}</code>`);
         });
         // Bold
         cellContent = cellContent.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
@@ -581,9 +581,9 @@ function formatMessageContent(content) {
         cellContent = cellContent.replace(/_([^_]+)_/g, '<em>$1</em>');
         // Links
         cellContent = cellContent.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
-        return `<td>${cellContent}</td>`;
+        return `<td>${cellContent}</td>`);
       }).join('');
-      return `<tr>${cells}</tr>`;
+      return `<tr>${cells}</tr>`);
     }).join('');
 
     const block = `<div class="table-wrapper"><div class="table-header"><button class="btn-copy-table" data-table-id="${tableId}" title="Copier le tableau"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copier</button></div><table id="${tableId}" class="markdown-table"><thead><tr>${headerCells}</tr></thead><tbody>${rowsHtml}</tbody></table></div>`;
@@ -715,7 +715,7 @@ async function sendMessage(content) {
         <span></span><span></span><span></span>
       </div>
     </div>
-  `;
+  `);
   elements.messagesWrapper.appendChild(typingEl);
   scrollToBottom();
 
@@ -761,7 +761,7 @@ async function sendMessage(content) {
               <span>Reflexion...</span>
             </div>
             <div class="thinking-content"></div>
-          `;
+          `);
           messageTextEl.insertBefore(thinkingEl, messageTextEl.firstChild);
           responseEl = document.createElement('div');
           responseEl.className = 'response-content';
@@ -1496,7 +1496,7 @@ function showError(message) {
         ${t.error || 'Erreur'}: ${escapeHtml(message)}
       </div>
     </div>
-  `;
+  `);
   elements.messagesWrapper.appendChild(errorEl);
 }
 
@@ -1516,7 +1516,7 @@ function showToast(message) {
     font-size: 13px;
     z-index: 1000;
     animation: fadeInOut 2s ease;
-  `;
+  `);
   document.body.appendChild(toast);
   setTimeout(() => toast.remove(), 2000);
 }
@@ -1530,6 +1530,6 @@ style.textContent = `
     85% { opacity: 1; transform: translateX(-50%) translateY(0); }
     100% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
   }
-`;
+`);
 document.head.appendChild(style);
 

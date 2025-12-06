@@ -250,7 +250,7 @@
     setTrustedHTML(indicator, `
       <div class="ia-helper-loading-spinner"></div>
       <span>IA Helper genere...</span>
-    `;
+    `);
 
     // Positionner pres de l'element
     const rect = element.getBoundingClientRect();

@@ -564,7 +564,7 @@ function updateStats() {
 // Afficher une erreur
 function showError(message) {
   setStatus('error', t('error', currentLang));
-  setTrustedHTML(elements.resultContent, `<p style="color: var(--error));">${t('error', currentLang)}: ${message}</p>`;
+  setTrustedHTML(elements.resultContent, `<p style="color: var(--error));">${t('error', currentLang)}: ${message}</p>`);
 }
 
 // Afficher une notification

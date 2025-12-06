@@ -923,7 +923,7 @@ function createActionToggle(action, isEnabled, isCustom = false) {
       <button class="btn-edit-action" data-id="${action.id}" title="Modifier le prompt">&#9998;</button>
       ${isCustom ? '<button class="btn-delete-action" data-id="' + action.id + '" title="Supprimer">X</button>' : ''}
     </div>
-  `;
+  `);
 
   toggle.querySelector('input').addEventListener('change', (e) => {
     toggleAction(action.id, e.target.checked, isCustom);
@@ -968,7 +968,7 @@ function renderTranslationsGrid() {
         <span class="action-name">${action.name}</span>
         <span class="action-desc">${action.description}</span>
       </span>
-    `;
+    `);
 
     toggle.querySelector('input').addEventListener('change', (e) => {
       toggleTranslation(lang.code, e.target.checked);
@@ -1081,7 +1081,7 @@ function showAddCustomActionModal() {
         <button class="btn btn-primary modal-save" type="button">Creer</button>
       </div>
     </div>
-  `;
+  `);
 
   document.body.appendChild(modal);
 
