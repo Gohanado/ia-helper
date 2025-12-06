@@ -103,11 +103,32 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  // Footer buttons
+  // Main chat button
   document.getElementById('btn-chat')?.addEventListener('click', () => {
     chrome.tabs.create({ url: chrome.runtime.getURL('src/chat/chat.html') });
   });
 
+  // Quick prompt - Send to chat
+  sendBtn?.addEventListener('click', () => {
+    const prompt = promptInput?.value.trim();
+    if (prompt) {
+      // Store prompt in session storage to be picked up by chat page
+      chrome.storage.session.set({ pendingPrompt: prompt }, () => {
+        chrome.tabs.create({ url: chrome.runtime.getURL('src/chat/chat.html') });
+        window.close();
+      });
+    }
+  });
+
+  // Send on Enter (without Shift)
+  promptInput?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendBtn?.click();
+    }
+  });
+
+  // Footer buttons
   document.getElementById('btn-options')?.addEventListener('click', () => {
     chrome.runtime.openOptionsPage();
   });
@@ -218,4 +239,49 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     window.close();
   }
+
+  // === TABS MANAGEMENT ===
+  const tabButtons = document.querySelectorAll('.tab-btn');
+  const tabPanels = document.querySelectorAll('.tab-panel');
+
+  tabButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetTab = btn.dataset.tab;
+
+      // Update active tab button
+      tabButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      // Update active tab panel
+      tabPanels.forEach(panel => {
+        if (panel.dataset.panel === targetTab) {
+          panel.classList.add('active');
+        } else {
+          panel.classList.remove('active');
+        }
+      });
+    });
+  });
+
+  // === COLLAPSIBLE SECTIONS ===
+  const collapsibleHeaders = document.querySelectorAll('.collapsible-header');
+
+  collapsibleHeaders.forEach(header => {
+    header.addEventListener('click', () => {
+      const section = header.parentElement;
+      const isOpen = section.classList.contains('open');
+
+      // Toggle open state
+      if (isOpen) {
+        section.classList.remove('open');
+      } else {
+        section.classList.add('open');
+      }
+    });
+  });
+
+  // Open first section of each tab by default
+  document.querySelectorAll('.collapsible-section.open').forEach(section => {
+    // Already marked as open in HTML
+  });
 });

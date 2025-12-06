@@ -1533,3 +1533,20 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
+// === CHECK FOR PENDING PROMPT FROM POPUP ===
+chrome.storage.session.get(['pendingPrompt'], (result) => {
+  if (result.pendingPrompt) {
+    // Clear the pending prompt
+    chrome.storage.session.remove('pendingPrompt');
+
+    // Set the prompt in the input and send it
+    elements.messageInput.value = result.pendingPrompt;
+    elements.btnSend.disabled = false;
+
+    // Auto-send after a short delay to ensure everything is loaded
+    setTimeout(() => {
+      sendMessage(result.pendingPrompt);
+    }, 500);
+  }
+});
+

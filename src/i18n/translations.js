@@ -69,6 +69,7 @@ export const TRANSLATIONS = {
     presetDeleted: 'Preset supprime',
 
     // Actions
+    actions: 'Actions',
     inputActions: 'Actions d\'edition',
     selectionActions: 'Actions de selection',
     proActions: 'Actions IA Helper Pro',
@@ -88,10 +89,20 @@ export const TRANSLATIONS = {
     analysis: 'Analyse',
     analysisDesc: 'Analyse et comprehension de texte',
     translation: 'Traduction',
+    translate: 'Traduire',
     translationDesc: 'Langues disponibles pour la traduction rapide',
     enableAll: 'Tout activer',
     disableAll: 'Tout desactiver',
     defaultValues: 'Valeurs par defaut',
+
+    // Popup tabs
+    textActions: 'Actions sur texte',
+    understanding: 'Comprendre',
+    page: 'Page',
+    commonLanguages: 'Langues courantes',
+    moreLanguages: 'Plus de langues',
+    pageAnalysis: 'Analyse de page',
+    sendToChat: 'Envoyer au chat',
 
     // Prompts
     prompts: 'Prompts',
@@ -436,10 +447,20 @@ export const TRANSLATIONS = {
     analysis: 'Analysis',
     analysisDesc: 'Text analysis and comprehension',
     translation: 'Translation',
+    translate: 'Translate',
     translationDesc: 'Available languages for quick translation',
     enableAll: 'Enable all',
     disableAll: 'Disable all',
     defaultValues: 'Default values',
+
+    // Popup tabs
+    textActions: 'Text actions',
+    understanding: 'Understanding',
+    page: 'Page',
+    commonLanguages: 'Common languages',
+    moreLanguages: 'More languages',
+    pageAnalysis: 'Page analysis',
+    sendToChat: 'Send to chat',
     prompts: 'Prompts',
     customizePrompts: 'Customize prompts',
     promptsDesc: 'Modify the instructions sent to the AI for each action.',

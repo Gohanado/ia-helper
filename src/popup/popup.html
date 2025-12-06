@@ -23,8 +23,8 @@
       </div>
     </header>
 
-    <!-- Chat Button Section -->
-    <section class="chat-section">
+    <!-- Main Action Button -->
+    <section class="main-action-section">
       <button class="btn-open-chat" id="btn-chat">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
@@ -46,85 +46,182 @@
           placeholder="Posez une question ou donnez une instruction..."
           rows="2"
         ></textarea>
-        <button class="send-btn" id="send-prompt-btn" data-i18n-title="send" title="Envoyer">
+        <button class="send-btn" id="send-prompt-btn" data-i18n-title="sendToChat" title="Envoyer au chat">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
           </svg>
         </button>
       </div>
-      <div class="prompt-hint" data-i18n="selectTextFirst">Selectionnez du texte sur la page pour l'utiliser</div>
     </section>
 
-    <!-- Quick Actions Grid -->
-    <section class="quick-actions-section">
-      <h3 class="section-title" data-i18n="quickActions">Actions rapides</h3>
-      <div class="actions-grid">
-        <button class="action-btn" data-action="correct_errors">
-          <span class="action-icon">Aa</span>
-          <span class="action-label" data-i18n="correct">Corriger</span>
-        </button>
-        <button class="action-btn" data-action="summarize">
-          <span class="action-icon">Rs</span>
-          <span class="action-label" data-i18n="summarize">Resumer</span>
-        </button>
-        <button class="action-btn" data-action="explain_simple">
-          <span class="action-icon">?</span>
-          <span class="action-label" data-i18n="explain">Expliquer</span>
-        </button>
-        <button class="action-btn" data-action="reformat_mail_pro">
-          <span class="action-icon">Pro</span>
-          <span class="action-label" data-i18n="professional">Pro</span>
-        </button>
-        <button class="action-btn" data-action="improve_style">
-          <span class="action-icon">St</span>
-          <span class="action-label" data-i18n="style">Style</span>
-        </button>
-        <button class="action-btn" data-action="expand_content">
-          <span class="action-icon">+</span>
-          <span class="action-label" data-i18n="expand">Developper</span>
-        </button>
-      </div>
-    </section>
-
-    <!-- Translation Section -->
-    <section class="translation-section">
-      <h3 class="section-title" data-i18n="translateTo">Traduire vers</h3>
-      <div class="lang-pills">
-        <button class="lang-pill" data-lang="fr">FR</button>
-        <button class="lang-pill" data-lang="en">EN</button>
-        <button class="lang-pill" data-lang="es">ES</button>
-        <button class="lang-pill" data-lang="de">DE</button>
-        <button class="lang-pill" data-lang="it">IT</button>
-        <button class="lang-pill" data-lang="pt">PT</button>
-        <button class="lang-pill more-langs" id="more-langs-btn">...</button>
-      </div>
-      <div class="lang-pills-extended" id="lang-pills-extended" style="display:none;">
-        <button class="lang-pill" data-lang="nl">NL</button>
-        <button class="lang-pill" data-lang="ru">RU</button>
-        <button class="lang-pill" data-lang="zh">ZH</button>
-        <button class="lang-pill" data-lang="ja">JA</button>
-        <button class="lang-pill" data-lang="ko">KO</button>
-        <button class="lang-pill" data-lang="ar">AR</button>
-      </div>
-    </section>
-
-    <!-- Page Actions -->
-    <section class="page-actions-section">
-      <button class="page-action-btn" data-action="quick_summarize_page">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <!-- Tabs Navigation -->
+    <nav class="tabs-nav">
+      <button class="tab-btn active" data-tab="actions">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+        </svg>
+        <span data-i18n="actions">Actions</span>
+      </button>
+      <button class="tab-btn" data-tab="translate">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M5 8h14M5 8a2 2 0 1 1 0-4h14a2 2 0 1 1 0 4M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8m-9 4h4"/>
+        </svg>
+        <span data-i18n="translate">Traduire</span>
+      </button>
+      <button class="tab-btn" data-tab="page">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-          <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>
+          <path d="M14 2v6h6"/>
         </svg>
-        <span data-i18n="summarizePage">Resumer la page</span>
+        <span data-i18n="page">Page</span>
       </button>
-      <button class="page-action-btn" data-action="quick_extract_main">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M9 11l3 3L22 4"/>
-          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
-        </svg>
-        <span data-i18n="extractKeyPoints">Points cles</span>
-      </button>
-    </section>
+    </nav>
+
+    <!-- Tab Content Container -->
+    <div class="tabs-content">
+
+      <!-- Tab: Actions -->
+      <div class="tab-panel active" data-panel="actions">
+
+        <!-- Collapsible: Text Actions -->
+        <div class="collapsible-section">
+          <button class="collapsible-header" data-section="text-actions">
+            <span class="section-icon">Aa</span>
+            <span class="section-title" data-i18n="textActions">Actions sur texte</span>
+            <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </button>
+          <div class="collapsible-content" data-content="text-actions">
+            <div class="actions-grid">
+              <button class="action-btn" data-action="correct_errors">
+                <span class="action-icon">Aa</span>
+                <span class="action-label" data-i18n="correct">Corriger</span>
+              </button>
+              <button class="action-btn" data-action="improve_style">
+                <span class="action-icon">St</span>
+                <span class="action-label" data-i18n="style">Style</span>
+              </button>
+              <button class="action-btn" data-action="reformat_mail_pro">
+                <span class="action-icon">Pro</span>
+                <span class="action-label" data-i18n="professional">Pro</span>
+              </button>
+              <button class="action-btn" data-action="expand_content">
+                <span class="action-icon">+</span>
+                <span class="action-label" data-i18n="expand">Developper</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Collapsible: Understanding -->
+        <div class="collapsible-section">
+          <button class="collapsible-header" data-section="understanding">
+            <span class="section-icon">?</span>
+            <span class="section-title" data-i18n="understanding">Comprendre</span>
+            <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </button>
+          <div class="collapsible-content" data-content="understanding">
+            <div class="actions-grid">
+              <button class="action-btn" data-action="summarize">
+                <span class="action-icon">Rs</span>
+                <span class="action-label" data-i18n="summarize">Resumer</span>
+              </button>
+              <button class="action-btn" data-action="explain_simple">
+                <span class="action-icon">?</span>
+                <span class="action-label" data-i18n="explain">Expliquer</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Tab: Translate -->
+      <div class="tab-panel" data-panel="translate">
+
+        <!-- Collapsible: Common Languages -->
+        <div class="collapsible-section open">
+          <button class="collapsible-header" data-section="common-langs">
+            <span class="section-icon">🌍</span>
+            <span class="section-title" data-i18n="commonLanguages">Langues courantes</span>
+            <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </button>
+          <div class="collapsible-content" data-content="common-langs">
+            <div class="lang-pills">
+              <button class="lang-pill" data-lang="fr">FR</button>
+              <button class="lang-pill" data-lang="en">EN</button>
+              <button class="lang-pill" data-lang="es">ES</button>
+              <button class="lang-pill" data-lang="de">DE</button>
+              <button class="lang-pill" data-lang="it">IT</button>
+              <button class="lang-pill" data-lang="pt">PT</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Collapsible: More Languages -->
+        <div class="collapsible-section">
+          <button class="collapsible-header" data-section="more-langs">
+            <span class="section-icon">🌏</span>
+            <span class="section-title" data-i18n="moreLanguages">Plus de langues</span>
+            <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </button>
+          <div class="collapsible-content" data-content="more-langs">
+            <div class="lang-pills">
+              <button class="lang-pill" data-lang="nl">NL</button>
+              <button class="lang-pill" data-lang="ru">RU</button>
+              <button class="lang-pill" data-lang="zh">ZH</button>
+              <button class="lang-pill" data-lang="ja">JA</button>
+              <button class="lang-pill" data-lang="ko">KO</button>
+              <button class="lang-pill" data-lang="ar">AR</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Tab: Page -->
+      <div class="tab-panel" data-panel="page">
+
+        <!-- Collapsible: Page Analysis -->
+        <div class="collapsible-section open">
+          <button class="collapsible-header" data-section="page-analysis">
+            <span class="section-icon">📄</span>
+            <span class="section-title" data-i18n="pageAnalysis">Analyse de page</span>
+            <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </button>
+          <div class="collapsible-content" data-content="page-analysis">
+            <div class="page-actions-list">
+              <button class="page-action-btn" data-action="quick_summarize_page">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>
+                </svg>
+                <span data-i18n="summarizePage">Resumer la page</span>
+              </button>
+              <button class="page-action-btn" data-action="quick_extract_main">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M9 11l3 3L22 4"/>
+                  <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                </svg>
+                <span data-i18n="extractKeyPoints">Points cles</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+    <!-- End Tabs Content -->
 
     <!-- Model Info Bar -->
     <div class="model-info-bar" id="model-info-bar">

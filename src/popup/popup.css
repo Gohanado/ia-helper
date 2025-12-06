@@ -22,9 +22,11 @@
 
 body {
   width: 340px;
+  max-height: 600px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background: linear-gradient(180deg, var(--bg-dark) 0%, #1a1a2e 100%);
   color: var(--text);
+  overflow-y: auto;
 }
 
 .popup-container {
@@ -32,6 +34,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  min-height: min-content;
 }
 
 /* Header */
@@ -39,8 +42,9 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 10px;
+  padding-bottom: 12px;
   border-bottom: 1px solid var(--border);
+  margin-bottom: 12px;
 }
 
 .logo-section {
@@ -446,4 +450,148 @@ body {
   opacity: 0.4;
   cursor: not-allowed;
   transform: none !important;
+}
+
+/* === TABS NAVIGATION === */
+.tabs-nav {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--bg-card);
+  border-radius: 10px;
+  margin-bottom: 12px;
+}
+
+.tab-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+}
+
+.tab-btn.active {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.tab-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* === TABS CONTENT === */
+.tabs-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tab-panel {
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  animation: fadeIn 0.2s ease;
+}
+
+.tab-panel.active {
+  display: flex;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* === COLLAPSIBLE SECTIONS === */
+.collapsible-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.collapsible-section:hover {
+  border-color: rgba(102, 126, 234, 0.3);
+}
+
+.collapsible-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.collapsible-header:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.collapsible-header .section-icon {
+  font-size: 16px;
+  width: 20px;
+  text-align: center;
+}
+
+.collapsible-header .section-title {
+  flex: 1;
+  text-align: left;
+}
+
+.collapsible-header .chevron {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.2s ease;
+  color: var(--text-muted);
+}
+
+.collapsible-section.open .chevron {
+  transform: rotate(180deg);
+}
+
+.collapsible-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+}
+
+.collapsible-section.open .collapsible-content {
+  max-height: 500px;
+  padding: 0 14px 14px 14px;
+}
+
+/* === PAGE ACTIONS LIST === */
+.page-actions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
