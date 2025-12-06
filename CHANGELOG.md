@@ -16,7 +16,16 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 
 ## [1.9.1] - 2025-12-06
 
+### Statut
+- **VERSION STABLE FIREFOX**: Validation 100% reussie (0 erreurs, 0 warnings)
+- **VERSION STABLE CHROME**: Testee et fonctionnelle
+
 ### Corrige
+- **Validation Firefox Add-ons**: Elimination complete de tous les warnings
+  - Remplacement innerHTML par DOMParser dans dom-sanitizer.js et content-script.js
+  - Configuration data_collection_permissions avec required: ["none"]
+  - Version minimale Firefox: strict_min_version 142.0
+  - Format ZIP compatible avec slashes Unix
 - **Correction erreurs de syntaxe**: Correction de toutes les erreurs de syntaxe JavaScript
   - Correction des parentheses manquantes dans setTrustedHTML() (options.js, chat.js, content-script.js)
   - Correction de la configuration dans results.js (ollamaUrl -> apiUrl)
@@ -25,7 +34,6 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
   - Implementation du streaming via Port Chrome comme dans chat.js
   - Parsing markdown en temps reel sans scintillement
   - Amelioration de la performance de rendu
-- **Stabilite Chrome**: Version completement stable et testee sur Chrome
 
 ---
 
