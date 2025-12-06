@@ -330,7 +330,22 @@ export const TRANSLATIONS = {
     copied: 'Copie !',
     listen: 'Ecouter',
     stopGeneration: 'Arreter',
-    stopSpeech: 'Arreter lecture'
+    stopSpeech: 'Arreter lecture',
+
+    // Agents
+    noModelAvailable: 'Aucun modele disponible',
+    builtinAgents: 'Agents integres',
+    customAgents: 'Agents personnalises',
+    thinking: 'Reflexion',
+
+    // Options labels
+    ollamaServerUrl: 'URL du serveur Ollama',
+    customApiUrl: 'URL de l\'API (compatible OpenAI)',
+    providerApiUrl: 'URL de l\'API',
+    pressKeyPrompt: 'Appuyez sur une touche...',
+    createPresetTitle: 'Creer un preset',
+    noActionsInPreset: 'Aucune action. Cliquez sur "+ Ajouter action".',
+    unableToCheckUpdates: 'Impossible de verifier les mises a jour.'
   },
   
   en: {
@@ -641,7 +656,22 @@ export const TRANSLATIONS = {
     copied: 'Copied!',
     listen: 'Listen',
     stopGeneration: 'Stop',
-    stopSpeech: 'Stop reading'
+    stopSpeech: 'Stop reading',
+
+    // Agents
+    noModelAvailable: 'No model available',
+    builtinAgents: 'Built-in agents',
+    customAgents: 'Custom agents',
+    thinking: 'Thinking',
+
+    // Options labels
+    ollamaServerUrl: 'Ollama server URL',
+    customApiUrl: 'API URL (OpenAI compatible)',
+    providerApiUrl: 'API URL',
+    pressKeyPrompt: 'Press a key...',
+    createPresetTitle: 'Create preset',
+    noActionsInPreset: 'No actions. Click "+ Add action".',
+    unableToCheckUpdates: 'Unable to check for updates.'
   }
 };
 
@@ -773,7 +803,18 @@ TRANSLATIONS.es = {
   conversations: 'conversaciones',
   conversationsDeleted: 'conversaciones eliminadas',
   copied: 'Copiado!', listen: 'Escuchar',
-  stopGeneration: 'Detener', stopSpeech: 'Detener lectura'
+  stopGeneration: 'Detener', stopSpeech: 'Detener lectura',
+  noModelAvailable: 'Ningun modelo disponible',
+  builtinAgents: 'Agentes integrados',
+  customAgents: 'Agentes personalizados',
+  thinking: 'Reflexion',
+  ollamaServerUrl: 'URL del servidor Ollama',
+  customApiUrl: 'URL de la API (compatible OpenAI)',
+  providerApiUrl: 'URL de la API',
+  pressKeyPrompt: 'Presione una tecla...',
+  createPresetTitle: 'Crear preset',
+  noActionsInPreset: 'Sin acciones. Haga clic en "+ Agregar accion".',
+  unableToCheckUpdates: 'No se puede verificar actualizaciones.'
 };
 
 // Italien
@@ -904,7 +945,18 @@ TRANSLATIONS.it = {
   conversations: 'conversazioni',
   conversationsDeleted: 'conversazioni eliminate',
   copied: 'Copiato!', listen: 'Ascolta',
-  stopGeneration: 'Ferma', stopSpeech: 'Ferma lettura'
+  stopGeneration: 'Ferma', stopSpeech: 'Ferma lettura',
+  noModelAvailable: 'Nessun modello disponibile',
+  builtinAgents: 'Agenti integrati',
+  customAgents: 'Agenti personalizzati',
+  thinking: 'Riflessione',
+  ollamaServerUrl: 'URL del server Ollama',
+  customApiUrl: 'URL dell\'API (compatibile OpenAI)',
+  providerApiUrl: 'URL dell\'API',
+  pressKeyPrompt: 'Premi un tasto...',
+  createPresetTitle: 'Crea preset',
+  noActionsInPreset: 'Nessuna azione. Fai clic su "+ Aggiungi azione".',
+  unableToCheckUpdates: 'Impossibile verificare gli aggiornamenti.'
 };
 
 // Portugais
@@ -1035,7 +1087,18 @@ TRANSLATIONS.pt = {
   conversations: 'conversas',
   conversationsDeleted: 'conversas excluidas',
   copied: 'Copiado!', listen: 'Ouvir',
-  stopGeneration: 'Parar', stopSpeech: 'Parar leitura'
+  stopGeneration: 'Parar', stopSpeech: 'Parar leitura',
+  noModelAvailable: 'Nenhum modelo disponivel',
+  builtinAgents: 'Agentes integrados',
+  customAgents: 'Agentes personalizados',
+  thinking: 'Reflexao',
+  ollamaServerUrl: 'URL do servidor Ollama',
+  customApiUrl: 'URL da API (compativel OpenAI)',
+  providerApiUrl: 'URL da API',
+  pressKeyPrompt: 'Pressione uma tecla...',
+  createPresetTitle: 'Criar preset',
+  noActionsInPreset: 'Sem acoes. Clique em "+ Adicionar acao".',
+  unableToCheckUpdates: 'Nao foi possivel verificar atualizacoes.'
 };
 
 // Available languages

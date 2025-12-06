@@ -207,7 +207,7 @@ async function populateModelDropdown() {
   if (models.length === 0) {
     const msg = document.createElement('div');
     msg.className = 'model-option disabled';
-    msg.textContent = 'Aucun modele disponible';
+    msg.textContent = t('noModelAvailable', currentLang);
     elements.modelDropdown.appendChild(msg);
     return;
   }
@@ -248,7 +248,7 @@ function populateAgentDropdown() {
 
   const builtinTitle = document.createElement('div');
   builtinTitle.className = 'agent-dropdown-title';
-  builtinTitle.textContent = 'Agents integres';
+  builtinTitle.textContent = t('builtinAgents', currentLang);
   builtinSection.appendChild(builtinTitle);
 
   BUILTIN_AGENTS_LIST.forEach(agent => {
@@ -265,7 +265,7 @@ function populateAgentDropdown() {
 
     const customTitle = document.createElement('div');
     customTitle.className = 'agent-dropdown-title';
-    customTitle.textContent = 'Agents personnalises';
+    customTitle.textContent = t('customAgents', currentLang);
     customSection.appendChild(customTitle);
 
     customAgents.forEach(agent => {
@@ -772,7 +772,7 @@ async function sendMessage(content) {
       } else if (thinkingEnd) {
         // Fin du thinking
         if (thinkingEl) {
-          thinkingEl.querySelector('.thinking-header span').textContent = 'Reflexion';
+          thinkingEl.querySelector('.thinking-header span').textContent = t('thinking', currentLang);
         }
       } else {
         // Reponse normale

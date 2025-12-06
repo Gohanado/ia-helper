@@ -479,11 +479,11 @@ function updateProviderUI(provider) {
   // Mettre a jour le label de l'URL
   if (elements.apiUrlLabel) {
     if (provider === 'ollama') {
-      elements.apiUrlLabel.textContent = 'URL du serveur Ollama';
+      elements.apiUrlLabel.textContent = t('ollamaServerUrl', currentLang);
     } else if (provider === 'custom') {
-      elements.apiUrlLabel.textContent = 'URL de l\'API (compatible OpenAI)';
+      elements.apiUrlLabel.textContent = t('customApiUrl', currentLang);
     } else {
-      elements.apiUrlLabel.textContent = `URL de l\'API ${providerConfig.name}`;
+      elements.apiUrlLabel.textContent = `${t('providerApiUrl', currentLang)} ${providerConfig.name}`;
     }
   }
 
@@ -1386,7 +1386,7 @@ function checkShortcutConflict(newShortcut, excludeActionId = null) {
 // Commencer l'enregistrement d'un raccourci
 function startRecordingShortcut(button, actionId) {
   button.classList.add('recording');
-  button.querySelector('.key-display').textContent = 'Appuyez sur une touche...';
+  button.querySelector('.key-display').textContent = t('pressKeyPrompt', currentLang);
 
   const handler = (e) => {
     e.preventDefault();
@@ -1720,8 +1720,8 @@ function showAddPresetModal() {
 
   document.getElementById('preset-name').value = '';
   document.getElementById('preset-description').value = '';
-  setTrustedHTML(document.getElementById('preset-actions-items'), '<p class="empty-state">Aucune action. Cliquez sur "+ Ajouter action".</p>');
-  document.querySelector('#modal-preset-overlay .modal-title').textContent = 'Creer un preset';
+  setTrustedHTML(document.getElementById('preset-actions-items'), `<p class="empty-state">${t('noActionsInPreset', currentLang)}</p>`);
+  document.querySelector('#modal-preset-overlay .modal-title').textContent = t('createPresetTitle', currentLang);
 
   document.getElementById('modal-preset-overlay').classList.add('active');
 }
@@ -2023,7 +2023,7 @@ async function checkForUpdates() {
   } catch (error) {
     console.error('Erreur verification mise a jour:', error);
     if (updateStatus) {
-      updateStatus.textContent = 'Impossible de verifier les mises a jour.';
+      updateStatus.textContent = t('unableToCheckUpdates', currentLang);
     }
   }
 }
