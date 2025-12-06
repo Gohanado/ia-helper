@@ -1,5 +1,6 @@
 // Results Page Script - IA Helper
 import { t, getCurrentLanguage } from '../i18n/translations.js';
+import { setTrustedHTML } from '../utils/dom-sanitizer.js';
 
 // Langue courante
 let currentLang = 'fr';
@@ -436,7 +437,7 @@ async function startGeneration() {
   setStatus('generating', t('generating', currentLang));
   startTime = Date.now();
   currentResult = '';
-  elements.resultContent.innerHTML = '<span class="streaming-cursor"></span>';
+  setTrustedHTML(elements.resultContent, '<span class="streaming-cursor"></span>');
   
   try {
     const response = await fetch(`${config.ollamaUrl}/api/generate`, {
@@ -515,7 +516,7 @@ async function refine(additionalPrompt) {
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
     currentResult = '';
-    elements.resultContent.innerHTML = '<span class="streaming-cursor"></span>';
+    setTrustedHTML(elements.resultContent, '<span class="streaming-cursor"></span>');
 
     while (true) {
       const { done, value } = await reader.read();
@@ -563,7 +564,7 @@ function updateStats() {
 // Afficher une erreur
 function showError(message) {
   setStatus('error', t('error', currentLang));
-  elements.resultContent.innerHTML = `<p style="color: var(--error);">${t('error', currentLang)}: ${message}</p>`;
+  setTrustedHTML(elements.resultContent, `<p style="color: var(--error));">${t('error', currentLang)}: ${message}</p>`;
 }
 
 // Afficher une notification
@@ -714,8 +715,8 @@ function convertMarkdownToHtml(markdown) {
 function renderMarkdown(text, targetElement, isStreaming = false) {
   const html = convertMarkdownToHtml(text);
   if (isStreaming) {
-    targetElement.innerHTML = '<div class="markdown-body">' + html + '<span class="streaming-cursor"></span></div>';
+    setTrustedHTML(targetElement, '<div class="markdown-body">' + html + '<span class="streaming-cursor"></span></div>');
   } else {
-    targetElement.innerHTML = '<div class="markdown-body">' + html + '</div>';
+    setTrustedHTML(targetElement, '<div class="markdown-body">' + html + '</div>');
   }
 }

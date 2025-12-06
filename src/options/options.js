@@ -2,6 +2,7 @@
 
 import { t } from '../i18n/translations.js';
 import { DEFAULT_AGENT, BUILTIN_AGENTS, BUILTIN_AGENTS_LIST, createCustomAgent } from '../config/agents.js';
+import { setTrustedHTML } from '../utils/dom-sanitizer.js';
 
 // Version courante - lue depuis le manifest
 const VERSION = chrome.runtime.getManifest().version;
@@ -507,7 +508,7 @@ function setupProviderListeners() {
 
     // Mettre a jour les modeles par defaut
     if (providerConfig?.defaultModels) {
-      elements.modelSelect.innerHTML = '<option value="">Selectionnez un modele</option>';
+      setTrustedHTML(elements.modelSelect, '<option value="">Selectionnez un modele</option>');
       providerConfig.defaultModels.forEach(model => {
         const option = document.createElement('option');
         option.value = model;
@@ -680,7 +681,7 @@ async function refreshModels() {
   const apiKey = elements.apiKey?.value.trim();
   const providerConfig = PROVIDERS[provider];
 
-  elements.modelSelect.innerHTML = '<option value="">Selectionnez un modele</option>';
+  setTrustedHTML(elements.modelSelect, '<option value="">Selectionnez un modele</option>');
 
   // Si le provider a des modeles par defaut, les utiliser
   if (providerConfig?.defaultModels && provider !== 'ollama') {
@@ -886,7 +887,7 @@ function renderActionsGrid() {
     const container = document.getElementById(`actions-${category}`);
     if (!container) continue;
 
-    container.innerHTML = '';
+    setTrustedHTML(container, '');
 
     const actionsInCategory = Object.values(BASE_ACTIONS).filter(a => a.category === category);
 
@@ -911,7 +912,7 @@ function createActionToggle(action, isEnabled, isCustom = false) {
   // Verifier si le prompt a ete personnalise
   const hasCustomPrompt = customPrompts[action.id] !== undefined;
 
-  toggle.innerHTML = `
+  setTrustedHTML(toggle, `
     <input type="checkbox" ${isEnabled ? 'checked' : ''} data-action-id="${action.id}">
     <span class="toggle-indicator"></span>
     <span class="action-info">
@@ -951,7 +952,7 @@ function renderTranslationsGrid() {
   const container = document.getElementById('actions-translate');
   if (!container) return;
 
-  container.innerHTML = '';
+  setTrustedHTML(container, '');
 
   for (const lang of TRANSLATE_LANGUAGES) {
     const actionId = `translate_${lang.code}`;
@@ -960,7 +961,7 @@ function renderTranslationsGrid() {
 
     const toggle = document.createElement('label');
     toggle.className = `action-toggle ${isEnabled ? 'active' : ''}`;
-    toggle.innerHTML = `
+    setTrustedHTML(toggle, `
       <input type="checkbox" ${isEnabled ? 'checked' : ''} data-lang="${lang.code}">
       <span class="toggle-indicator"></span>
       <span class="action-info">
@@ -1000,10 +1001,10 @@ function renderCustomActionsGrid() {
   const container = document.getElementById('actions-custom');
   if (!container) return;
 
-  container.innerHTML = '';
+  setTrustedHTML(container, '');
 
   if (customActions.length === 0) {
-    container.innerHTML = '<p class="empty-message">Aucune action personnalisee. Cliquez sur le bouton ci-dessous pour en creer une.</p>';
+    setTrustedHTML(container, '<p class="empty-message">Aucune action personnalisee. Cliquez sur le bouton ci-dessous pour en creer une.</p>');
     return;
   }
 
@@ -1059,7 +1060,7 @@ function showAddCustomActionModal() {
   const modal = document.createElement('div');
   modal.className = 'modal-overlay active';
   modal.id = 'custom-action-modal';
-  modal.innerHTML = `
+  setTrustedHTML(modal, `
     <div class="modal">
       <div class="modal-header">
         <h3>Nouvelle action personnalisee</h3>
@@ -1179,7 +1180,7 @@ function showEditActionModal(action, isCustom = false) {
   const modal = document.createElement('div');
   modal.className = 'modal-overlay active';
   modal.id = 'edit-action-modal';
-  modal.innerHTML = `
+  setTrustedHTML(modal, `
     <div class="modal">
       <div class="modal-header">
         <h3>Modifier: ${action.name}</h3>
@@ -1287,7 +1288,7 @@ function renderShortcutsList() {
   const container = document.getElementById('shortcuts-list');
   if (!container) return;
 
-  container.innerHTML = '';
+  setTrustedHTML(container, '');
 
   // Raccourcis existants
   for (const [actionId, shortcut] of Object.entries(shortcuts)) {
@@ -1296,7 +1297,7 @@ function renderShortcutsList() {
 
     const item = document.createElement('div');
     item.className = 'shortcut-item';
-    item.innerHTML = `
+    setTrustedHTML(item, `
       <div class="shortcut-info">
         <span class="shortcut-name">${actionName}</span>
       </div>
@@ -1321,7 +1322,7 @@ function renderShortcutsList() {
   }
 
   if (Object.keys(shortcuts).length === 0) {
-    container.innerHTML = '<p class="empty-message">Aucun raccourci configure. Cliquez sur le bouton ci-dessous pour en ajouter.</p>';
+    setTrustedHTML(container, '<p class="empty-message">Aucun raccourci configure. Cliquez sur le bouton ci-dessous pour en ajouter.</p>');
   }
 }
 
@@ -1444,7 +1445,7 @@ function showAddShortcutModal() {
   const modal = document.createElement('div');
   modal.className = 'modal-overlay active';
   modal.id = 'shortcut-modal';
-  modal.innerHTML = `
+  setTrustedHTML(modal, `
     <div class="modal">
       <div class="modal-header">
         <h3>${t('addShortcut', currentLang)}</h3>
@@ -1582,7 +1583,7 @@ function showPresetActions(presetId, isCustom = false) {
   }
 
   if (!preset) {
-    container.innerHTML = `<h3>${t('presetActions', currentLang)}</h3><p class="empty-state">Preset non trouve.</p>`;
+    setTrustedHTML(container, `<h3>${t('presetActions', currentLang)}</h3><p class="empty-state">Preset non trouve.</p>`);
     return;
   }
 
@@ -1600,7 +1601,7 @@ function showPresetActions(presetId, isCustom = false) {
   }
 
   html += '</div>';
-  container.innerHTML = html;
+  setTrustedHTML(container, html);
 
   // Voir prompt
   container.querySelectorAll('.view-prompt-btn').forEach(btn => {
@@ -1673,7 +1674,7 @@ function showPromptModal(title, prompt) {
 
   const modal = document.createElement('div');
   modal.className = 'prompt-view-modal';
-  modal.innerHTML = `
+  setTrustedHTML(modal, `
     <div class="prompt-view-content">
       <h3>${title}</h3>
       <pre>${prompt}</pre>
@@ -1719,7 +1720,7 @@ function showAddPresetModal() {
 
   document.getElementById('preset-name').value = '';
   document.getElementById('preset-description').value = '';
-  document.getElementById('preset-actions-items').innerHTML = '<p class="empty-state">Aucune action. Cliquez sur "+ Ajouter action".</p>';
+  setTrustedHTML(document.getElementById('preset-actions-items'), '<p class="empty-state">Aucune action. Cliquez sur "+ Ajouter action".</p>');
   document.querySelector('#modal-preset-overlay .modal-title').textContent = 'Creer un preset';
 
   document.getElementById('modal-preset-overlay').classList.add('active');
@@ -1763,11 +1764,11 @@ function renderPresetActionsEditor() {
   const container = document.getElementById('preset-actions-items');
 
   if (currentPresetActions.length === 0) {
-    container.innerHTML = '<p class="empty-state">Aucune action. Cliquez sur "+ Ajouter action".</p>';
+    setTrustedHTML(container, '<p class="empty-state">Aucune action. Cliquez sur "+ Ajouter action".</p>');
     return;
   }
 
-  container.innerHTML = currentPresetActions.map((action, index) => `
+  setTrustedHTML(container, currentPresetActions.map((action, index) => `
     <div class="preset-action-edit-item" data-index="${index}">
       <input type="text" placeholder="Nom de l'action" value="${action.name}" class="action-name-input">
       <textarea placeholder="Prompt systeme..." class="action-prompt-input">${action.prompt}</textarea>
@@ -1901,7 +1902,7 @@ function showEditPromptModal(title, prompt, onSave) {
 
   const modal = document.createElement('div');
   modal.className = 'prompt-edit-modal prompt-view-modal';
-  modal.innerHTML = `
+  setTrustedHTML(modal, `
     <div class="prompt-view-content">
       <h3>${t('editPrompt', currentLang)}: ${title}</h3>
       <textarea id="edit-prompt-textarea" rows="10" style="width:100%; font-family: monospace; resize: vertical;">${prompt}</textarea>
@@ -1935,7 +1936,7 @@ async function deleteCustomPreset(presetId) {
   // Vider l'affichage des actions
   const container = document.getElementById('preset-actions-display');
   if (container) {
-    container.innerHTML = `<h3>${t('presetActions', currentLang)}</h3><p class="empty-state">${t('clickPresetToSee', currentLang)}</p>`;
+    setTrustedHTML(container, `<h3>${t('presetActions', currentLang)}</h3><p class="empty-state">${t('clickPresetToSee', currentLang)}</p>`);
   }
 
   renderAllPresetsGrid();
@@ -1987,7 +1988,7 @@ async function checkForUpdates() {
       // Mise a jour disponible
       if (updateStatus) {
         const versionText = t('newVersionAvailable', currentLang).replace('{version}', data.version);
-        updateStatus.innerHTML = `<strong style="color: var(--success);">${versionText}</strong><br><small>${data.releaseNotes || ''}</small>`;
+        setTrustedHTML(updateStatus, `<strong style="color: var(--success));">${versionText}</strong><br><small>${data.releaseNotes || ''}</small>`;
       }
       if (updateCard) {
         updateCard.classList.add('update-available');
@@ -2049,7 +2050,7 @@ async function loadUpdateStatus() {
     }
     if (updateStatus) {
       const versionText = t('newVersionAvailable', currentLang).replace('{version}', result.updateAvailable.version);
-      updateStatus.innerHTML = `<strong style="color: var(--success);">${versionText}</strong>`;
+      setTrustedHTML(updateStatus, `<strong style="color: var(--success));">${versionText}</strong>`;
     }
     if (updateCard) {
       updateCard.classList.add('update-available');
@@ -2116,7 +2117,7 @@ function renderBuiltinAgents() {
   const grid = document.getElementById('builtin-agents-grid');
   if (!grid) return;
 
-  grid.innerHTML = '';
+  setTrustedHTML(grid, '');
 
   BUILTIN_AGENTS_LIST.forEach(agent => {
     const card = createAgentCard(agent, false);
@@ -2130,7 +2131,7 @@ function renderCustomAgents() {
   const emptyState = document.getElementById('no-custom-agents');
   if (!grid) return;
 
-  grid.innerHTML = '';
+  setTrustedHTML(grid, '');
 
   if (customAgents.length === 0) {
     if (emptyState) emptyState.style.display = 'block';
@@ -2154,7 +2155,7 @@ function createAgentCard(agent, isCustom) {
 
   const isDefault = agent.id === DEFAULT_AGENT.id;
 
-  card.innerHTML = `
+  setTrustedHTML(card, `
     ${isDefault ? '<div class="agent-badge">Par defaut</div>' : ''}
     <div class="agent-card-header">
       <div class="agent-icon">${agent.icon || '🤖'}</div>

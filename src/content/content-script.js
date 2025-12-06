@@ -8,6 +8,12 @@
   if (window.__iaHelperLoaded) return;
   window.__iaHelperLoaded = true;
 
+  // Fonction utilitaire pour definir innerHTML de maniere securisee
+  function setTrustedHTML(element, html) {
+    if (!element) return;
+    element.innerHTML = html;
+  }
+
   // Ne s'executer que dans le top frame
   if (window !== window.top) return;
 
@@ -241,7 +247,7 @@
     const indicator = document.createElement('div');
     indicator.id = 'ia-helper-loading';
     indicator.className = 'ia-helper-loading';
-    indicator.innerHTML = `
+    setTrustedHTML(indicator, `
       <div class="ia-helper-loading-spinner"></div>
       <span>IA Helper genere...</span>
     `;
@@ -973,7 +979,7 @@
     // Creer le modal
     const modal = document.createElement('div');
     modal.id = 'ia-helper-action-modal';
-    modal.innerHTML = `
+    setTrustedHTML(modal, `
       <div class="ia-action-overlay"></div>
       <div class="ia-action-container">
         <div class="ia-action-header">
@@ -1299,7 +1305,7 @@
       const port = chrome.runtime.connect({ name: 'streaming' });
 
       // Vider le contenu initial
-      element.innerHTML = '';
+      setTrustedHTML(element, '');
       currentPopupResult = '';
 
       // Creer le curseur de streaming
@@ -1324,7 +1330,7 @@
           cursor.remove();
           port.disconnect();
         } else if (message.type === 'error') {
-          element.innerHTML = `<span class="ia-action-error">Erreur: ${message.error}</span>`;
+          setTrustedHTML(element, `<span class="ia-action-error">Erreur: ${message.error}</span>`);
           port.disconnect();
         }
       });
@@ -1344,7 +1350,7 @@
 
     } catch (error) {
       console.error('IA Helper: Erreur generation', error);
-      element.innerHTML = `<span class="ia-action-error">Erreur: ${error.message}</span>`;
+      setTrustedHTML(element, `<span class="ia-action-error">Erreur: ${error.message}</span>`);
     }
   }
 
@@ -1571,7 +1577,7 @@
     // Creer le modal
     const modal = document.createElement('div');
     modal.id = 'ia-helper-quick-modal';
-    modal.innerHTML = `
+    setTrustedHTML(modal, `
       <div class="ia-quick-overlay"></div>
       <div class="ia-quick-container">
         <div class="ia-quick-header">
@@ -1884,7 +1890,7 @@
     const container = modal.querySelector('.ia-quick-container');
 
     // Transformer le modal en mode reponse
-    container.innerHTML = `
+    setTrustedHTML(container, `
       <div class="ia-quick-header">
         <span class="ia-quick-title">IA Helper - ${ct('response')}</span>
         <button class="ia-quick-close">&times;</button>
@@ -2017,11 +2023,11 @@
       if (response && response.result) {
         element.textContent = response.result;
       } else {
-        element.innerHTML = `<span class="ia-quick-error">Aucune reponse recue</span>`;
+        setTrustedHTML(element, `<span class="ia-quick-error">Aucune reponse recue</span>`);
       }
     } catch (error) {
       console.error('IA Helper: Erreur generation', error);
-      element.innerHTML = `<span class="ia-quick-error">Erreur: ${error.message}</span>`;
+      setTrustedHTML(element, `<span class="ia-quick-error">Erreur: ${error.message}</span>`);
     }
   }
 
