@@ -2156,7 +2156,7 @@ function createAgentCard(agent, isCustom) {
   const isDefault = agent.id === DEFAULT_AGENT.id;
 
   setTrustedHTML(card, `
-    ${isDefault ? '<div class="agent-badge">Par defaut</div>' : ''}
+    ${isDefault ? `<div class="agent-badge">${t('defaultAgent', currentLang)}</div>` : ''}
     <div class="agent-card-header">
       <div class="agent-icon">${agent.icon || '🤖'}</div>
       <div class="agent-info">
@@ -2180,10 +2180,10 @@ function createAgentCard(agent, isCustom) {
     </div>
     <div class="agent-actions">
       ${isCustom ? `
-        <button class="agent-action-btn" data-action="edit" data-agent-id="${agent.id}">Modifier</button>
-        <button class="agent-action-btn danger" data-action="delete" data-agent-id="${agent.id}">Supprimer</button>
+        <button class="agent-action-btn" data-action="edit" data-agent-id="${agent.id}">${t('edit', currentLang)}</button>
+        <button class="agent-action-btn danger" data-action="delete" data-agent-id="${agent.id}">${t('delete', currentLang)}</button>
       ` : `
-        <button class="agent-action-btn" data-action="duplicate" data-agent-id="${agent.id}">Dupliquer</button>
+        <button class="agent-action-btn" data-action="duplicate" data-agent-id="${agent.id}">${t('duplicate', currentLang)}</button>
       `}
     </div>
   `);
