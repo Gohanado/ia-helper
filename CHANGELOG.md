@@ -14,6 +14,21 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 
 ---
 
+## [1.9.1] - 2025-12-06
+
+### Corrige
+- **Correction erreurs de syntaxe**: Correction de toutes les erreurs de syntaxe JavaScript
+  - Correction des parentheses manquantes dans setTrustedHTML() (options.js, chat.js, content-script.js)
+  - Correction de la configuration dans results.js (ollamaUrl -> apiUrl)
+- **Optimisation du streaming dans results.js**: Elimination du scintillement pendant la generation
+  - Suppression de l'animation CSS fadeIn qui causait le scintillement
+  - Implementation du streaming via Port Chrome comme dans chat.js
+  - Parsing markdown en temps reel sans scintillement
+  - Amelioration de la performance de rendu
+- **Stabilite Chrome**: Version completement stable et testee sur Chrome
+
+---
+
 ## [1.9.0] - 2025-12-06
 
 ### Ajoute
@@ -32,6 +47,13 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
   - Application automatique des parametres de l'agent aux requetes API
   - Support de tous les providers (Ollama, OpenAI, Anthropic, Groq, OpenRouter, Custom)
 
+- **Build multi-navigateurs**: Systeme de build separe pour Chrome et Firefox
+  - Script de build automatique (`npm run package`)
+  - Dossiers de build distincts: `dist/chrome/` et `dist/firefox/`
+  - Bundling automatique des modules ES6 pour Firefox
+  - Configuration manifest adaptee pour chaque navigateur
+  - Documentation complete dans BUILD.md
+
 ### Corrige
 - **Code blocks**: Correction du debordement horizontal
   - Ajout de scroll horizontal pour le code long
@@ -39,6 +61,11 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
   - Prevention du debordement du conteneur parent
 - **Blockquotes**: Reduction de l'espacement vertical
   - Marge reduite de 12px a 6px pour un affichage plus compact
+- **Firefox**: Compatibilite complete avec Firefox
+  - Ajout de `data_collection_permissions` dans le manifest
+  - Bundling des fichiers JavaScript pour eviter les erreurs de validation
+  - Retrait de `type="module"` des fichiers HTML
+  - Configuration `browser_specific_settings` correcte
 
 ---
 

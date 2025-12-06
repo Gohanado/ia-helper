@@ -1209,7 +1209,7 @@ function showEditActionModal(action, isCustom = false) {
         <button class="btn btn-primary modal-save" type="button">Sauvegarder</button>
       </div>
     </div>
-  `;
+  `);
 
   document.body.appendChild(modal);
 
@@ -1307,7 +1307,7 @@ function renderShortcutsList() {
         </button>
         <button class="btn btn-small btn-secondary btn-delete-shortcut" data-action="${actionId}">X</button>
       </div>
-    `;
+    `);
 
     item.querySelector('.shortcut-key-btn').addEventListener('click', (e) => {
       startRecordingShortcut(e.currentTarget, actionId);
@@ -1470,7 +1470,7 @@ function showAddShortcutModal() {
         <button class="btn btn-primary modal-save" disabled>${t('add', currentLang)}</button>
       </div>
     </div>
-  `;
+  `);
 
   document.body.appendChild(modal);
 
@@ -1680,7 +1680,7 @@ function showPromptModal(title, prompt) {
       <pre>${prompt}</pre>
       <button class="btn btn-primary close-modal">Fermer</button>
     </div>
-  `;
+  `);
 
   document.body.appendChild(modal);
 
@@ -1774,7 +1774,7 @@ function renderPresetActionsEditor() {
       <textarea placeholder="Prompt systeme..." class="action-prompt-input">${action.prompt}</textarea>
       <button class="btn-remove" data-index="${index}">X</button>
     </div>
-  `).join('');
+  `).join(''));
 
   // Event listeners pour les inputs
   container.querySelectorAll('.preset-action-edit-item').forEach((item, index) => {
@@ -1911,7 +1911,7 @@ function showEditPromptModal(title, prompt, onSave) {
         <button class="btn btn-primary save-edit">${t('save', currentLang)}</button>
       </div>
     </div>
-  `;
+  `);
 
   document.body.appendChild(modal);
 
@@ -1988,7 +1988,7 @@ async function checkForUpdates() {
       // Mise a jour disponible
       if (updateStatus) {
         const versionText = t('newVersionAvailable', currentLang).replace('{version}', data.version);
-        setTrustedHTML(updateStatus, `<strong style="color: var(--success));">${versionText}</strong><br><small>${data.releaseNotes || ''}</small>`;
+        setTrustedHTML(updateStatus, `<strong style="color: var(--success);">${versionText}</strong><br><small>${data.releaseNotes || ''}</small>`);
       }
       if (updateCard) {
         updateCard.classList.add('update-available');
@@ -2050,7 +2050,7 @@ async function loadUpdateStatus() {
     }
     if (updateStatus) {
       const versionText = t('newVersionAvailable', currentLang).replace('{version}', result.updateAvailable.version);
-      setTrustedHTML(updateStatus, `<strong style="color: var(--success));">${versionText}</strong>`;
+      setTrustedHTML(updateStatus, `<strong style="color: var(--success);">${versionText}</strong>`);
     }
     if (updateCard) {
       updateCard.classList.add('update-available');
@@ -2186,7 +2186,7 @@ function createAgentCard(agent, isCustom) {
         <button class="agent-action-btn" data-action="duplicate" data-agent-id="${agent.id}">Dupliquer</button>
       `}
     </div>
-  `;
+  `);
 
   return card;
 }

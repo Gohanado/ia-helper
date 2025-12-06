@@ -642,12 +642,4 @@ textarea:focus {
   background: rgba(102, 126, 234, 0.05);
 }
 
-/* Animation d'apparition */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(5px); }
-  to { opacity: 1; transform: translateY(0); }
-}
 
-.markdown-body > * {
-  animation: fadeIn 0.2s ease-out;
-}

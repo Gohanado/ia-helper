@@ -1,6 +1,6 @@
 {
   "name": "ia-helper",
-  "version": "1.9.0",
+  "version": "1.9.1",
   "description": "Extension Chrome d'assistant IA intelligent connectee a Ollama - 100% local et prive",
   "author": {
     "name": "Gohanado",
@@ -42,6 +42,9 @@
     "package": "node scripts/build-packages.js"
   },
   "devDependencies": {
+    "@babel/cli": "^7.28.3",
+    "@babel/core": "^7.28.5",
+    "@babel/preset-env": "^7.28.5",
     "archiver": "^7.0.1"
   },
   "dependencies": {

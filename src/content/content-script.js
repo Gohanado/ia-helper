@@ -1006,7 +1006,7 @@
           <button class="ia-action-btn ia-action-btn-primary ia-action-close-final">${ct('close')}</button>
         </div>
       </div>
-    `;
+    `);
 
     // Styles
     const styles = document.createElement('style');
@@ -1615,7 +1615,7 @@
           </button>
         </div>
       </div>
-    `;
+    `);
 
     // Ajouter les styles
     const styles = document.createElement('style');
@@ -1907,7 +1907,7 @@
         <button class="ia-quick-btn ia-quick-btn-secondary ia-quick-detail">${ct('viewDetails')}</button>
         <button class="ia-quick-btn ia-quick-btn-primary ia-quick-close-final">${ct('close')}</button>
       </div>
-    `;
+    `);
 
     // Ajouter les styles de reponse
     addResponseStyles();

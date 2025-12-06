@@ -1,9 +1,9 @@
 {
-  "version": "1.9.0",
+  "version": "1.9.1",
   "releaseDate": "2025-12-06",
   "minChromeVersion": "88",
-  "downloadUrl": "https://github.com/Gohanado/ia-helper/archive/refs/tags/v1.9.0.zip",
+  "downloadUrl": "https://github.com/Gohanado/ia-helper/archive/refs/tags/v1.9.1.zip",
   "changelogUrl": "https://github.com/Gohanado/ia-helper/blob/main/CHANGELOG.md",
-  "releaseNotes": "Systeme d'agents personnalises avec parametres configurables (temperature, max tokens, system prompt, etc.)"
+  "releaseNotes": "Corrections critiques: erreurs de syntaxe et optimisation du streaming sans scintillement. Version stable pour Chrome."
 }
 

@@ -7,7 +7,9 @@ let currentLang = 'fr';
 
 // Configuration
 let config = {
-  ollamaUrl: 'http://localhost:11434',
+  provider: 'ollama',
+  apiUrl: 'http://localhost:11434',
+  apiKey: '',
   selectedModel: '',
   interfaceLanguage: 'fr',
   speechEnabled: true,
@@ -25,6 +27,9 @@ let startTime = 0;
 // Variables TTS
 let isSpeaking = false;
 let currentSpeechUtterance = null;
+
+// Port de streaming
+let currentPort = null;
 
 // Elements DOM
 const elements = {
@@ -71,7 +76,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Si on a un resultat pre-genere, l'afficher directement
     if (pendingResult.preGeneratedResult) {
       currentResult = pendingResult.preGeneratedResult;
-      renderMarkdown(currentResult, elements.resultContent, false);
+      const html = convertMarkdownToHtml(currentResult);
+      setTrustedHTML(elements.resultContent, '<div class="markdown-body">' + html + '</div>');
       setStatus('done', t('generating', currentLang).replace('...', ''));
       updateStats();
     } else {
@@ -306,6 +312,9 @@ async function loadConfig() {
       if (result.config) {
         config = { ...config, ...result.config };
       }
+      console.log('IA Helper Results: Config chargee', config);
+      console.log('IA Helper Results: apiUrl =', config.apiUrl);
+      console.log('IA Helper Results: selectedModel =', config.selectedModel);
       resolve();
     });
   });
@@ -437,46 +446,60 @@ async function startGeneration() {
   setStatus('generating', t('generating', currentLang));
   startTime = Date.now();
   currentResult = '';
-  setTrustedHTML(elements.resultContent, '<span class="streaming-cursor"></span>');
-  
+
+  // Creer la structure DOM une seule fois
+  elements.resultContent.innerHTML = '';
+  const markdownBody = document.createElement('div');
+  markdownBody.className = 'markdown-body';
+  const cursor = document.createElement('span');
+  cursor.className = 'streaming-cursor';
+  elements.resultContent.appendChild(markdownBody);
+  elements.resultContent.appendChild(cursor);
+
   try {
-    const response = await fetch(`${config.ollamaUrl}/api/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: config.selectedModel,
-        prompt: pendingResult.content,
-        system: pendingResult.systemPrompt,
-        stream: true
-      })
+    // Utiliser le port de streaming comme dans chat.js
+    currentPort = chrome.runtime.connect({ name: 'streaming' });
+    let updateScheduled = false;
+
+    currentPort.onMessage.addListener((msg) => {
+      if (msg.type === 'chunk') {
+        currentResult += msg.text;
+
+        // Throttle avec requestAnimationFrame pour limiter a 60fps
+        if (!updateScheduled) {
+          updateScheduled = true;
+          requestAnimationFrame(() => {
+            const html = convertMarkdownToHtml(currentResult);
+            setTrustedHTML(markdownBody, html);
+            updateScheduled = false;
+          });
+        }
+      } else if (msg.type === 'done') {
+        currentPort.disconnect();
+        currentPort = null;
+
+        // Finaliser: supprimer le curseur et parser le markdown
+        cursor.remove();
+        const html = convertMarkdownToHtml(currentResult);
+        setTrustedHTML(markdownBody, html);
+        setStatus('done', t('generating', currentLang).replace('...', ''));
+        updateStats();
+      } else if (msg.type === 'error') {
+        currentPort.disconnect();
+        currentPort = null;
+        showError(msg.error);
+      }
     });
 
-    if (!response.ok) throw new Error(`Erreur: ${response.status}`);
-
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      const chunk = decoder.decode(value, { stream: true });
-      const lines = chunk.split('\n').filter(line => line.trim());
-
-      for (const line of lines) {
-        try {
-          const json = JSON.parse(line);
-          if (json.response) {
-            currentResult += json.response;
-            renderMarkdown(currentResult, elements.resultContent, true);
-          }
-        } catch (e) {}
+    // Envoyer la requete
+    currentPort.postMessage({
+      type: 'GENERATE_STREAMING',
+      content: pendingResult.content,
+      systemPrompt: pendingResult.systemPrompt,
+      agentParams: {
+        model: config.selectedModel
       }
-    }
-
-    renderMarkdown(currentResult, elements.resultContent, false);
-    setStatus('done', t('generating', currentLang).replace('...', ''));
-    updateStats();
+    });
 
   } catch (error) {
     showError(error.message);
@@ -500,45 +523,54 @@ async function refine(additionalPrompt) {
   setStatus('generating', t('generating', currentLang));
   startTime = Date.now();
 
+  const previousResult = currentResult;
+  currentResult = '';
+
+  // Creer la structure DOM une seule fois
+  elements.resultContent.innerHTML = '';
+  const markdownBody = document.createElement('div');
+  markdownBody.className = 'markdown-body';
+  const cursor = document.createElement('span');
+  cursor.className = 'streaming-cursor';
+  elements.resultContent.appendChild(markdownBody);
+  elements.resultContent.appendChild(cursor);
+
   try {
-    const response = await fetch(`${config.ollamaUrl}/api/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: config.selectedModel,
-        prompt: `Voici le texte a modifier:\n\n${currentResult}\n\nInstruction: ${additionalPrompt}`,
-        stream: true
-      })
+    // Utiliser le port de streaming comme dans chat.js
+    currentPort = chrome.runtime.connect({ name: 'streaming' });
+
+    currentPort.onMessage.addListener((msg) => {
+      if (msg.type === 'chunk') {
+        currentResult += msg.text;
+        // Parser le markdown en live comme dans chat.js
+        const html = convertMarkdownToHtml(currentResult);
+        setTrustedHTML(markdownBody, html);
+      } else if (msg.type === 'done') {
+        currentPort.disconnect();
+        currentPort = null;
+
+        // Finaliser: supprimer le curseur et afficher le resultat final
+        cursor.remove();
+        const html = convertMarkdownToHtml(currentResult);
+        setTrustedHTML(markdownBody, html);
+        setStatus('done', t('generating', currentLang).replace('...', ''));
+        updateStats();
+      } else if (msg.type === 'error') {
+        currentPort.disconnect();
+        currentPort = null;
+        showError(msg.error);
+      }
     });
 
-    if (!response.ok) throw new Error(`Erreur: ${response.status}`);
-
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-    currentResult = '';
-    setTrustedHTML(elements.resultContent, '<span class="streaming-cursor"></span>');
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      const chunk = decoder.decode(value, { stream: true });
-      const lines = chunk.split('\n').filter(line => line.trim());
-
-      for (const line of lines) {
-        try {
-          const json = JSON.parse(line);
-          if (json.response) {
-            currentResult += json.response;
-            renderMarkdown(currentResult, elements.resultContent, true);
-          }
-        } catch (e) {}
+    // Envoyer la requete
+    currentPort.postMessage({
+      type: 'GENERATE_STREAMING',
+      content: `Voici le texte a modifier:\n\n${previousResult}\n\nInstruction: ${additionalPrompt}`,
+      systemPrompt: '',
+      agentParams: {
+        model: config.selectedModel
       }
-    }
-
-    renderMarkdown(currentResult, elements.resultContent, false);
-    setStatus('done', t('generating', currentLang).replace('...', ''));
-    updateStats();
+    });
 
   } catch (error) {
     showError(error.message);
@@ -711,12 +743,3 @@ function convertMarkdownToHtml(markdown) {
   return processedLines.join('\n');
 }
 
-// Rendre le markdown avec mise a jour en temps reel
-function renderMarkdown(text, targetElement, isStreaming = false) {
-  const html = convertMarkdownToHtml(text);
-  if (isStreaming) {
-    setTrustedHTML(targetElement, '<div class="markdown-body">' + html + '<span class="streaming-cursor"></span></div>');
-  } else {
-    setTrustedHTML(targetElement, '<div class="markdown-body">' + html + '</div>');
-  }
-}
