@@ -3,7 +3,7 @@
  * Gestion du chat libre avec l'IA
  */
 
-import { TRANSLATIONS } from '../i18n/translations.js';
+import { TRANSLATIONS, t } from '../i18n/translations.js';
 import { DEFAULT_AGENT, BUILTIN_AGENTS, BUILTIN_AGENTS_LIST } from '../config/agents.js';
 import { setTrustedHTML } from '../utils/dom-sanitizer.js';
 
