@@ -27,7 +27,9 @@ Copy-Item -Path "assets" -Destination $chromeDir -Recurse
 
 # Creer le ZIP Chrome
 $chromeZip = "dist/ia-helper-chrome-v$version.zip"
-Compress-Archive -Path "$chromeDir/*" -DestinationPath $chromeZip -Force
+Push-Location $chromeDir
+Compress-Archive -Path "*" -DestinationPath "../../$chromeZip" -Force
+Pop-Location
 Write-Host "Package Chrome cree: $chromeZip" -ForegroundColor Green
 
 # === PACKAGE FIREFOX ===
@@ -56,7 +58,9 @@ $firefoxManifest | ConvertTo-Json -Depth 10 | Set-Content "$firefoxDir/manifest.
 
 # Creer le ZIP Firefox
 $firefoxZip = "dist/ia-helper-firefox-v$version.zip"
-Compress-Archive -Path "$firefoxDir/*" -DestinationPath $firefoxZip -Force
+Push-Location $firefoxDir
+Compress-Archive -Path "*" -DestinationPath "../../$firefoxZip" -Force
+Pop-Location
 Write-Host "Package Firefox cree: $firefoxZip" -ForegroundColor Green
 
 # Nettoyer les dossiers temporaires
