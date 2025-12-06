@@ -10,7 +10,7 @@
       "strict_min_version": "142.0",
       "data_collection_permissions": {
         "data_collection": false,
-        "required": []
+        "required": ["none"]
       }
     }
   },
