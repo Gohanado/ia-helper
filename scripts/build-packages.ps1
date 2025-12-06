@@ -54,12 +54,6 @@ $firefoxManifest | Add-Member -NotePropertyName "browser_specific_settings" -Not
     }
 } -Force
 
-# Firefox MV3 necessite scripts au lieu de service_worker
-$firefoxManifest.background = @{
-    scripts = @("src/background/service-worker.js")
-    type = "module"
-}
-
 # Sauvegarder le manifest modifie avec encodage UTF8 sans BOM
 $jsonOutput = $firefoxManifest | ConvertTo-Json -Depth 10
 # Remplacer les caracteres echappes Unicode

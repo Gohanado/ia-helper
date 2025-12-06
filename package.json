@@ -39,9 +39,11 @@
     "icons": "node scripts/create-icons.js",
     "build": "echo 'No build needed - native JS'",
     "zip": "powershell Compress-Archive -Path manifest.json,src,assets -DestinationPath ia-helper.zip -Force",
-    "package": "powershell -ExecutionPolicy Bypass -File scripts/build-packages.ps1"
+    "package": "node scripts/build-packages.js"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "archiver": "^7.0.1"
+  },
   "dependencies": {
     "canvas": "^3.2.0"
   }
