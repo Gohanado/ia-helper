@@ -38,7 +38,8 @@
   "scripts": {
     "icons": "node scripts/create-icons.js",
     "build": "echo 'No build needed - native JS'",
-    "zip": "powershell Compress-Archive -Path manifest.json,src,assets -DestinationPath ia-helper.zip -Force"
+    "zip": "powershell Compress-Archive -Path manifest.json,src,assets -DestinationPath ia-helper.zip -Force",
+    "package": "powershell -ExecutionPolicy Bypass -File scripts/build-packages.ps1"
   },
   "devDependencies": {},
   "dependencies": {
