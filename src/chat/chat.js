@@ -5,6 +5,7 @@
 
 import { TRANSLATIONS } from '../i18n/translations.js';
 import { DEFAULT_AGENT, BUILTIN_AGENTS, BUILTIN_AGENTS_LIST } from '../config/agents.js';
+import { setTrustedHTML } from '../utils/dom-sanitizer.js';
 
 // Alias pour compatibilite
 const translations = TRANSLATIONS;
@@ -200,7 +201,7 @@ async function populateModelDropdown() {
   }
 
   // Vider le dropdown
-  elements.modelDropdown.innerHTML = '';
+  setTrustedHTML(elements.modelDropdown, '');
 
   // Si aucun modele, afficher un message
   if (models.length === 0) {
@@ -239,7 +240,7 @@ function updateAgentBadge() {
 function populateAgentDropdown() {
   if (!elements.agentDropdown) return;
 
-  elements.agentDropdown.innerHTML = '';
+  setTrustedHTML(elements.agentDropdown, '');
 
   // Section agents built-in
   const builtinSection = document.createElement('div');
@@ -285,7 +286,7 @@ function createAgentOption(agent) {
     btn.classList.add('active');
   }
 
-  btn.innerHTML = `
+  setTrustedHTML(btn, `
     <div class="agent-option-icon">${agent.icon || '🤖'}</div>
     <div class="agent-option-info">
       <div class="agent-option-name">${agent.name}</div>
@@ -379,7 +380,7 @@ function renderConversationsList(filter = '') {
     ? conversations.filter(c => c.title.toLowerCase().includes(filter.toLowerCase()))
     : conversations;
 
-  elements.conversationsList.innerHTML = filtered.map(conv => `
+  setTrustedHTML(elements.conversationsList, filtered.map(conv => `
     <div class="conversation-item ${conv.id === currentConversationId ? 'active' : ''} ${selectionMode ? 'selection-mode' : ''}" data-id="${conv.id}">
       ${selectionMode ? `
         <div class="conversation-checkbox">
@@ -476,7 +477,7 @@ function createMessageElement(msg, t) {
     messageTextContent = formatMessageContent(msg.content);
   }
 
-  div.innerHTML = `
+  setTrustedHTML(div, `
     <div class="message-avatar">${avatarText}</div>
     <div class="message-content">
       <div class="message-header">
@@ -707,7 +708,7 @@ async function sendMessage(content) {
   // Afficher l'indicateur de frappe
   const typingEl = document.createElement('div');
   typingEl.className = 'message assistant typing';
-  typingEl.innerHTML = `
+  setTrustedHTML(typingEl, `
     <div class="message-avatar">IA</div>
     <div class="message-content">
       <div class="typing-indicator">
@@ -751,7 +752,7 @@ async function sendMessage(content) {
         if (!thinkingEl) {
           thinkingEl = document.createElement('div');
           thinkingEl.className = 'thinking-section';
-          thinkingEl.innerHTML = `
+          setTrustedHTML(thinkingEl, `
             <div class="thinking-header">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="10"/>
@@ -767,7 +768,7 @@ async function sendMessage(content) {
           messageTextEl.appendChild(responseEl);
         }
         assistantMessage.thinking += chunk;
-        thinkingEl.querySelector('.thinking-content').innerHTML = formatMessageContent(assistantMessage.thinking);
+        setTrustedHTML(thinkingEl.querySelector('.thinking-content'), formatMessageContent(assistantMessage.thinking));
       } else if (thinkingEnd) {
         // Fin du thinking
         if (thinkingEl) {
@@ -777,9 +778,9 @@ async function sendMessage(content) {
         // Reponse normale
         assistantMessage.content += chunk;
         if (responseEl) {
-          responseEl.innerHTML = formatMessageContent(assistantMessage.content);
+          setTrustedHTML(responseEl, formatMessageContent(assistantMessage.content));
         } else {
-          messageTextEl.innerHTML = formatMessageContent(assistantMessage.content);
+          setTrustedHTML(messageTextEl, formatMessageContent(assistantMessage.content));
         }
       }
       scrollToBottom();
@@ -919,7 +920,7 @@ function setupEventListeners() {
         currentConversationId = null;
         saveConversations();
         renderConversationsList();
-        elements.messagesWrapper.innerHTML = '';
+        setTrustedHTML(elements.messagesWrapper, '');
         elements.welcomeScreen.style.display = 'flex';
         showToast(t.allConversationsDeleted || 'Toutes les conversations ont ete supprimees');
       }
@@ -995,7 +996,7 @@ function setupEventListeners() {
         // Si la conversation courante est supprimee
         if (selectedConversations.has(currentConversationId)) {
           currentConversationId = null;
-          elements.messagesWrapper.innerHTML = '';
+          setTrustedHTML(elements.messagesWrapper, '');
           elements.welcomeScreen.style.display = 'flex';
         }
 
@@ -1177,13 +1178,13 @@ function setupEventListeners() {
       const isInline = copyBtn.classList.contains('btn-copy-inline');
 
       if (isInline) {
-        copyBtn.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>';
+        setTrustedHTML(copyBtn, '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>');
       } else {
-        copyBtn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Copie!';
+        setTrustedHTML(copyBtn, '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Copie!');
       }
 
       setTimeout(() => {
-        copyBtn.innerHTML = originalText;
+        setTrustedHTML(copyBtn, originalText);
       }, 2000);
     }
   });
@@ -1209,10 +1210,10 @@ function setupEventListeners() {
 
       // Feedback visuel
       const originalText = copyBtn.innerHTML;
-      copyBtn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Copie!';
+      setTrustedHTML(copyBtn, '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Copie!');
 
       setTimeout(() => {
-        copyBtn.innerHTML = originalText;
+        setTrustedHTML(copyBtn, originalText);
       }, 2000);
     }
   });
@@ -1488,7 +1489,7 @@ function showError(message) {
 
   const errorEl = document.createElement('div');
   errorEl.className = 'message assistant error';
-  errorEl.innerHTML = `
+  setTrustedHTML(errorEl, `
     <div class="message-avatar" style="background: var(--chat-danger);">!</div>
     <div class="message-content">
       <div class="message-text" style="color: var(--chat-danger);">

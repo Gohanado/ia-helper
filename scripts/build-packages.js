@@ -73,6 +73,11 @@ createZip(chromeZip, '.', null)
                 scripts: ["src/background/service-worker.js"]
             };
 
+            // Ajouter data_collection_permissions (requis pour Firefox)
+            if (!manifest.browser_specific_settings.gecko.data_collection_permissions) {
+                manifest.browser_specific_settings.gecko.data_collection_permissions = false;
+            }
+
             return manifest;
         });
     })
