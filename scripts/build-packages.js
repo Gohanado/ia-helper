@@ -63,10 +63,16 @@ createZip(chromeZip, '.', null)
             // Ajouter browser_specific_settings pour Firefox
             manifest.browser_specific_settings = {
                 gecko: {
-                    id: "{ia-helper@badom.ch}",
+                    id: "ia-helper@badom.ch",
                     strict_min_version: "109.0"
                 }
             };
+
+            // Firefox MV3 necessite scripts au lieu de service_worker
+            manifest.background = {
+                scripts: ["src/background/service-worker.js"]
+            };
+
             return manifest;
         });
     })
