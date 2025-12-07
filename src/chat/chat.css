@@ -1346,6 +1346,17 @@ body {
 
 /* === RESPONSIVE === */
 @media (max-width: 768px) {
+  body {
+    height: auto;
+    min-height: 100vh;
+    overflow: auto;
+  }
+
+  .chat-app {
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
   .sidebar {
     position: fixed;
     left: 0;
@@ -1361,5 +1372,43 @@ body {
   .welcome-suggestions {
     flex-direction: column;
   }
-}
 
+  .chat-main {
+    margin-left: 0;
+  }
+
+  .chat-header {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px 14px;
+  }
+
+  .header-controls {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .messages-container {
+    padding: 12px;
+  }
+
+  .messages-wrapper {
+    max-width: 100%;
+  }
+
+  .chat-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .input-container {
+    width: 100%;
+  }
+
+  .control-buttons {
+    justify-content: flex-start;
+    gap: 8px;
+  }
+}

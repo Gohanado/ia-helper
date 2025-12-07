@@ -21,11 +21,12 @@
 }
 
 html, body {
-  width: 360px;
-  height: 600px;
+  width: 100%;
+  max-width: 420px;
+  min-height: 100vh;
   margin: 0;
   padding: 0;
-  overflow: hidden;
+  overflow-y: auto;
 }
 
 body {
@@ -35,8 +36,9 @@ body {
 }
 
 .popup-wrapper {
-  width: 360px;
-  height: 600px;
+  width: 100%;
+  max-width: 420px;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
