@@ -2029,14 +2029,18 @@
       });
     }
 
+    // Variable pour stocker le resultat genere
+    let quickPromptResult = '';
+
     container.querySelector('.ia-quick-detail').addEventListener('click', () => {
       closeQuickModal();
-      openResultsPage('quick_prompt', content, systemPrompt, null);
+      // Utiliser le resultat deja genere au lieu de regenerer
+      openResultsPageWithResult('quick_prompt', content, systemPrompt, quickPromptResult);
     });
 
     // Lancer la generation
     const responseEl = container.querySelector('.ia-quick-response-content');
-    await generateResponse(responseEl, content, systemPrompt);
+    quickPromptResult = await generateResponse(responseEl, content, systemPrompt);
   }
 
   // Ajouter les styles pour le mode reponse
@@ -2121,12 +2125,15 @@
 
       if (response && response.result) {
         element.textContent = response.result;
+        return response.result;
       } else {
         setTrustedHTML(element, `<span class="ia-quick-error">Aucune reponse recue</span>`);
+        return '';
       }
     } catch (error) {
       console.error('IA Helper: Erreur generation', error);
       setTrustedHTML(element, `<span class="ia-quick-error">Erreur: ${error.message}</span>`);
+      return '';
     }
   }
 
