@@ -102,6 +102,17 @@ body {
   border-color: var(--accent-start);
 }
 
+/* Stop Button */
+.btn-stop {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  border-color: #f5576c;
+}
+
+.btn-stop:hover {
+  background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+  box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4);
+}
+
 /* Speak Button */
 .btn-speak.speaking {
   background: linear-gradient(135deg, var(--accent-start) 0%, var(--accent-end) 100%);

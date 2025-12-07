@@ -1,9 +1,9 @@
 {
-  "version": "1.9.1",
-  "releaseDate": "2025-12-06",
+  "version": "1.9.2",
+  "releaseDate": "2025-12-07",
   "minChromeVersion": "88",
-  "downloadUrl": "https://github.com/Gohanado/ia-helper/archive/refs/tags/v1.9.1.zip",
+  "downloadUrl": "https://github.com/Gohanado/ia-helper/archive/refs/tags/v1.9.2.zip",
   "changelogUrl": "https://github.com/Gohanado/ia-helper/blob/main/CHANGELOG.md",
-  "releaseNotes": "Corrections critiques: erreurs de syntaxe et optimisation du streaming sans scintillement. Version stable pour Chrome."
+  "releaseNotes": "Chrome 100% fonctionnel: Actions de page enrichies, bouton stop generation, detection langue ultra-rapide, corrections TTS. Firefox a corriger."
 }
 

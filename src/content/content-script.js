@@ -774,6 +774,9 @@
   let currentSpeechUtterance = null;
   let isSpeaking = false;
 
+  // Variable pour le port de streaming actif
+  let currentStreamingPort = null;
+
   // Fonction pour nettoyer le texte Markdown pour la lecture
   function cleanTextForSpeech(text) {
     return text
@@ -796,45 +799,45 @@
   const LANG_MAP = { fr: 'fr-FR', en: 'en-US', es: 'es-ES', it: 'it-IT', pt: 'pt-BR' };
   const TTS_LANG_NAMES = { fr: 'French', en: 'English', es: 'Spanish', it: 'Italian', pt: 'Portuguese' };
 
-  // Detecter la langue d'un texte via l'IA
-  async function detectLanguage(text) {
-    return new Promise((resolve) => {
-      const sampleText = text.substring(0, 500); // Limiter pour la detection
-      const prompt = `Detect the language of this text and respond with ONLY the language code (fr, en, es, it, or pt). If uncertain, respond with "fr". Text: "${sampleText}"`;
+  // Detecter la langue d'un texte (detection rapide cote client)
+  function detectLanguage(text) {
+    const sample = text.toLowerCase().substring(0, 500);
 
-      const port = chrome.runtime.connect({ name: 'ollama-stream' });
-      let response = '';
+    // Mots courants par langue
+    const patterns = {
+      fr: ['le', 'la', 'les', 'de', 'et', 'est', 'un', 'une', 'dans', 'pour', 'que', 'qui', 'avec', 'sur', 'par', 'ce', 'cette', 'sont', 'des', 'du'],
+      en: ['the', 'is', 'are', 'and', 'or', 'of', 'to', 'in', 'for', 'on', 'with', 'at', 'by', 'from', 'this', 'that', 'was', 'were', 'have', 'has'],
+      es: ['el', 'la', 'los', 'las', 'de', 'y', 'es', 'en', 'un', 'una', 'por', 'para', 'con', 'que', 'del', 'al', 'se', 'lo', 'su', 'como'],
+      it: ['il', 'la', 'le', 'di', 'e', 'un', 'una', 'per', 'con', 'che', 'del', 'della', 'sono', 'nel', 'nella', 'da', 'come', 'questo', 'questa'],
+      pt: ['o', 'a', 'os', 'as', 'de', 'e', 'um', 'uma', 'para', 'com', 'que', 'do', 'da', 'em', 'por', 'se', 'no', 'na', 'como', 'mais']
+    };
 
-      port.onMessage.addListener((msg) => {
-        if (msg.type === 'chunk') {
-          response += msg.content || '';
-        } else if (msg.type === 'done' || msg.type === 'error') {
-          port.disconnect();
-          // Extraire le code de langue de la reponse
-          const langCode = response.toLowerCase().trim().match(/^(fr|en|es|it|pt)/);
-          resolve(langCode ? langCode[1] : 'fr');
+    // Compter les correspondances pour chaque langue
+    const scores = {};
+    for (const [lang, words] of Object.entries(patterns)) {
+      scores[lang] = 0;
+      for (const word of words) {
+        // Chercher le mot entoure d'espaces ou de ponctuation
+        const regex = new RegExp(`\\b${word}\\b`, 'gi');
+        const matches = sample.match(regex);
+        if (matches) {
+          scores[lang] += matches.length;
         }
-      });
+      }
+    }
 
-      port.postMessage({
-        type: 'generate',
-        config: {
-          provider: config.provider,
-          apiUrl: config.apiUrl,
-          apiKey: config.apiKey,
-          selectedModel: config.selectedModel,
-          streamingEnabled: false
-        },
-        prompt: prompt,
-        systemPrompt: 'You are a language detection assistant. Respond only with a language code.'
-      });
+    // Trouver la langue avec le score le plus eleve
+    let maxScore = 0;
+    let detectedLang = 'fr';
+    for (const [lang, score] of Object.entries(scores)) {
+      if (score > maxScore) {
+        maxScore = score;
+        detectedLang = lang;
+      }
+    }
 
-      // Timeout de securite
-      setTimeout(() => {
-        port.disconnect();
-        resolve('fr');
-      }, 10000);
-    });
+    // Si aucune correspondance significative, retourner la langue de l'interface
+    return maxScore > 2 ? detectedLang : (config.interfaceLanguage || 'fr');
   }
 
   // Traduire un texte dans une langue cible via l'IA
@@ -878,7 +881,14 @@
 
   // Obtenir une voix par son nom, ou une voix par defaut pour la langue
   function getVoiceByNameOrLang(voiceName, langCode) {
-    const voices = window.speechSynthesis.getVoices();
+    let voices = window.speechSynthesis.getVoices();
+
+    // Si les voix ne sont pas encore chargees, attendre un peu
+    if (voices.length === 0) {
+      // Forcer le chargement des voix
+      window.speechSynthesis.getVoices();
+      voices = window.speechSynthesis.getVoices();
+    }
 
     // Si un nom de voix est specifie, le chercher
     if (voiceName) {
@@ -918,32 +928,37 @@
       return;
     }
 
+    // S'assurer que les voix sont chargees
+    await new Promise((resolve) => {
+      const voices = window.speechSynthesis.getVoices();
+      if (voices.length > 0) {
+        resolve();
+      } else {
+        window.speechSynthesis.addEventListener('voiceschanged', () => resolve(), { once: true });
+        // Timeout de securite
+        setTimeout(() => resolve(), 1000);
+      }
+    });
+
     // Determiner la langue et le texte a lire
     let textToRead = cleanText;
     let targetLang = config.speechFixedLanguage || 'fr';
 
     if (config.speechLanguageMode === 'auto') {
-      // Mode automatique: detecter la langue du texte
-      speakBtn.textContent = ct('detectingLanguage') || 'Detecting...';
-      speakBtn.classList.add('ia-action-speaking');
-      try {
-        targetLang = await detectLanguage(cleanText);
-      } catch (e) {
-        targetLang = config.interfaceLanguage || 'fr';
-      }
+      // Mode automatique: detecter la langue du texte (rapide, cote client)
+      targetLang = detectLanguage(cleanText);
     } else {
       // Mode fixe: verifier si traduction necessaire
-      speakBtn.textContent = ct('detectingLanguage') || 'Detecting...';
-      speakBtn.classList.add('ia-action-speaking');
-      try {
-        const detectedLang = await detectLanguage(cleanText);
-        if (detectedLang !== targetLang) {
-          // Traduction necessaire
-          speakBtn.textContent = ct('translatingText') || 'Translating...';
+      const detectedLang = detectLanguage(cleanText);
+      if (detectedLang !== targetLang) {
+        // Traduction necessaire
+        speakBtn.textContent = ct('translatingText') || 'Translating...';
+        speakBtn.classList.add('ia-action-speaking');
+        try {
           textToRead = await translateText(cleanText, targetLang);
+        } catch (e) {
+          // En cas d'erreur, lire le texte original
         }
-      } catch (e) {
-        // En cas d'erreur, lire le texte original
       }
     }
 
@@ -1005,6 +1020,7 @@
           </div>
         </div>
         <div class="ia-action-actions">
+          <button class="ia-action-btn ia-action-btn-warning ia-action-stop-generation" style="display: none;">${ct('stopGeneration') || 'Arreter'}</button>
           <div class="ia-action-copy-dropdown">
             <button class="ia-action-btn ia-action-btn-secondary ia-action-copy-toggle">${ct('copy')}</button>
             <div class="ia-action-copy-menu">
@@ -1194,6 +1210,14 @@
         background: rgba(102, 126, 234, 0.2);
         color: #fff;
       }
+      .ia-action-btn-warning {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: #fff;
+      }
+      .ia-action-btn-warning:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4);
+      }
       .ia-action-speaking {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
         color: #fff !important;
@@ -1264,6 +1288,28 @@
       });
     }
 
+    // Bouton stop generation
+    const stopBtn = modal.querySelector('.ia-action-stop-generation');
+    if (stopBtn) {
+      stopBtn.addEventListener('click', () => {
+        if (currentStreamingPort) {
+          try {
+            currentStreamingPort.disconnect();
+          } catch (e) {
+            // Ignorer les erreurs
+          }
+          currentStreamingPort = null;
+          stopBtn.style.display = 'none';
+
+          // Afficher un message
+          const responseEl = modal.querySelector('.ia-action-response-content');
+          if (responseEl && !currentPopupResult) {
+            setTrustedHTML(responseEl, `<span class="ia-action-error">${ct('generationStopped') || 'Generation arretee'}</span>`);
+          }
+        }
+      });
+    }
+
     // Lancer la generation
     const responseEl = modal.querySelector('.ia-action-response-content');
     generateActionResponse(responseEl, content, systemPrompt);
@@ -1315,6 +1361,7 @@
     try {
       // Utiliser un port pour le streaming
       const port = chrome.runtime.connect({ name: 'streaming' });
+      currentStreamingPort = port;
 
       // Vider le contenu initial
       setTrustedHTML(element, '');
@@ -1324,6 +1371,15 @@
       const cursor = document.createElement('span');
       cursor.className = 'ia-action-cursor';
       element.appendChild(cursor);
+
+      // Afficher le bouton stop
+      const modal = document.getElementById('ia-helper-action-modal');
+      if (modal) {
+        const stopBtn = modal.querySelector('.ia-action-stop-generation');
+        if (stopBtn) {
+          stopBtn.style.display = 'inline-flex';
+        }
+      }
 
       port.onMessage.addListener((message) => {
         if (message.type === 'chunk') {
@@ -1341,9 +1397,29 @@
           // Retirer le curseur
           cursor.remove();
           port.disconnect();
+          currentStreamingPort = null;
+
+          // Masquer le bouton stop
+          const modal = document.getElementById('ia-helper-action-modal');
+          if (modal) {
+            const stopBtn = modal.querySelector('.ia-action-stop-generation');
+            if (stopBtn) {
+              stopBtn.style.display = 'none';
+            }
+          }
         } else if (message.type === 'error') {
           setTrustedHTML(element, `<span class="ia-action-error">Erreur: ${message.error}</span>`);
           port.disconnect();
+          currentStreamingPort = null;
+
+          // Masquer le bouton stop
+          const modal = document.getElementById('ia-helper-action-modal');
+          if (modal) {
+            const stopBtn = modal.querySelector('.ia-action-stop-generation');
+            if (stopBtn) {
+              stopBtn.style.display = 'none';
+            }
+          }
         }
       });
 
@@ -1840,11 +1916,22 @@
 
   // Fermer le modal
   function closeQuickModal() {
+    // Arreter la generation en cours
+    if (currentStreamingPort) {
+      try {
+        currentStreamingPort.disconnect();
+      } catch (e) {
+        // Ignorer les erreurs de deconnexion
+      }
+      currentStreamingPort = null;
+    }
+
     // Arreter la lecture vocale si en cours
     if (isSpeaking) {
       window.speechSynthesis.cancel();
       isSpeaking = false;
     }
+
     const modal = document.getElementById('ia-helper-quick-modal');
     if (modal) modal.remove();
   }

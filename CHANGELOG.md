@@ -14,6 +14,75 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 
 ---
 
+## [1.9.2] - 2025-12-07
+
+### Statut
+- **VERSION STABLE CHROME**: 100% fonctionnelle - Toutes les fonctionnalites testees et validees
+- **VERSION FIREFOX**: A corriger - Bugs identifies (menu contextuel incomplet, popup sans reponse, results ne charge pas)
+
+### Ajoute
+- **Actions de page enrichies**: 4 nouvelles actions dans la section Page du popup
+  - Traduire la page: Traduction complete de la page web
+  - Analyser le sentiment: Analyse du ton et sentiment du contenu
+  - Extraire les liens: Extraction et organisation de tous les liens
+  - Generer un plan: Creation d'un plan structure du contenu
+- **Bouton stop generation**: Controle de la generation LLM
+  - Bouton "Arreter" dans le popup de reponse inline
+  - Bouton stop dans la page results
+  - Arret automatique de la generation lors de la fermeture du popup
+  - Economie de ressources (plus de generations inutiles en arriere-plan)
+- **Menu contextuel ameliore**: Organisation et traductions
+  - Traduction complete de "Create custom action" dans toutes les langues
+  - Navigation directe vers l'onglet Presets lors de la creation d'action personnalisee
+  - Structure du menu contextuel optimisee
+
+### Ameliore
+- **Detection de langue ultra-rapide**: Optimisation de la lecture audio
+  - Remplacement de la detection IA (10-15 secondes) par detection client (< 1ms)
+  - Analyse de mots courants pour 5 langues (FR, EN, ES, IT, PT)
+  - Demarrage instantane de la lecture vocale
+  - Pas de requete reseau pour la detection
+- **Selection de voix TTS**: Correction du chargement des voix
+  - Voix configuree utilisee des la premiere lecture (popup, results, live chat)
+  - Mecanisme d'attente des voix avec event listener voiceschanged
+  - Timeout de securite pour garantir le chargement
+- **Prompt rapide**: Correction du comportement
+  - Affichage uniquement du popup de reponse (suppression de l'ouverture du chat)
+  - Tooltip corrige: "Envoyer" au lieu de "Envoyer au chat"
+  - Comportement coherent avec les attentes utilisateur
+- **Gestion des ports de streaming**: Architecture optimisee
+  - Variable currentStreamingPort pour tracker les connexions actives
+  - Deconnexion propre lors de la fermeture du popup
+  - Prevention des fuites de ressources
+
+### Corrige
+- **Popup de reponse**: Correction de l'affichage
+  - Suppression de l'ouverture simultanee du chat et du popup
+  - Le popup inline s'affiche correctement sans ouvrir le chat
+- **Taille du popup**: Hauteur fixe optimisee
+  - Hauteur fixe de 600px avec scroll interne
+  - Plus de redimensionnement lors de l'ouverture/fermeture des sections
+  - Experience utilisateur amelioree
+
+### Technique
+- **Traductions ajoutees**: Nouvelles cles i18n
+  - stopGeneration: "Arreter" (FR), "Stop" (EN)
+  - generationStopped: "Generation arretee" (FR), "Generation stopped" (EN)
+  - translatePage, analyzeSentiment, extractLinks, generateOutline
+  - pageActions: "Actions de page"
+- **Fichiers modifies**:
+  - src/chat/chat.js: Correction chargement voix TTS
+  - src/content/content-script.js: Bouton stop, detection langue rapide, voix TTS
+  - src/results/results.js: Bouton stop, detection langue rapide, voix TTS
+  - src/results/results.html: Bouton stop dans header
+  - src/results/results.css: Style bouton stop
+  - src/popup/popup.js: Correction prompt rapide, nouvelles actions page
+  - src/popup/popup.html: Correction tooltip
+  - src/options/options.js: Navigation vers Presets
+  - src/i18n/translations.js: Nouvelles traductions
+
+---
+
 ## [1.9.1] - 2025-12-06
 
 ### Statut

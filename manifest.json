@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "IA Helper",
-  "version": "1.9.1",
+  "version": "1.9.2",
   "description": "Assistant IA intelligent pour Chrome - Multi-providers (Ollama, OpenAI, Anthropic, Groq...) - 100% configurable",
   "author": "Gohanado",
   "icons": {

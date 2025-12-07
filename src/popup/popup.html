@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
+  <div class="popup-wrapper">
   <div class="popup-container">
     <!-- Header -->
     <header class="popup-header">
@@ -46,11 +47,14 @@
           placeholder="Posez une question ou donnez une instruction..."
           rows="2"
         ></textarea>
-        <button class="send-btn" id="send-prompt-btn" data-i18n-title="sendToChat" title="Envoyer au chat">
+        <button class="send-btn" id="send-prompt-btn" data-i18n-title="send" title="Envoyer">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
           </svg>
         </button>
+      </div>
+      <div class="prompt-hint">
+        <span data-i18n="selectTextHint">Selectionnez du texte sur la page pour utiliser les actions rapides</span>
       </div>
     </section>
 
@@ -110,6 +114,22 @@
                 <span class="action-icon">+</span>
                 <span class="action-label" data-i18n="expand">Developper</span>
               </button>
+              <button class="action-btn" data-action="shorten_content">
+                <span class="action-icon">-</span>
+                <span class="action-label" data-i18n="shorten">Raccourcir</span>
+              </button>
+              <button class="action-btn" data-action="translate_en">
+                <span class="action-icon">EN</span>
+                <span class="action-label" data-i18n="translateEn">Anglais</span>
+              </button>
+              <button class="action-btn" data-action="translate_fr">
+                <span class="action-icon">FR</span>
+                <span class="action-label" data-i18n="translateFr">Francais</span>
+              </button>
+              <button class="action-btn" data-action="translate_de">
+                <span class="action-icon">DE</span>
+                <span class="action-label" data-i18n="translateDe">Allemand</span>
+              </button>
             </div>
           </div>
         </div>
@@ -133,6 +153,14 @@
                 <span class="action-icon">?</span>
                 <span class="action-label" data-i18n="explain">Expliquer</span>
               </button>
+              <button class="action-btn" data-action="extract_keywords">
+                <span class="action-icon">Kw</span>
+                <span class="action-label" data-i18n="keywords">Mots-cles</span>
+              </button>
+              <button class="action-btn" data-action="analyze_tone">
+                <span class="action-icon">Tn</span>
+                <span class="action-label" data-i18n="tone">Ton</span>
+              </button>
             </div>
           </div>
         </div>
@@ -143,7 +171,7 @@
       <div class="tab-panel" data-panel="translate">
 
         <!-- Collapsible: Common Languages -->
-        <div class="collapsible-section open">
+        <div class="collapsible-section">
           <button class="collapsible-header" data-section="common-langs">
             <span class="section-icon">🌍</span>
             <span class="section-title" data-i18n="commonLanguages">Langues courantes</span>
@@ -190,7 +218,7 @@
       <div class="tab-panel" data-panel="page">
 
         <!-- Collapsible: Page Analysis -->
-        <div class="collapsible-section open">
+        <div class="collapsible-section">
           <button class="collapsible-header" data-section="page-analysis">
             <span class="section-icon">📄</span>
             <span class="section-title" data-i18n="pageAnalysis">Analyse de page</span>
@@ -214,6 +242,37 @@
                 </svg>
                 <span data-i18n="extractKeyPoints">Points cles</span>
               </button>
+              <button class="page-action-btn" data-action="translate_page">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M5 8h14M5 8a2 2 0 1 1 0-4h14a2 2 0 1 1 0 4M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8m-9 4h2m-1 0v6"/>
+                </svg>
+                <span data-i18n="translatePage">Traduire la page</span>
+              </button>
+              <button class="page-action-btn" data-action="analyze_sentiment">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/>
+                </svg>
+                <span data-i18n="analyzeSentiment">Analyser le sentiment</span>
+              </button>
+              <button class="page-action-btn" data-action="extract_links">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                </svg>
+                <span data-i18n="extractLinks">Extraire les liens</span>
+              </button>
+              <button class="page-action-btn" data-action="generate_outline">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="8" y1="6" x2="21" y2="6"/>
+                  <line x1="8" y1="12" x2="21" y2="12"/>
+                  <line x1="8" y1="18" x2="21" y2="18"/>
+                  <line x1="3" y1="6" x2="3.01" y2="6"/>
+                  <line x1="3" y1="12" x2="3.01" y2="12"/>
+                  <line x1="3" y1="18" x2="3.01" y2="18"/>
+                </svg>
+                <span data-i18n="generateOutline">Generer un plan</span>
+              </button>
             </div>
           </div>
         </div>
@@ -228,33 +287,34 @@
       <span class="provider-badge" id="provider-badge">Ollama</span>
       <span class="model-name" id="model-name">-</span>
     </div>
+  </div>
 
-    <!-- Footer -->
-    <footer class="popup-footer">
-      <button class="footer-btn" id="btn-options" data-i18n-title="options" title="Options">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="3"/>
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-        </svg>
-      </button>
-      <button class="footer-btn" id="btn-shortcuts" data-i18n-title="shortcuts" title="Raccourcis">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="2" y="4" width="20" height="16" rx="2"/>
-          <path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M8 12h8M6 16h.01M18 16h.01M10 16h4"/>
-        </svg>
-      </button>
-      <a class="footer-btn" href="https://github.com/Gohanado/ia-helper" target="_blank" data-i18n-title="documentation" title="Documentation">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
-          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-        </svg>
-      </a>
-      <a class="footer-btn support" href="https://paypal.me/gohanado" target="_blank" data-i18n-title="support" title="Soutenir">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-        </svg>
-      </a>
-    </footer>
+  <!-- Footer -->
+  <footer class="popup-footer">
+    <button class="footer-btn" id="btn-options" data-i18n-title="options" title="Options">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </button>
+    <button class="footer-btn" id="btn-shortcuts" data-i18n-title="shortcuts" title="Raccourcis">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="2" y="4" width="20" height="16" rx="2"/>
+        <path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M8 12h8M6 16h.01M18 16h.01M10 16h4"/>
+      </svg>
+    </button>
+    <a class="footer-btn" href="https://github.com/Gohanado/ia-helper" target="_blank" data-i18n-title="documentation" title="Documentation">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+      </svg>
+    </a>
+    <a class="footer-btn support" href="https://paypal.me/gohanado" target="_blank" data-i18n-title="support" title="Soutenir">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+      </svg>
+    </a>
+  </footer>
   </div>
 
   <script src="popup.js" type="module"></script>

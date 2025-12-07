@@ -1368,13 +1368,28 @@ async function speakText(text) {
   // Nettoyer le Markdown
   const cleanText = stripMarkdown(text);
 
+  // S'assurer que les voix sont chargees
+  await new Promise((resolve) => {
+    const voices = window.speechSynthesis.getVoices();
+    if (voices.length > 0) {
+      resolve();
+    } else {
+      window.speechSynthesis.addEventListener('voiceschanged', () => resolve(), { once: true });
+      setTimeout(() => resolve(), 1000);
+    }
+  });
+
   const utterance = new SpeechSynthesisUtterance(cleanText);
   utterance.rate = cfg.speechRate || 1;
   utterance.pitch = cfg.speechPitch || 1;
 
   // Trouver la voix
   if (cfg.speechVoiceName) {
-    const voices = speechSynthesis.getVoices();
+    let voices = speechSynthesis.getVoices();
+    if (voices.length === 0) {
+      speechSynthesis.getVoices();
+      voices = speechSynthesis.getVoices();
+    }
     const voice = voices.find(v => v.name === cfg.speechVoiceName);
     if (voice) utterance.voice = voice;
   }

@@ -293,11 +293,25 @@ async function createContextMenus() {
       contexts: ctx
     });
 
-    // === OPTIONS (toujours visible) ===
+    // === ACTIONS DE PAGE (toujours visible) ===
     chrome.contextMenus.create({
-      id: 'open-options',
-      title: mt('openOptions'),
+      id: 'page-actions-section',
+      title: mt('pageActions') || 'Actions de page',
       parentId: 'ia-helper-main',
+      contexts: ctx
+    });
+
+    chrome.contextMenus.create({
+      id: 'quick_summarize_page',
+      title: mt('summarizePage'),
+      parentId: 'page-actions-section',
+      contexts: ctx
+    });
+
+    chrome.contextMenus.create({
+      id: 'quick_extract_main',
+      title: mt('extractKeyPoints'),
+      parentId: 'page-actions-section',
       contexts: ctx
     });
 
@@ -331,21 +345,6 @@ async function createContextMenus() {
         contexts: ctx
       });
     }
-
-    // === ACTIONS DE PAGE (toujours visible) ===
-    chrome.contextMenus.create({
-      id: 'quick_summarize_page',
-      title: mt('summarizePage'),
-      parentId: 'ia-helper-main',
-      contexts: ctx
-    });
-
-    chrome.contextMenus.create({
-      id: 'quick_extract_main',
-      title: mt('extractKeyPoints'),
-      parentId: 'ia-helper-main',
-      contexts: ctx
-    });
 
     // Separateur
     chrome.contextMenus.create({
@@ -427,6 +426,30 @@ async function createContextMenus() {
       }
     }
 
+    // Separateur avant les options
+    chrome.contextMenus.create({
+      id: 'separator-bottom',
+      type: 'separator',
+      parentId: 'ia-helper-main',
+      contexts: ctx
+    });
+
+    // === RACCOURCI CREATION ACTION ===
+    chrome.contextMenus.create({
+      id: 'create-custom-action',
+      title: mt('createCustomAction') || 'Creer une action personnalisee',
+      parentId: 'ia-helper-main',
+      contexts: ctx
+    });
+
+    // === OPTIONS (toujours visible) ===
+    chrome.contextMenus.create({
+      id: 'open-options',
+      title: mt('openOptions'),
+      parentId: 'ia-helper-main',
+      contexts: ctx
+    });
+
     console.log('IA Helper: Menus crees avec succes');
   } catch (error) {
     console.error('IA Helper: Erreur creation menus', error);
@@ -451,6 +474,19 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   // Ouvrir les options
   if (menuId === 'open-options') {
     chrome.runtime.openOptionsPage();
+    return;
+  }
+
+  // Creer une action personnalisee
+  if (menuId === 'create-custom-action') {
+    chrome.runtime.openOptionsPage();
+    // Envoyer un message pour ouvrir directement la section actions
+    setTimeout(() => {
+      chrome.runtime.sendMessage({
+        type: 'OPEN_CUSTOM_ACTION_CREATOR',
+        selectedText: info.selectionText || ''
+      });
+    }, 500);
     return;
   }
 

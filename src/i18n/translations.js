@@ -103,6 +103,22 @@ export const TRANSLATIONS = {
     moreLanguages: 'Plus de langues',
     pageAnalysis: 'Analyse de page',
     sendToChat: 'Envoyer au chat',
+    askAnything: 'Posez une question ou donnez une instruction...',
+    selectTextHint: 'Selectionnez du texte sur la page pour utiliser les actions rapides',
+
+    // New actions
+    shorten: 'Raccourcir',
+    translateEn: 'Anglais',
+    translateFr: 'Francais',
+    translateDe: 'Allemand',
+    keywords: 'Mots-cles',
+    tone: 'Ton',
+    translatePage: 'Traduire la page',
+    analyzeSentiment: 'Analyser le sentiment',
+    extractLinks: 'Extraire les liens',
+    generateOutline: 'Generer un plan',
+    pageActions: 'Actions de page',
+    createCustomAction: 'Creer une action personnalisee',
 
     // Prompts
     prompts: 'Prompts',
@@ -124,6 +140,8 @@ export const TRANSLATIONS = {
     casual: 'Plus decontracte',
     addInstructions: 'Ajouter des instructions',
     send: 'Envoyer',
+    stopGeneration: 'Arreter',
+    generationStopped: 'Generation arretee',
 
     // Copy options
     copyMarkdown: 'Copier en Markdown',
@@ -645,6 +663,8 @@ export const TRANSLATIONS = {
     actionNamePlaceholder: 'Ex: Rephrase as poetry',
     presetNameExample: 'Ex: My workflow',
     shortDescription: 'Short description',
+    createCustomAction: 'Create custom action',
+    pageActions: 'Page actions',
 
     // Notifications
     allActionsEnabled: 'All actions enabled',
@@ -686,6 +706,7 @@ export const TRANSLATIONS = {
     listen: 'Listen',
     stopGeneration: 'Stop',
     stopSpeech: 'Stop reading',
+    generationStopped: 'Generation stopped',
 
     // Agents
     agents: 'Custom AI Agents',

@@ -2392,3 +2392,86 @@ function duplicateAgent(agentId) {
     openAgentModal(duplicatedAgent);
   }
 }
+
+// Ecouter les messages du service worker
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === 'OPEN_CUSTOM_ACTION_CREATOR') {
+    // Naviguer vers l'onglet Presets
+    const presetsTab = document.querySelector('[data-tab="presets"]');
+    if (presetsTab) {
+      presetsTab.click();
+    }
+
+    // Ouvrir le modal de creation avec le texte selectionne si disponible
+    setTimeout(() => {
+      openCustomActionModal(message.selectedText || '');
+    }, 300);
+  }
+});
+
+// Ouvrir le modal de creation d'action personnalisee avec texte pre-rempli
+function openCustomActionModal(selectedText = '') {
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+
+  const promptPlaceholder = selectedText
+    ? `Exemple avec le texte selectionne:\n"${selectedText.substring(0, 100)}${selectedText.length > 100 ? '...' : ''}"`
+    : 'Entrez les instructions pour l\'IA...';
+
+  setTrustedHTML(modal, `
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>${t('addCustomActionBtn', currentLang)}</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>${t('actionName', currentLang)}</label>
+          <input type="text" id="custom-action-name" placeholder="Ex: Traduire en langage simple">
+        </div>
+        <div class="form-group">
+          <label>${t('actionPrompt', currentLang)}</label>
+          <textarea id="custom-action-prompt" rows="6" placeholder="${promptPlaceholder}"></textarea>
+        </div>
+        ${selectedText ? `<div class="form-hint">Texte selectionne: "${selectedText.substring(0, 50)}${selectedText.length > 50 ? '...' : ''}"</div>` : ''}
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary modal-cancel">${t('cancel', currentLang)}</button>
+        <button class="btn-primary modal-save">${t('save', currentLang)}</button>
+      </div>
+    </div>
+  `);
+
+  document.body.appendChild(modal);
+
+  const nameInput = modal.querySelector('#custom-action-name');
+  const promptInput = modal.querySelector('#custom-action-prompt');
+
+  modal.querySelector('.modal-close').addEventListener('click', () => modal.remove());
+  modal.querySelector('.modal-cancel').addEventListener('click', () => modal.remove());
+  modal.querySelector('.modal-save').addEventListener('click', () => {
+    const name = nameInput.value.trim();
+    const prompt = promptInput.value.trim();
+
+    if (!name || !prompt) {
+      showNotification(t('fillAllFields', currentLang), 'error');
+      return;
+    }
+
+    const newAction = {
+      id: 'custom_' + Date.now(),
+      name,
+      prompt,
+      description: prompt.substring(0, 50) + '...',
+      category: 'custom'
+    };
+
+    customActions.push(newAction);
+    enabledActions.push(newAction.id);
+    saveCustomActions();
+    saveEnabledActions();
+    renderActionsGrid();
+    modal.remove();
+    showNotification(t('actionCustomCreated', currentLang), 'success');
+  });
+}

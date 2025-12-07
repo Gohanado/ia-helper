@@ -108,26 +108,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     chrome.tabs.create({ url: chrome.runtime.getURL('src/chat/chat.html') });
   });
 
-  // Quick prompt - Send to chat
-  sendBtn?.addEventListener('click', () => {
-    const prompt = promptInput?.value.trim();
-    if (prompt) {
-      // Store prompt in session storage to be picked up by chat page
-      chrome.storage.session.set({ pendingPrompt: prompt }, () => {
-        chrome.tabs.create({ url: chrome.runtime.getURL('src/chat/chat.html') });
-        window.close();
-      });
-    }
-  });
-
-  // Send on Enter (without Shift)
-  promptInput?.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendBtn?.click();
-    }
-  });
-
   // Footer buttons
   document.getElementById('btn-options')?.addEventListener('click', () => {
     chrome.runtime.openOptionsPage();
@@ -213,15 +193,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     if (!tab) return;
 
+    // Envoyer le message et attendre la reponse avant de fermer
     chrome.tabs.sendMessage(tab.id, {
       type: 'EXECUTE_ACTION',
       actionType: 'custom_prompt',
       customPrompt: prompt,
       selectedText: '',
       isEditable: false
+    }, (response) => {
+      // Fermer le popup seulement apres que le message soit traite
+      setTimeout(() => window.close(), 100);
     });
-
-    window.close();
   }
 
   async function executeAction(actionId, targetLanguage = null, actionType = 'selection') {
@@ -263,25 +245,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  // === COLLAPSIBLE SECTIONS ===
+  // === COLLAPSIBLE SECTIONS (ACCORDION BEHAVIOR) ===
   const collapsibleHeaders = document.querySelectorAll('.collapsible-header');
 
   collapsibleHeaders.forEach(header => {
     header.addEventListener('click', () => {
       const section = header.parentElement;
+      const currentTab = section.closest('.tab-panel');
       const isOpen = section.classList.contains('open');
 
-      // Toggle open state
-      if (isOpen) {
-        section.classList.remove('open');
-      } else {
+      // Close all sections in the current tab (accordion behavior)
+      currentTab.querySelectorAll('.collapsible-section').forEach(s => {
+        s.classList.remove('open');
+      });
+
+      // Toggle open state - if it was closed, open it
+      if (!isOpen) {
         section.classList.add('open');
       }
     });
-  });
-
-  // Open first section of each tab by default
-  document.querySelectorAll('.collapsible-section.open').forEach(section => {
-    // Already marked as open in HTML
   });
 });
