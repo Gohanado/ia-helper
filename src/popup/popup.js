@@ -2,11 +2,11 @@
 import { TRANSLATIONS } from '../i18n/translations.js';
 
 // Langue courante
-let currentLang = 'fr';
+let currentLang = 'en';
 
 // Fonction de traduction
 function t(key) {
-  return TRANSLATIONS[currentLang]?.[key] || TRANSLATIONS.fr[key] || key;
+  return TRANSLATIONS[currentLang]?.[key] || TRANSLATIONS.en[key] || key;
 }
 
 // Appliquer les traductions
@@ -28,7 +28,7 @@ function applyTranslations() {
 document.addEventListener('DOMContentLoaded', async () => {
   // Charger la configuration
   const config = await loadConfig();
-  currentLang = config.interfaceLanguage || 'fr';
+  currentLang = config.interfaceLanguage || 'en';
 
   // Appliquer les traductions
   applyTranslations();

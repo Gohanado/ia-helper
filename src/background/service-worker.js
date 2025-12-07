@@ -71,11 +71,11 @@ const MENU_TRANSLATIONS = {
 };
 
 // Langue courante pour les menus
-let interfaceLanguage = 'fr';
+let interfaceLanguage = 'en';
 
 // Fonction pour obtenir une traduction de menu
 function mt(key) {
-  return MENU_TRANSLATIONS[interfaceLanguage]?.[key] || MENU_TRANSLATIONS.fr[key] || key;
+  return MENU_TRANSLATIONS[interfaceLanguage]?.[key] || MENU_TRANSLATIONS.en[key] || key;
 }
 
 // Configuration par defaut
@@ -84,7 +84,8 @@ const DEFAULT_CONFIG = {
   apiUrl: 'http://localhost:11434',
   apiKey: '',
   selectedModel: '',
-  streamingEnabled: true
+  streamingEnabled: true,
+  interfaceLanguage: 'en'
 };
 
 // Providers supportes
@@ -273,7 +274,7 @@ async function loadConfig() {
     chrome.storage.local.get(['config'], (result) => {
       config = result.config || DEFAULT_CONFIG;
       // Charger la langue pour les menus
-      interfaceLanguage = config.interfaceLanguage || 'fr';
+      interfaceLanguage = config.interfaceLanguage || 'en';
       resolve(config);
     });
   });

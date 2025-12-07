@@ -39,13 +39,13 @@
     inlinePopupEnabled: true,
     directInputEnabled: false,
     directInputMode: 'replace',
-    interfaceLanguage: 'fr',
+    interfaceLanguage: 'en',
     speechEnabled: true,
     speechRate: 1.0,
     speechPitch: 1.0,
     speechVoiceName: '',
     speechLanguageMode: 'auto',
-    speechFixedLanguage: 'fr'
+    speechFixedLanguage: 'en'
   };
 
   let config = { ...DEFAULT_CONFIG };
@@ -135,8 +135,8 @@
   };
 
   function ct(key) {
-    const lang = config.interfaceLanguage || 'fr';
-    return CONTENT_TRANSLATIONS[lang]?.[key] || CONTENT_TRANSLATIONS['fr'][key] || key;
+    const lang = config.interfaceLanguage || 'en';
+    return CONTENT_TRANSLATIONS[lang]?.[key] || CONTENT_TRANSLATIONS['en'][key] || key;
   }
 
   // Element actif actuel
@@ -837,7 +837,7 @@
     }
 
     // Si aucune correspondance significative, retourner la langue de l'interface
-    return maxScore > 2 ? detectedLang : (config.interfaceLanguage || 'fr');
+    return maxScore > 2 ? detectedLang : (config.interfaceLanguage || 'en');
   }
 
   // Traduire un texte dans une langue cible via l'IA
@@ -942,7 +942,7 @@
 
     // Determiner la langue et le texte a lire
     let textToRead = cleanText;
-    let targetLang = config.speechFixedLanguage || 'fr';
+      let targetLang = config.speechFixedLanguage || 'en';
 
     if (config.speechLanguageMode === 'auto') {
       // Mode automatique: detecter la langue du texte (rapide, cote client)

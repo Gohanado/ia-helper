@@ -3,7 +3,7 @@ import { t, getCurrentLanguage } from '../i18n/translations.js';
 import { setTrustedHTML } from '../utils/dom-sanitizer.js';
 
 // Langue courante
-let currentLang = 'fr';
+let currentLang = 'en';
 
 // Configuration
 let config = {
@@ -11,13 +11,13 @@ let config = {
   apiUrl: 'http://localhost:11434',
   apiKey: '',
   selectedModel: '',
-  interfaceLanguage: 'fr',
+  interfaceLanguage: 'en',
   speechEnabled: true,
   speechRate: 1.0,
   speechPitch: 1.0,
   speechVoiceName: '',
   speechLanguageMode: 'auto',
-  speechFixedLanguage: 'fr'
+  speechFixedLanguage: 'en'
 };
 
 let pendingResult = null;
@@ -67,7 +67,7 @@ const ACTION_NAMES = {
 // Initialisation
 document.addEventListener('DOMContentLoaded', async () => {
   await loadConfig();
-  currentLang = config.interfaceLanguage || 'fr';
+  currentLang = config.interfaceLanguage || 'en';
   applyTranslations();
   await loadPendingResult();
   setupEventListeners();
@@ -153,7 +153,7 @@ function detectLanguage(text) {
 
   // Trouver la langue avec le score le plus eleve
   let maxScore = 0;
-  let detectedLang = 'fr';
+  let detectedLang = 'en';
   for (const [lang, score] of Object.entries(scores)) {
     if (score > maxScore) {
       maxScore = score;
@@ -162,7 +162,7 @@ function detectLanguage(text) {
   }
 
   // Si aucune correspondance significative, retourner la langue de l'interface
-  return maxScore > 2 ? detectedLang : (config.interfaceLanguage || 'fr');
+  return maxScore > 2 ? detectedLang : (config.interfaceLanguage || 'en');
 }
 
 // Traduire un texte dans une langue cible via l'IA
@@ -266,7 +266,7 @@ async function toggleSpeech() {
 
   // Determiner la langue et le texte a lire
   let textToRead = cleanText;
-  let targetLang = config.speechFixedLanguage || 'fr';
+  let targetLang = config.speechFixedLanguage || 'en';
 
   if (config.speechLanguageMode === 'auto') {
     // Mode automatique: detecter la langue du texte (rapide, cote client)

@@ -11,6 +11,7 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 - Systeme de logging et debug avance
 - Mode sombre/clair automatique
 - System instructions personnalisees
+- Langue par defaut en anglais pour l'interface et les reponses (installation initiale)
 
 ---
 
