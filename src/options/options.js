@@ -889,7 +889,9 @@ function renderActionsGrid() {
 
     setTrustedHTML(container, '');
 
-    const actionsInCategory = Object.values(BASE_ACTIONS).filter(a => a.category === category);
+    const actionsInCategory = Object.values(BASE_ACTIONS)
+      .filter(a => a.category === category)
+      .map(localizeBaseAction);
 
     for (const action of actionsInCategory) {
       const isEnabled = enabledActions.includes(action.id);
@@ -1328,8 +1330,8 @@ function renderShortcutsList() {
 
 // Obtenir le nom d'une action
 function getActionName(actionId) {
-  if (actionId === 'quickPrompt') return 'Prompt rapide';
-  if (BASE_ACTIONS[actionId]) return BASE_ACTIONS[actionId].name;
+  if (actionId === 'quickPrompt') return t('quickPrompt', currentLang) || 'Prompt rapide';
+  if (BASE_ACTIONS[actionId]) return localizeBaseAction(BASE_ACTIONS[actionId]).name;
   const customAction = customActions.find(a => a.id === actionId);
   if (customAction) return customAction.name;
   if (actionId.startsWith('translate_')) {
@@ -1428,11 +1430,14 @@ function startRecordingShortcut(button, actionId) {
 // Afficher le modal pour ajouter un raccourci
 function showAddShortcutModal() {
   // Collecter toutes les actions disponibles
-  const quickPromptName = currentLang === 'fr' ? 'Prompt rapide' : currentLang === 'en' ? 'Quick prompt' : currentLang === 'es' ? 'Prompt rapido' : currentLang === 'it' ? 'Prompt rapido' : 'Prompt rapido';
-  const translatePrefix = currentLang === 'fr' ? 'Traduire en' : currentLang === 'en' ? 'Translate to' : currentLang === 'es' ? 'Traducir a' : currentLang === 'it' ? 'Traduci in' : 'Traduzir para';
+  const quickPromptName = t('quickPrompt', currentLang) || 'Prompt rapide';
+  const translatePrefix = t('translateTo', currentLang) || 'Traduire en';
   const allActions = [
     { id: 'quickPrompt', name: quickPromptName },
-    ...Object.values(BASE_ACTIONS).map(a => ({ id: a.id, name: a.name })),
+    ...Object.values(BASE_ACTIONS).map(a => {
+      const localized = localizeBaseAction(a);
+      return { id: a.id, name: localized.name };
+    }),
     ...TRANSLATE_LANGUAGES.map(l => ({ id: `translate_${l.code}`, name: `${translatePrefix} ${l.name}` })),
     ...customActions.map(a => ({ id: a.id, name: a.name }))
   ].filter(a => !shortcuts[a.id]); // Exclure ceux qui ont deja un raccourci
@@ -2120,7 +2125,7 @@ function renderBuiltinAgents() {
   setTrustedHTML(grid, '');
 
   BUILTIN_AGENTS_LIST.forEach(agent => {
-    const card = createAgentCard(agent, false);
+    const card = createAgentCard(localizeBuiltinAgent(agent), false);
     grid.appendChild(card);
   });
 }
@@ -2166,15 +2171,15 @@ function createAgentCard(agent, isCustom) {
     </div>
     <div class="agent-params">
       <div class="agent-param">
-        <span class="agent-param-label">Temp:</span>
+        <span class="agent-param-label">${t('tempLabel', currentLang) || 'Temp:'}</span>
         <span class="agent-param-value">${agent.temperature}</span>
       </div>
       <div class="agent-param">
-        <span class="agent-param-label">Tokens:</span>
+        <span class="agent-param-label">${t('tokensLabel', currentLang) || 'Tokens:'}</span>
         <span class="agent-param-value">${agent.maxTokens}</span>
       </div>
       <div class="agent-param">
-        <span class="agent-param-label">Top P:</span>
+        <span class="agent-param-label">${t('topPLabel', currentLang) || 'Top P:'}</span>
         <span class="agent-param-value">${agent.topP}</span>
       </div>
     </div>
@@ -2189,6 +2194,45 @@ function createAgentCard(agent, isCustom) {
   `);
 
   return card;
+}
+
+// Appliquer les traductions sur les agents built-in
+function localizeBuiltinAgent(agent) {
+  const map = {
+    default: 'agentDefault',
+    developer: 'agentDeveloper',
+    writer: 'agentWriter',
+    translator: 'agentTranslator',
+    analyst: 'agentAnalyst',
+    teacher: 'agentTeacher',
+    creative: 'agentCreative'
+  };
+  const baseKey = map[agent.id];
+  if (!baseKey) return agent;
+
+  const nameKey = `${baseKey}Name`;
+  const descKey = `${baseKey}Description`;
+  const localizedName = t(nameKey, currentLang);
+  const localizedDesc = t(descKey, currentLang);
+
+  return {
+    ...agent,
+    name: localizedName || agent.name,
+    description: localizedDesc || agent.description
+  };
+}
+
+// Localiser une action de base
+function localizeBaseAction(action) {
+  const nameKey = `action_${action.id}_name`;
+  const descKey = `action_${action.id}_desc`;
+  const localizedName = t(nameKey, currentLang);
+  const localizedDesc = t(descKey, currentLang);
+  return {
+    ...action,
+    name: localizedName || action.name,
+    description: localizedDesc || action.description
+  };
 }
 
 // Configurer les event listeners pour les agents

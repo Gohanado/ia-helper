@@ -1382,7 +1382,10 @@
       }
 
       port.onMessage.addListener((message) => {
-        if (message.type === 'chunk') {
+        if (message.type === 'ping') {
+          // Ignorer les messages de keep-alive
+          return;
+        } else if (message.type === 'chunk') {
           // Ajouter le texte avant le curseur
           currentPopupResult += message.text;
           element.textContent = currentPopupResult;

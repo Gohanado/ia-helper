@@ -9,6 +9,15 @@ import { setTrustedHTML } from '../utils/dom-sanitizer.js';
 
 // Alias pour compatibilite
 const translations = TRANSLATIONS;
+const agentKeyMap = {
+  default: 'agentDefault',
+  developer: 'agentDeveloper',
+  writer: 'agentWriter',
+  translator: 'agentTranslator',
+  analyst: 'agentAnalyst',
+  teacher: 'agentTeacher',
+  creative: 'agentCreative'
+};
 
 // Langue courante (chargee au demarrage)
 let currentLang = 'fr';
@@ -45,6 +54,19 @@ function applyTranslations() {
   document.querySelectorAll('[data-i18n-title]').forEach(el => {
     const key = el.getAttribute('data-i18n-title');
     if (t[key]) el.title = t[key];
+  });
+
+  // Suggestions: synchroniser les prompts avec la langue courante
+  const suggestionPrompts = {
+    suggestionAI: t['suggestionAI_prompt'] || t['suggestionAI'],
+    suggestionEmail: t['suggestionEmail_prompt'] || t['suggestionEmail'],
+    suggestionIdeas: t['suggestionIdeas_prompt'] || t['suggestionIdeas']
+  };
+  document.querySelectorAll('.suggestion-chip').forEach(chip => {
+    const key = chip.querySelector('[data-i18n]')?.getAttribute('data-i18n');
+    if (key && suggestionPrompts[key]) {
+      chip.dataset.prompt = suggestionPrompts[key];
+    }
   });
 }
 
@@ -229,7 +251,7 @@ async function populateModelDropdown() {
 function updateAgentBadge() {
   if (!elements.agentBadge) return;
 
-  const agent = allAgents.find(a => a.id === selectedAgent) || DEFAULT_AGENT;
+  const agent = localizeAgent(allAgents.find(a => a.id === selectedAgent) || DEFAULT_AGENT);
   const iconEl = elements.agentBadge.querySelector('.agent-badge-icon');
   const nameEl = elements.agentBadge.querySelector('.agent-badge-name');
 
@@ -252,7 +274,7 @@ function populateAgentDropdown() {
   builtinSection.appendChild(builtinTitle);
 
   BUILTIN_AGENTS_LIST.forEach(agent => {
-    const option = createAgentOption(agent);
+    const option = createAgentOption(localizeAgent(agent));
     builtinSection.appendChild(option);
   });
 
@@ -269,7 +291,7 @@ function populateAgentDropdown() {
     customSection.appendChild(customTitle);
 
     customAgents.forEach(agent => {
-      const option = createAgentOption(agent);
+      const option = createAgentOption(localizeAgent(agent));
       customSection.appendChild(option);
     });
 
@@ -295,6 +317,21 @@ function createAgentOption(agent) {
   `);
 
   return btn;
+}
+
+// Localiser un agent built-in (nom + description)
+function localizeAgent(agent) {
+  const key = agentKeyMap[agent.id];
+  if (!key) return agent;
+  const nameKey = `${key}Name`;
+  const descKey = `${key}Description`;
+  const localizedName = t(nameKey, currentLang);
+  const localizedDesc = t(descKey, currentLang);
+  return {
+    ...agent,
+    name: localizedName || agent.name,
+    description: localizedDesc || agent.description
+  };
 }
 
 async function selectAgent(agentId) {
@@ -826,7 +863,18 @@ async function generateResponseStreaming(messages, onChunk) {
     ).join('\n\n');
 
     // Utiliser le system prompt de l'agent
-    const systemPrompt = agent.systemPrompt;
+    let systemPrompt = agent.systemPrompt;
+    if (config.responseLanguage && config.responseLanguage !== 'auto') {
+      const langNames = {
+        fr: 'francais',
+        en: 'anglais',
+        es: 'espagnol',
+        it: 'italien',
+        pt: 'portugais'
+      };
+      const langName = langNames[config.responseLanguage] || config.responseLanguage;
+      systemPrompt += `\n\nIMPORTANT: Reponds toujours en ${langName}.`;
+    }
 
     const lastUserMessage = messages[messages.length - 1].content;
     const fullPrompt = messages.length > 1
@@ -840,7 +888,10 @@ async function generateResponseStreaming(messages, onChunk) {
     let isInThinking = false;
 
     currentPort.onMessage.addListener((msg) => {
-      if (msg.type === 'chunk') {
+      if (msg.type === 'ping') {
+        // Ignorer les messages de keep-alive
+        return;
+      } else if (msg.type === 'chunk') {
         if (msg.isThinking) {
           isInThinking = true;
           thinkingContent += msg.text;

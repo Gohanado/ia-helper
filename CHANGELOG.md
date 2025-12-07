@@ -14,6 +14,25 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 
 ---
 
+## [2.0.0] - 2025-12-08
+
+### Statut
+- **VERSION STABLE CHROME**: OK
+- **VERSION FIREFOX**: Popup inline encore a investiguer (generation longue qui s'arrete trop tot)
+
+### Ajoute / Ameliore
+- **Internationalisation complete**: noms/descriptions des agents, actions de base, suggestions du chat, labels menu contextuel.
+- **Menu contextuel**: libelles traduire pour `pageActions` et `createCustomAction`, ouverture directe de la creation d'action (onglet Presets).
+- **Experience chat**: suggestions multilingues, badge agent localise, enforcement langue de reponse des agents.
+- **Documentation**: README refait (multi-providers, Ollama local, packaging), docs Chrome Store et docs/README mis a jour.
+- **Packaging**: nettoyage des artefacts ZIP suivis par git, version unifiee 2.0.0 (manifest Chrome/Firefox, package.json, version.json).
+
+### Technique
+- Scripts d'empaquetage conserves (`npm run package`, scripts/build-*.js/ps1) ; ZIP ignores par git.
+- Known issue: sur Firefox, popup inline peut stopper des generations longues (a corriger).
+
+---
+
 ## [1.9.2] - 2025-12-07
 
 ### Statut
@@ -684,6 +703,7 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 ---
 
 [Non publie]: https://github.com/Gohanado/ia-helper/compare/v1.5.0...HEAD
+[2.0.0]: https://github.com/Gohanado/ia-helper/releases/tag/v2.0.0
 [1.5.0]: https://github.com/Gohanado/ia-helper/releases/tag/v1.5.0
 [1.4.9]: https://github.com/Gohanado/ia-helper/releases/tag/v1.4.9
 [1.4.8]: https://github.com/Gohanado/ia-helper/releases/tag/v1.4.8

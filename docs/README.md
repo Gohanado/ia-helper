@@ -1,30 +1,46 @@
 # Documentation IA Helper
 
-Documentation technique et guide utilisateur complet pour l'extension IA Helper.
+Documentation technique et guide utilisateur complet pour l'extension IA Helper (Chrome/Firefox).
 
 ## Table des matieres
 
 1. [Guide de demarrage rapide](#guide-de-demarrage-rapide)
-2. [Installation d'Ollama (detaille)](#installation-dollama-detaille)
-3. [Serveur Ollama distant (VPS/VM)](#serveur-ollama-distant)
-4. [Configuration avancee](#configuration-avancee)
-5. [Fonctionnalites detaillees](#fonctionnalites-detaillees)
-6. [API et architecture](#api-et-architecture)
-7. [Depannage](#depannage)
-8. [FAQ](#faq)
+2. [Providers disponibles](#providers-disponibles)
+3. [Installer un LLM local (Ollama)](#installer-un-llm-local-ollama)
+4. [Serveur Ollama distant (VPS/VM)](#serveur-ollama-distant)
+5. [Configuration avancee](#configuration-avancee)
+6. [Fonctionnalites detaillees](#fonctionnalites-detaillees)
+7. [API et architecture](#api-et-architecture)
+8. [Depannage](#depannage)
+9. [FAQ](#faq)
 
 ---
 
 ## Guide de demarrage rapide
 
-IA Helper necessite un serveur Ollama pour fonctionner. Ollama est **100% gratuit** et **open source**.
+IA Helper fonctionne avec plusieurs providers. Le plus simple et gratuit : Ollama en local. Vous pouvez aussi brancher OpenAI, Anthropic, Groq, OpenRouter ou un endpoint compatible OpenAI.
 
-### 3 minutes pour demarrer
-
+### 3 minutes pour demarrer en local (recommande)
 1. **Installez Ollama**: [ollama.ai/download](https://ollama.ai/download)
-2. **Telechargez un modele**: `ollama pull llama3.2`
-3. **Installez l'extension**: Chrome Web Store ou mode developpeur
-4. **C'est pret!** Cliquez sur l'icone IA Helper
+2. **Telechargez un modele**: `ollama pull llama3.2` (ou autre)
+3. **Installez l'extension** (mode dev ou Web Store)
+4. **Options IA Helper**: provider = Ollama, URL = `http://localhost:11434`, test connexion
+5. Utilisez le menu contextuel ou le chat
+
+### Utiliser un provider cloud
+1. Choisissez le provider dans Options (OpenAI, Anthropic, Groq, OpenRouter, custom)
+2. Renseignez l'URL/API key (voir la doc du provider)
+3. Selectionnez un modele (badge modele dans le chat et le popup)
+4. Sauvegardez; IA Helper route toutes les actions vers ce provider
+
+### Providers disponibles
+- **Ollama (local)**: 100% gratuit, donnees locales
+- **OpenAI / OpenRouter / Custom**: API compatible OpenAI
+- **Anthropic / Groq**: support streaming et roles system/user
+
+---
+
+## Installer un LLM local (Ollama)
 
 ---
 
@@ -368,4 +384,3 @@ R: Non, actuellement Chrome uniquement (Manifest V3).
 
 **Version:** 1.0.0
 **Derniere mise a jour:** 2025-11-26
-

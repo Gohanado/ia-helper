@@ -12,7 +12,9 @@ const MENU_TRANSLATIONS = {
     essentials: 'Essentiels',
     practical: 'Pratique',
     technical: 'Technique',
-    analysis: 'Analyse'
+    analysis: 'Analyse',
+    pageActions: 'Actions de page',
+    createCustomAction: 'Creer une action personnalisee'
   },
   en: {
     openOptions: 'Open options',
@@ -23,7 +25,9 @@ const MENU_TRANSLATIONS = {
     essentials: 'Essentials',
     practical: 'Practical',
     technical: 'Technical',
-    analysis: 'Analysis'
+    analysis: 'Analysis',
+    pageActions: 'Page actions',
+    createCustomAction: 'Create custom action'
   },
   es: {
     openOptions: 'Abrir opciones',
@@ -34,7 +38,9 @@ const MENU_TRANSLATIONS = {
     essentials: 'Esenciales',
     practical: 'Practico',
     technical: 'Tecnico',
-    analysis: 'Analisis'
+    analysis: 'Analisis',
+    pageActions: 'Acciones de pagina',
+    createCustomAction: 'Crear accion personalizada'
   },
   it: {
     openOptions: 'Apri opzioni',
@@ -45,7 +51,9 @@ const MENU_TRANSLATIONS = {
     essentials: 'Essenziali',
     practical: 'Pratico',
     technical: 'Tecnico',
-    analysis: 'Analisi'
+    analysis: 'Analisi',
+    pageActions: 'Azioni pagina',
+    createCustomAction: 'Crea azione personalizzata'
   },
   pt: {
     openOptions: 'Abrir opcoes',
@@ -56,7 +64,9 @@ const MENU_TRANSLATIONS = {
     essentials: 'Essenciais',
     practical: 'Pratico',
     technical: 'Tecnico',
-    analysis: 'Analise'
+    analysis: 'Analise',
+    pageActions: 'Acoes da pagina',
+    createCustomAction: 'Criar acao personalizada'
   }
 };
 
@@ -272,6 +282,9 @@ async function loadConfig() {
 // Verrou pour eviter les creations multiples de menus
 let menuCreationInProgress = false;
 
+// Detecter si on est sur Firefox
+const isFirefox = typeof browser !== 'undefined' && typeof browser.runtime !== 'undefined';
+
 // Creer les menus contextuels
 async function createContextMenus() {
   // Eviter les appels simultanes
@@ -374,27 +387,62 @@ async function createContextMenus() {
       (a, b) => (ACTION_CATEGORIES[a]?.order || 99) - (ACTION_CATEGORIES[b]?.order || 99)
     );
 
-    for (const category of categories) {
-      const categoryInfo = ACTION_CATEGORIES[category];
-      const actions = actionsByCategory[category];
-
-      // Creer sous-menu de categorie avec traduction
-      const categoryTitle = mt(category) !== category ? mt(category) : (categoryInfo?.name || category);
+    if (isFirefox && categories.length > 0) {
+      // Sur Firefox, regrouper toutes les categories dans un seul menu "Actions"
       chrome.contextMenus.create({
-        id: `category-${category}`,
-        title: categoryTitle,
+        id: 'all-actions-section',
+        title: mt('actions') || 'Actions',
         parentId: 'ia-helper-main',
         contexts: ctx
       });
 
-      // Ajouter les actions de la categorie
-      for (const action of actions) {
+      for (const category of categories) {
+        const categoryInfo = ACTION_CATEGORIES[category];
+        const actions = actionsByCategory[category];
+
+        // Creer sous-menu de categorie
+        const categoryTitle = mt(category) !== category ? mt(category) : (categoryInfo?.name || category);
         chrome.contextMenus.create({
-          id: `action-${action.id}`,
-          title: action.name,
-          parentId: `category-${category}`,
+          id: `category-${category}`,
+          title: categoryTitle,
+          parentId: 'all-actions-section',
           contexts: ctx
         });
+
+        // Ajouter les actions de la categorie
+        for (const action of actions) {
+          chrome.contextMenus.create({
+            id: `action-${action.id}`,
+            title: action.name,
+            parentId: `category-${category}`,
+            contexts: ctx
+          });
+        }
+      }
+    } else {
+      // Sur Chrome, garder la structure actuelle
+      for (const category of categories) {
+        const categoryInfo = ACTION_CATEGORIES[category];
+        const actions = actionsByCategory[category];
+
+        // Creer sous-menu de categorie avec traduction
+        const categoryTitle = mt(category) !== category ? mt(category) : (categoryInfo?.name || category);
+        chrome.contextMenus.create({
+          id: `category-${category}`,
+          title: categoryTitle,
+          parentId: 'ia-helper-main',
+          contexts: ctx
+        });
+
+        // Ajouter les actions de la categorie
+        for (const action of actions) {
+          chrome.contextMenus.create({
+            id: `action-${action.id}`,
+            title: action.name,
+            parentId: `category-${category}`,
+            contexts: ctx
+          });
+        }
       }
     }
 
@@ -479,14 +527,16 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 
   // Creer une action personnalisee
   if (menuId === 'create-custom-action') {
-    chrome.runtime.openOptionsPage();
-    // Envoyer un message pour ouvrir directement la section actions
-    setTimeout(() => {
-      chrome.runtime.sendMessage({
-        type: 'OPEN_CUSTOM_ACTION_CREATOR',
-        selectedText: info.selectionText || ''
-      });
-    }, 500);
+    const optionsUrl = chrome.runtime.getURL('src/options/options.html#presets');
+    chrome.tabs.create({ url: optionsUrl }, () => {
+      // Envoyer un message pour ouvrir directement la creation d'action
+      setTimeout(() => {
+        chrome.runtime.sendMessage({
+          type: 'OPEN_CUSTOM_ACTION_CREATOR',
+          selectedText: info.selectionText || ''
+        });
+      }, 500);
+    });
     return;
   }
 
@@ -822,6 +872,42 @@ async function generateStreamingResponse(port, content, systemPrompt, agentParam
   const frequencyPenalty = agentParams.frequencyPenalty ?? 0;
   const presencePenalty = agentParams.presencePenalty ?? 0;
 
+  // Keep-alive pour Firefox: envoyer un ping toutes les 10 secondes
+  let keepAliveInterval = null;
+  let portDisconnected = false;
+
+  const startKeepAlive = () => {
+    keepAliveInterval = setInterval(() => {
+      if (!portDisconnected) {
+        try {
+          port.postMessage({ type: 'ping' });
+        } catch (e) {
+          portDisconnected = true;
+          if (keepAliveInterval) {
+            clearInterval(keepAliveInterval);
+          }
+        }
+      }
+    }, 10000);
+  };
+
+  const stopKeepAlive = () => {
+    if (keepAliveInterval) {
+      clearInterval(keepAliveInterval);
+      keepAliveInterval = null;
+    }
+  };
+
+  // Detecter la deconnexion du port
+  const onDisconnect = () => {
+    portDisconnected = true;
+    stopKeepAlive();
+  };
+  port.onDisconnect.addListener(onDisconnect);
+
+  // Demarrer le keep-alive
+  startKeepAlive();
+
   let response;
 
   if (provider === 'ollama') {
@@ -920,6 +1006,7 @@ async function generateStreamingResponse(port, content, systemPrompt, agentParam
   }
 
   if (!response.ok) {
+    stopKeepAlive();
     throw new Error(`Erreur API ${response.status}`);
   }
 
@@ -927,68 +1014,80 @@ async function generateStreamingResponse(port, content, systemPrompt, agentParam
   const decoder = new TextDecoder();
   let isInThinking = false;
 
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
+  try {
+    while (true) {
+      // Verifier si le port est deconnecte
+      if (portDisconnected) {
+        break;
+      }
 
-    const chunk = decoder.decode(value, { stream: true });
-    const lines = chunk.split('\n').filter(line => line.trim());
+      const { done, value } = await reader.read();
+      if (done) break;
 
-    for (const line of lines) {
-      try {
-        // Format Ollama
-        if (provider === 'ollama') {
-          const json = JSON.parse(line);
-          if (json.response) {
-            port.postMessage({ type: 'chunk', text: json.response });
-          }
-        }
-        // Format OpenAI/Groq/OpenRouter (SSE)
-        else if (provider === 'openai' || provider === 'groq' || provider === 'openrouter' || provider === 'custom') {
-          if (line.startsWith('data: ')) {
-            const data = line.slice(6);
-            if (data === '[DONE]') continue;
-            const json = JSON.parse(data);
+      const chunk = decoder.decode(value, { stream: true });
+      const lines = chunk.split('\n').filter(line => line.trim());
 
-            // Detecter le thinking (certains modeles utilisent un role special)
-            const choice = json.choices?.[0];
-            if (choice?.delta?.role === 'reasoning' || choice?.message?.role === 'reasoning') {
-              isInThinking = true;
-            }
-
-            const text = choice?.delta?.content || '';
-            if (text) {
-              // Envoyer avec le type approprie
-              port.postMessage({
-                type: 'chunk',
-                text: text,
-                isThinking: isInThinking
-              });
-            }
-
-            // Detecter la fin du thinking
-            if (choice?.finish_reason === 'stop' && isInThinking) {
-              isInThinking = false;
-              port.postMessage({ type: 'thinking_end' });
+      for (const line of lines) {
+        try {
+          // Format Ollama
+          if (provider === 'ollama') {
+            const json = JSON.parse(line);
+            if (json.response) {
+              port.postMessage({ type: 'chunk', text: json.response });
             }
           }
-        }
-        // Format Anthropic (SSE)
-        else if (provider === 'anthropic') {
-          if (line.startsWith('data: ')) {
-            const data = line.slice(6);
-            const json = JSON.parse(data);
-            if (json.type === 'content_block_delta' && json.delta?.text) {
-              port.postMessage({ type: 'chunk', text: json.delta.text });
+          // Format OpenAI/Groq/OpenRouter (SSE)
+          else if (provider === 'openai' || provider === 'groq' || provider === 'openrouter' || provider === 'custom') {
+            if (line.startsWith('data: ')) {
+              const data = line.slice(6);
+              if (data === '[DONE]') continue;
+              const json = JSON.parse(data);
+
+              // Detecter le thinking (certains modeles utilisent un role special)
+              const choice = json.choices?.[0];
+              if (choice?.delta?.role === 'reasoning' || choice?.message?.role === 'reasoning') {
+                isInThinking = true;
+              }
+
+              const text = choice?.delta?.content || '';
+              if (text) {
+                // Envoyer avec le type approprie
+                port.postMessage({
+                  type: 'chunk',
+                  text: text,
+                  isThinking: isInThinking
+                });
+              }
+
+              // Detecter la fin du thinking
+              if (choice?.finish_reason === 'stop' && isInThinking) {
+                isInThinking = false;
+                port.postMessage({ type: 'thinking_end' });
+              }
             }
           }
+          // Format Anthropic (SSE)
+          else if (provider === 'anthropic') {
+            if (line.startsWith('data: ')) {
+              const data = line.slice(6);
+              const json = JSON.parse(data);
+              if (json.type === 'content_block_delta' && json.delta?.text) {
+                port.postMessage({ type: 'chunk', text: json.delta.text });
+              }
+            }
+          }
+        } catch (e) {
+          // Ignorer les erreurs de parsing JSON
         }
-      } catch (e) {
-        // Ignorer les erreurs de parsing JSON
       }
     }
-  }
 
-  port.postMessage({ type: 'done' });
+    if (!portDisconnected) {
+      port.postMessage({ type: 'done' });
+    }
+  } finally {
+    stopKeepAlive();
+    port.onDisconnect.removeListener(onDisconnect);
+  }
 }
 

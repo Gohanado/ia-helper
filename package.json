@@ -1,7 +1,7 @@
 {
   "name": "ia-helper",
-  "version": "1.9.2",
-  "description": "Extension Chrome d'assistant IA intelligent connectee a Ollama - 100% local et prive",
+  "version": "2.0.0",
+  "description": "Extension IA Helper multi-providers (Ollama, OpenAI, Anthropic, Groq, OpenRouter) avec chat, menu contextuel et popup inline",
   "author": {
     "name": "Gohanado",
     "email": "contact@badom.ch",

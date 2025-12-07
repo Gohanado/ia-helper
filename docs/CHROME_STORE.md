@@ -4,58 +4,42 @@
 
 ### Nom de l'extension
 ```
-IA Helper - Assistant IA Local
+IA Helper - Assistant IA Multi-Providers
 ```
 
 ### Description courte (132 caracteres max)
 ```
-Assistant IA 100% local avec Ollama. Correction, traduction, reformulation. Vos donnees restent sur votre machine.
+Assistant IA multi-providers (Ollama local, OpenAI, Anthropic, Groq, OpenRouter). Menu clic droit, popup inline, chat, agents.
 ```
 
 ### Description longue
 ```
-IA Helper - Votre assistant IA local et prive
+IA Helper - Votre assistant IA multi-providers dans le navigateur
 
-Connectez votre navigateur Chrome a Ollama pour beneficier de l'intelligence artificielle directement dans vos pages web, sans envoyer vos donnees sur Internet.
+Choisissez votre LLM (local ou cloud) et utilisez-le en un clic droit, dans un popup inline ou dans un chat complet. Support Ollama (local), OpenAI, Anthropic, Groq, OpenRouter et endpoints compatibles OpenAI.
 
 FONCTIONNALITES PRINCIPALES
-- Correction orthographique et grammaticale instantanee
-- Traduction en 12 langues (FR, EN, ES, IT, PT, DE, NL, RU, ZH, JA, AR, KO)
-- Reformulation professionnelle d'emails
-- Resume de texte et de pages web
-- Streaming en temps reel des reponses
-- Rendu Markdown complet
+- Menu contextuel intelligent (selection, champ, page) avec 140+ actions et actions personnalisees
+- Popup inline avec streaming, copie, TTS, stop, voir en detail
+- Chat complet avec historique local, export, TTS, copie multi-formats, selector modele/agent
+- Agents IA personnalises (prompts, temperature, top_p, penalties, modele par agent)
+- Rendu Markdown/LaTeX et code blocks avec bouton copie
+- UI et traductions completes (FR, EN, ES, IT, PT)
 
-24 PRESETS PROFESSIONNELS (140+ actions)
-- Etudiant : Redaction, recherche, revision
-- Assistant Personnel : Emails, organisation, rappels
-- Ecrivain : Creativite, style, relecture
-- Developpeur : Code review, documentation, debugging
-- Support IT : Tickets, diagnostics, solutions
-- Service Client : Reponses, satisfaction, escalade
-- Commercial : Propositions, relances, negociation
-- Designer UX : Personas, wireframes, tests
-- Data Analyst : Rapports, visualisation, insights
-- RH/Recruteur : Offres, entretiens, onboarding
-- Manager : Reunions, delegations, feedback
-- Juriste : Contrats, conformite, veille
-- Marketing : Campagnes, SEO, branding
-- Product Manager : Roadmap, specs, KPIs
-- Copywriter : Headlines, landing pages, CTAs
-- Et bien plus...
+PRESETS PROFESSIONNELS (140+ actions)
+- Developpeur : code review, explication, debug
+- Redacteur : reformulation, resume, style
+- Support/Service client : reponses, satisfaction
+- Analyste/Manager : synthese, plan d’action
+- Plus de 20 autres profils metiers
 
-CONFIDENTIALITE TOTALE
-- 100% local : vos donnees restent sur votre machine
-- Aucun serveur externe, aucun tracking
-- Fonctionne avec Ollama (gratuit et open source)
-- Zero collecte de donnees personnelles
-
-PRE-REQUIS
-- Ollama installe sur votre machine (ollama.ai)
-- Un modele telecharge (llama3.2, mistral, phi3...)
+CONFIDENTIALITE
+- Mode local (Ollama) sans fuite de donnees
+- Aucun tracking, aucune telemetrie
+- Pour les providers cloud, seules vos requetes API sont envoyees au provider choisi
 
 OPEN SOURCE
-Le code source est disponible sur GitHub. Contributions bienvenues!
+Code source disponible sur GitHub. Contributions bienvenues.
 ```
 
 ### Categorie
@@ -108,7 +92,7 @@ Productivite
 
 ```powershell
 Remove-Item ia-helper-v1.0.0.zip -ErrorAction SilentlyContinue
-Compress-Archive -Path "manifest.json", "src", "assets" -DestinationPath "ia-helper-v1.0.0.zip" -Force
+Compress-Archive -Path "manifest.json", "src", "assets" -DestinationPath "ia-helper-chrome-v2.0.0.zip" -Force
 ```
 
 ---
@@ -118,5 +102,4 @@ Compress-Archive -Path "manifest.json", "src", "assets" -DestinationPath "ia-hel
 - [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/devconsole/)
 - [Guide de publication](https://developer.chrome.com/docs/webstore/publish/)
 - [Politiques du store](https://developer.chrome.com/docs/webstore/program_policies/)
-
 

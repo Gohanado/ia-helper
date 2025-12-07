@@ -502,7 +502,10 @@ async function startGeneration() {
     }
 
     currentPort.onMessage.addListener((msg) => {
-      if (msg.type === 'chunk') {
+      if (msg.type === 'ping') {
+        // Ignorer les messages de keep-alive
+        return;
+      } else if (msg.type === 'chunk') {
         currentResult += msg.text;
 
         // Throttle avec requestAnimationFrame pour limiter a 60fps
@@ -599,7 +602,10 @@ async function refine(additionalPrompt) {
     }
 
     currentPort.onMessage.addListener((msg) => {
-      if (msg.type === 'chunk') {
+      if (msg.type === 'ping') {
+        // Ignorer les messages de keep-alive
+        return;
+      } else if (msg.type === 'chunk') {
         currentResult += msg.text;
         // Parser le markdown en live comme dans chat.js
         const html = convertMarkdownToHtml(currentResult);
