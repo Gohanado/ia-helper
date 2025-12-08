@@ -1491,6 +1491,14 @@
             if (body) {
               body.textContent = thinkingContent;
             }
+          } else if (message.type === 'thinking_end') {
+            if (thinkingEl) {
+              thinkingEl.classList.add('collapsed');
+              const toggle = thinkingEl.querySelector('.ia-thinking-toggle');
+              const body = thinkingEl.querySelector('.ia-thinking-body');
+              if (toggle) toggle.textContent = '►';
+              if (body) body.style.display = 'none';
+            }
           } else {
             // Ajouter le texte avant le curseur
             currentPopupResult += message.text;

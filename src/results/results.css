@@ -484,8 +484,9 @@ textarea:focus {
 .thinking-block {
   background: rgba(102, 126, 234, 0.08);
   border: 1px solid rgba(102, 126, 234, 0.2);
-  border-radius: 8px;
-  padding: 10px 12px 8px;
+  border-radius: 10px;
+  box-shadow: 0 6px 14px rgba(102, 126, 234, 0.12);
+  padding: 12px 14px 10px;
   margin-bottom: 12px;
   font-size: 0.95em;
 }
@@ -502,6 +503,7 @@ textarea:focus {
   font-weight: 600;
   font-size: 0.85em;
   text-transform: uppercase;
+  letter-spacing: 0.04em;
   color: #3b4a7a;
 }
 
