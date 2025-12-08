@@ -733,7 +733,7 @@ async function generateAIResponse(content, systemPrompt) {
   const provider = config.provider || 'ollama';
   const apiUrl = config.apiUrl || DEFAULT_CONFIG.apiUrl;
   const apiKey = config.apiKey || '';
-  const model = config.selectedModel || '';
+  let model = config.selectedModel || '';
   const temperature = 0.7;
   const maxTokens = 8000;
   const topP = 1.0;
@@ -744,6 +744,7 @@ async function generateAIResponse(content, systemPrompt) {
   let result = '';
 
   if (provider === 'ollama') {
+    if (!model) model = 'llama3.2';
     response = await fetch(`${apiUrl}/api/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -762,8 +763,10 @@ async function generateAIResponse(content, systemPrompt) {
       })
     });
     const data = await response.json();
+    if (data.error) throw new Error(data.error);
     result = data.response || '';
   } else if (provider === 'openai' || provider === 'openrouter' || provider === 'custom') {
+    if (!model) model = 'gpt-3.5-turbo';
     const baseUrl = provider === 'openai' ? 'https://api.openai.com/v1' :
                     provider === 'openrouter' ? 'https://openrouter.ai/api/v1' : apiUrl;
     response = await fetch(`${baseUrl}/chat/completions`, {
@@ -784,11 +787,13 @@ async function generateAIResponse(content, systemPrompt) {
       frequency_penalty: frequencyPenalty,
       presence_penalty: presencePenalty,
       stream: false
-    })
-  });
-  const data = await response.json();
-  result = data.choices?.[0]?.message?.content || '';
-} else if (provider === 'anthropic') {
+      })
+    });
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message || data.error);
+    result = data.choices?.[0]?.message?.content || '';
+  } else if (provider === 'anthropic') {
+    if (!model) model = 'claude-3-haiku-20240307';
     response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -806,8 +811,10 @@ async function generateAIResponse(content, systemPrompt) {
       })
     });
     const data = await response.json();
+    if (data.error) throw new Error(data.error.message || data.error);
     result = data.content?.[0]?.text || '';
   } else if (provider === 'groq') {
+    if (!model) model = 'llama-3.1-8b-instant';
     response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -828,6 +835,7 @@ async function generateAIResponse(content, systemPrompt) {
       })
     });
     const data = await response.json();
+    if (data.error) throw new Error(data.error.message || data.error);
     result = data.choices?.[0]?.message?.content || '';
   }
 
