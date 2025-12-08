@@ -734,6 +734,11 @@ async function generateAIResponse(content, systemPrompt) {
   const apiUrl = config.apiUrl || DEFAULT_CONFIG.apiUrl;
   const apiKey = config.apiKey || '';
   const model = config.selectedModel || '';
+  const temperature = 0.7;
+  const maxTokens = 4096;
+  const topP = 1.0;
+  const frequencyPenalty = 0;
+  const presencePenalty = 0;
 
   let response;
   let result = '';
@@ -746,7 +751,14 @@ async function generateAIResponse(content, systemPrompt) {
         model: model,
         prompt: content,
         system: systemPrompt,
-        stream: false
+        stream: false,
+        options: {
+          temperature: temperature,
+          num_predict: maxTokens,
+          top_p: topP,
+          frequency_penalty: frequencyPenalty,
+          presence_penalty: presencePenalty
+        }
       })
     });
     const data = await response.json();
@@ -764,14 +776,19 @@ async function generateAIResponse(content, systemPrompt) {
         model: model,
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'user', content: content }
-        ],
-        stream: false
-      })
-    });
-    const data = await response.json();
-    result = data.choices?.[0]?.message?.content || '';
-  } else if (provider === 'anthropic') {
+        { role: 'user', content: content }
+      ],
+      temperature: temperature,
+      max_tokens: maxTokens,
+      top_p: topP,
+      frequency_penalty: frequencyPenalty,
+      presence_penalty: presencePenalty,
+      stream: false
+    })
+  });
+  const data = await response.json();
+  result = data.choices?.[0]?.message?.content || '';
+} else if (provider === 'anthropic') {
     response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -781,7 +798,9 @@ async function generateAIResponse(content, systemPrompt) {
       },
       body: JSON.stringify({
         model: model,
-        max_tokens: 4096,
+        max_tokens: maxTokens,
+        temperature: temperature,
+        top_p: topP,
         system: systemPrompt,
         messages: [{ role: 'user', content: content }]
       })
@@ -800,7 +819,12 @@ async function generateAIResponse(content, systemPrompt) {
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: content }
-        ]
+        ],
+        temperature: temperature,
+        max_tokens: maxTokens,
+        top_p: topP,
+        frequency_penalty: frequencyPenalty,
+        presence_penalty: presencePenalty
       })
     });
     const data = await response.json();
