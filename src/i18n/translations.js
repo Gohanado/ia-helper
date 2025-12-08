@@ -141,7 +141,7 @@ export const TRANSLATIONS = {
     casual: 'Plus decontracte',
     addInstructions: 'Ajouter des instructions',
     send: 'Envoyer',
-    stopGeneration: 'Arreter',
+    stopGeneration: 'Stop',
     generationStopped: 'Generation arretee',
 
     // Copy options

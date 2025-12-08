@@ -842,6 +842,8 @@ chrome.runtime.onConnect.addListener((port) => {
             port.postMessage({ type: 'error', error: error.message });
           }
         }
+      } else if (message.type === 'keepalive') {
+        // no-op: prevents SW idle
       }
     });
 
@@ -872,7 +874,7 @@ async function generateStreamingResponse(port, content, systemPrompt, agentParam
   const frequencyPenalty = agentParams.frequencyPenalty ?? 0;
   const presencePenalty = agentParams.presencePenalty ?? 0;
 
-  // Keep-alive pour Firefox: envoyer un ping toutes les 10 secondes
+  // Keep-alive pour Firefox: envoyer un ping regulier
   let keepAliveInterval = null;
   let portDisconnected = false;
 
@@ -888,7 +890,7 @@ async function generateStreamingResponse(port, content, systemPrompt, agentParam
           }
         }
       }
-    }, 10000);
+    }, 3000);
   };
 
   const stopKeepAlive = () => {
