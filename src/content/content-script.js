@@ -1025,7 +1025,7 @@
           </div>
         </div>
         <div class="ia-action-actions">
-          <button class="ia-action-btn ia-action-btn-warning ia-action-stop-generation" style="display: none;">${ct('stopGeneration') || 'Arreter'}</button>
+         <button class="ia-action-btn ia-action-btn-warning ia-action-stop-generation" style="display: none;">${ct('stopGeneration') || 'Stop'}</button>
           <div class="ia-action-copy-dropdown">
             <button class="ia-action-btn ia-action-btn-secondary ia-action-copy-toggle">${ct('copy')}</button>
             <div class="ia-action-copy-menu">
@@ -1295,6 +1295,7 @@
 
     // Bouton stop generation
     const stopBtn = modal.querySelector('.ia-action-stop-generation');
+    let userStopped = false;
     if (stopBtn) {
       stopBtn.addEventListener('click', () => {
         if (currentStreamingPort) {
@@ -1305,6 +1306,7 @@
           }
           currentStreamingPort = null;
           stopBtn.style.display = 'none';
+          userStopped = true;
 
           // Afficher un message
           const responseEl = modal.querySelector('.ia-action-response-content');
@@ -1317,7 +1319,7 @@
 
     // Lancer la generation
     const responseEl = modal.querySelector('.ia-action-response-content');
-    generateActionResponse(responseEl, content, systemPrompt);
+    generateActionResponse(responseEl, content, systemPrompt, () => userStopped);
   }
 
   // Copier dans un format specifique
@@ -1362,7 +1364,7 @@
   }
 
   // Generer la reponse pour une action via le background script avec STREAMING
-  async function generateActionResponse(element, content, systemPrompt) {
+  async function generateActionResponse(element, content, systemPrompt, isUserStoppedFn = () => false) {
     try {
       // Utiliser un port pour le streaming
       const port = chrome.runtime.connect({ name: 'streaming' });
@@ -1386,6 +1388,67 @@
         }
       }
 
+      let finished = false;
+      let keepAliveInterval = null;
+
+      const clearKeepAlive = () => {
+        if (keepAliveInterval) {
+          clearInterval(keepAliveInterval);
+          keepAliveInterval = null;
+        }
+      };
+
+      const fallbackToNonStreaming = async () => {
+        try {
+          const fallbackResult = await new Promise((resolve, reject) => {
+            chrome.runtime.sendMessage({
+              type: 'GENERATE_RESPONSE',
+              content,
+              systemPrompt
+            }, (response) => {
+              if (chrome.runtime.lastError) {
+                reject(new Error(chrome.runtime.lastError.message));
+                return;
+              }
+              if (response?.error) {
+                reject(new Error(response.error));
+                return;
+              }
+              resolve(response?.result || '');
+            });
+          });
+
+          currentPopupResult = fallbackResult || '';
+          cursor.remove();
+          element.textContent = currentPopupResult;
+
+          const modal = document.getElementById('ia-helper-action-modal');
+          if (modal) {
+            const stopBtn = modal.querySelector('.ia-action-stop-generation');
+            if (stopBtn) {
+              stopBtn.style.display = 'none';
+            }
+          }
+        } catch (err) {
+          cursor.remove();
+          setTrustedHTML(element, `<span class="ia-action-error">Erreur: ${err.message}</span>`);
+        }
+      };
+
+      const startKeepAlive = () => {
+        keepAliveInterval = setInterval(() => {
+          if (currentStreamingPort && !isUserStoppedFn() && !finished) {
+            try {
+              currentStreamingPort.postMessage({ type: 'keepalive' });
+            } catch (e) {
+              clearKeepAlive();
+            }
+          } else {
+            clearKeepAlive();
+          }
+        }, 3000);
+      };
+
       port.onMessage.addListener((message) => {
         if (message.type === 'ping') {
           // Ignorer les messages de keep-alive
@@ -1402,6 +1465,8 @@
             responseArea.scrollTop = responseArea.scrollHeight;
           }
         } else if (message.type === 'done') {
+          finished = true;
+          clearKeepAlive();
           // Retirer le curseur
           cursor.remove();
           port.disconnect();
@@ -1416,6 +1481,8 @@
             }
           }
         } else if (message.type === 'error') {
+          finished = true;
+          clearKeepAlive();
           setTrustedHTML(element, `<span class="ia-action-error">Erreur: ${message.error}</span>`);
           port.disconnect();
           currentStreamingPort = null;
@@ -1432,8 +1499,15 @@
       });
 
       port.onDisconnect.addListener(() => {
+        clearKeepAlive();
+        currentStreamingPort = null;
+        const userStopped = isUserStoppedFn();
         if (chrome.runtime.lastError) {
           console.error('IA Helper: Port disconnected', chrome.runtime.lastError.message);
+        }
+        if (!finished && !userStopped) {
+          // Fallback non-streaming pour terminer la reponse
+          fallbackToNonStreaming();
         }
       });
 
@@ -1443,6 +1517,9 @@
         content: content,
         systemPrompt: systemPrompt
       });
+
+      // Demarrer le keep-alive cote client (Firefox)
+      startKeepAlive();
 
     } catch (error) {
       console.error('IA Helper: Erreur generation', error);

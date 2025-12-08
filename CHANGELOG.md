@@ -14,6 +14,23 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 
 ---
 
+## [2.0.1] - 2025-12-09
+
+### Statut
+- **VERSION STABLE CHROME**: OK
+- **VERSION STABLE FIREFOX**: OK (popup streaming long texte fixe)
+
+### Corrige
+- Popup Firefox: streaming longue reponse ne se coupe plus (keepalive + fallback non-streaming).
+- Bouton Stop: libelle corrige et traduit proprement.
+- Manifest Firefox: ajout de `data_collection_permissions` pour AMO (suppression du warning).
+
+### Technique
+- `maxTokens` streaming releve a 8000.
+- Keepalive cote client popup + fallback automatique si le port tombe.
+
+---
+
 ## [2.0.0] - 2025-12-08
 
 ### Statut

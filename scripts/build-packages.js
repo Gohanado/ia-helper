@@ -83,7 +83,10 @@ const firefoxManifest = JSON.parse(fs.readFileSync('manifest.json', 'utf8'));
 firefoxManifest.browser_specific_settings = {
     gecko: {
         id: "ia-helper@badom.ch",
-        strict_min_version: "142.0"
+        strict_min_version: "142.0",
+        data_collection_permissions: {
+            required: ["none"]
+        }
     }
 };
 firefoxManifest.background = {
