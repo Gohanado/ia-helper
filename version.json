@@ -1,9 +1,8 @@
 {
-  "version": "2.0.1",
+  "version": "2.1.0",
   "releaseDate": "2025-12-09",
   "minChromeVersion": "88",
-  "downloadUrl": "https://github.com/Gohanado/ia-helper/archive/refs/tags/v2.0.1.zip",
+  "downloadUrl": "https://github.com/Gohanado/ia-helper/archive/refs/tags/v2.1.0.zip",
   "changelogUrl": "https://github.com/Gohanado/ia-helper/blob/main/CHANGELOG.md",
-  "releaseNotes": "Internationalisation complete (agents, actions, suggestions), correctifs menu contextuel Firefox, ouverture directe creation d’action, packaging nettoye."
+  "releaseNotes": "Dictée vocale (STT), correctifs streaming popup Firefox, packaging conforme AMO."
 }
-

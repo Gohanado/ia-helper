@@ -14,14 +14,25 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 
 ---
 
+## [2.1.0] - 2025-12-09
+
+### Statut
+- **VERSION STABLE CHROME**: OK
+- **VERSION STABLE FIREFOX**: OK
+
+### Ajoute
+- Bouton dictée vocale (STT) sur toutes les zones de saisie (popup rapide, chat live, page results).
+
+### Technique
+- Web Speech API (SpeechRecognition) avec feedback visuel et fallback si non supporte.
+
+---
+
 ## [2.0.1] - 2025-12-09
 
 ### Statut
 - **VERSION STABLE CHROME**: OK
 - **VERSION STABLE FIREFOX**: OK (popup streaming long texte fixe)
-
-### Ajoute
-- Bouton dictée vocale (STT) sur toutes les zones de saisie (popup rapide, chat live, page results).
 
 ### Corrige
 - Popup Firefox: streaming longue reponse ne se coupe plus (keepalive + fallback non-streaming).
