@@ -1516,6 +1516,13 @@
           clearKeepAlive();
           // Retirer le curseur
           cursor.remove();
+          if (thinkingEl && !thinkingEl.classList.contains('collapsed')) {
+            thinkingEl.classList.add('collapsed');
+            const toggle = thinkingEl.querySelector('.ia-thinking-toggle');
+            const body = thinkingEl.querySelector('.ia-thinking-body');
+            if (toggle) toggle.textContent = '►';
+            if (body) body.style.display = 'none';
+          }
           port.disconnect();
           currentStreamingPort = null;
 

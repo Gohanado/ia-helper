@@ -634,6 +634,14 @@ async function startGeneration() {
           stopBtn.style.display = 'none';
         }
 
+        if (thinkingEl && !thinkingEl.classList.contains('collapsed')) {
+          thinkingEl.classList.add('thinking-done', 'collapsed');
+          const toggle = thinkingEl.querySelector('.thinking-toggle');
+          const body = thinkingEl.querySelector('.thinking-body');
+          if (toggle) toggle.textContent = '►';
+          if (body) body.style.display = 'none';
+        }
+
         // Finaliser: supprimer le curseur et parser le markdown
         cursor.remove();
         const html = convertMarkdownToHtml(currentResult);
@@ -752,22 +760,34 @@ async function refine(additionalPrompt) {
           const html = convertMarkdownToHtml(currentResult);
           setTrustedHTML(markdownBody, html);
         }
-      } else if (msg.type === 'thinking_end') {
-        if (thinkingEl) {
-          thinkingEl.classList.add('thinking-done');
-        }
-      } else if (msg.type === 'done') {
-        currentPort.disconnect();
-        currentPort = null;
+    } else if (msg.type === 'thinking_end') {
+      if (thinkingEl) {
+        thinkingEl.classList.add('thinking-done', 'collapsed');
+        const toggle = thinkingEl.querySelector('.thinking-toggle');
+        const body = thinkingEl.querySelector('.thinking-body');
+        if (toggle) toggle.textContent = '►';
+        if (body) body.style.display = 'none';
+      }
+    } else if (msg.type === 'done') {
+      currentPort.disconnect();
+      currentPort = null;
 
-        // Masquer le bouton stop
-        const stopBtn = document.getElementById('btn-stop-generation');
-        if (stopBtn) {
-          stopBtn.style.display = 'none';
-        }
+      // Masquer le bouton stop
+      const stopBtn = document.getElementById('btn-stop-generation');
+      if (stopBtn) {
+        stopBtn.style.display = 'none';
+      }
 
-        // Finaliser: supprimer le curseur et afficher le resultat final
-        cursor.remove();
+      if (thinkingEl && !thinkingEl.classList.contains('collapsed')) {
+        thinkingEl.classList.add('thinking-done', 'collapsed');
+        const toggle = thinkingEl.querySelector('.thinking-toggle');
+        const body = thinkingEl.querySelector('.thinking-body');
+        if (toggle) toggle.textContent = '►';
+        if (body) body.style.display = 'none';
+      }
+
+      // Finaliser: supprimer le curseur et afficher le resultat final
+      cursor.remove();
         const html = convertMarkdownToHtml(currentResult);
         setTrustedHTML(markdownBody, html);
         setStatus('done', t('generating', currentLang).replace('...', ''));

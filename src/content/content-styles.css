@@ -93,11 +93,11 @@
 }
 
 .ia-thinking-block {
-  background: #f6f8ff;
-  border: 1px solid #d6ddff;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.12);
-  padding: 10px 12px 8px;
+  background: #f7f9ff;
+  border: 1px solid #d8e0ff;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(90, 115, 230, 0.08);
+  padding: 8px 10px;
   margin-bottom: 10px;
   font-size: 13px;
   color: #1f2a4d;
@@ -115,19 +115,19 @@
 .ia-thinking-title {
   font-weight: 700;
   font-size: 12px;
+  letter-spacing: 0.04em;
+  color: #23346a;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #243b6b;
 }
 
 .ia-thinking-toggle {
   font-size: 12px;
-  color: #243b6b;
-  opacity: 0.75;
+  color: #23346a;
+  opacity: 0.8;
 }
 
 .ia-thinking-body {
-  line-height: 1.5;
+  line-height: 1.45;
   margin-top: 6px;
 }
 

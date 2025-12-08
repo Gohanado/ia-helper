@@ -482,11 +482,11 @@ textarea:focus {
 }
 
 .thinking-block {
-  background: rgba(102, 126, 234, 0.08);
-  border: 1px solid rgba(102, 126, 234, 0.2);
-  border-radius: 10px;
-  box-shadow: 0 6px 14px rgba(102, 126, 234, 0.12);
-  padding: 12px 14px 10px;
+  background: #f7f9ff;
+  border: 1px solid #d8e0ff;
+  border-radius: 8px;
+  box-shadow: 0 6px 14px rgba(90, 115, 230, 0.1);
+  padding: 10px 12px;
   margin-bottom: 12px;
   font-size: 0.95em;
 }
@@ -504,12 +504,12 @@ textarea:focus {
   font-size: 0.85em;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: #3b4a7a;
+  color: #23346a;
 }
 
 .thinking-block .thinking-toggle {
   font-size: 0.85em;
-  color: #3b4a7a;
+  color: #23346a;
   opacity: 0.8;
 }
 

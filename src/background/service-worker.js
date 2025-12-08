@@ -1023,6 +1023,7 @@ async function generateStreamingResponse(port, content, systemPrompt, agentParam
   const decoder = new TextDecoder();
   let isInThinking = false;
   let bufferedLine = '';
+  let hasThinking = false;
 
   try {
     while (true) {
@@ -1050,6 +1051,7 @@ async function generateStreamingResponse(port, content, systemPrompt, agentParam
             }
             if (thinkingEnabled && json.thinking) {
               port.postMessage({ type: 'chunk', text: json.thinking, isThinking: true });
+              hasThinking = true;
             }
           }
           // Format OpenAI/Groq/OpenRouter (SSE)
@@ -1111,6 +1113,7 @@ async function generateStreamingResponse(port, content, systemPrompt, agentParam
           }
           if (thinkingEnabled && json.thinking) {
             port.postMessage({ type: 'chunk', text: json.thinking, isThinking: true });
+            hasThinking = true;
           }
         } else if (provider === 'openai' || provider === 'groq' || provider === 'openrouter' || provider === 'custom') {
           if (line.startsWith('data: ')) {
@@ -1143,6 +1146,9 @@ async function generateStreamingResponse(port, content, systemPrompt, agentParam
     }
 
     if (!portDisconnected) {
+      if (thinkingEnabled && hasThinking) {
+        port.postMessage({ type: 'thinking_end' });
+      }
       port.postMessage({ type: 'done' });
     }
   } finally {

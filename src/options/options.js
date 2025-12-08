@@ -142,7 +142,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     speechFixedLanguage: document.getElementById('speech-fixed-language'),
     speechFixedLanguageGroup: document.getElementById('speech-fixed-language-group'),
     btnPitchLow: document.getElementById('btn-pitch-low'),
-    btnPitchHigh: document.getElementById('btn-pitch-high')
+    btnPitchHigh: document.getElementById('btn-pitch-high'),
+    exportConfigBtn: document.getElementById('btn-export-config'),
+    importConfigBtn: document.getElementById('btn-import-config'),
+    importConfigFile: document.getElementById('import-config-file')
   };
 
   // Charger les voix disponibles
@@ -169,6 +172,50 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderShortcutsList();
     renderAgentsGrids();
     refreshModels();
+
+    // Export config
+    if (elements.exportConfigBtn) {
+      elements.exportConfigBtn.addEventListener('click', () => {
+        const payload = { config };
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'ia-helper-config.json';
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+    }
+
+    // Import config
+    if (elements.importConfigBtn && elements.importConfigFile) {
+      elements.importConfigBtn.addEventListener('click', () => elements.importConfigFile.click());
+      elements.importConfigFile.addEventListener('change', (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = async (evt) => {
+          try {
+            const data = JSON.parse(evt.target.result);
+            if (data?.config && typeof data.config === 'object') {
+              config = { ...DEFAULT_CONFIG, ...data.config };
+              await saveConfig();
+              await loadAllSettings();
+              applyTranslations();
+              showNotification(t('settingsSaved', currentLang) || 'Settings restored', 'success');
+            } else {
+              showNotification(t('importError', currentLang) || 'Import error', 'error');
+            }
+          } catch (err) {
+            console.error('Import config error', err);
+            showNotification(t('importError', currentLang) || 'Import error', 'error');
+          } finally {
+            elements.importConfigFile.value = '';
+          }
+        };
+        reader.readAsText(file);
+      });
+    }
 
     // Initialiser le systeme de mise a jour (en dernier, non-bloquant)
     initUpdateSystem();

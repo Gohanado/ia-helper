@@ -126,6 +126,16 @@
         </div>
 
         <div class="form-group">
+          <label data-i18n="configExportImport">Exporter / Importer les options</label>
+          <div class="input-with-btn">
+            <button id="btn-export-config" class="btn btn-secondary" data-i18n="exportConfig">Exporter</button>
+            <button id="btn-import-config" class="btn btn-secondary" data-i18n="importConfig">Importer</button>
+            <input type="file" id="import-config-file" accept=".json" style="display:none;">
+          </div>
+          <p class="form-hint" data-i18n="configExportHint">Permet de sauvegarder vos parametres et de les restaurer en un clic.</p>
+        </div>
+
+        <div class="form-group">
           <label class="toggle-label">
             <input type="checkbox" id="inline-popup-enabled" checked>
             <span class="toggle-switch"></span>
