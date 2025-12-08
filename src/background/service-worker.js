@@ -735,7 +735,7 @@ async function generateAIResponse(content, systemPrompt) {
   const apiKey = config.apiKey || '';
   const model = config.selectedModel || '';
   const temperature = 0.7;
-  const maxTokens = 4096;
+  const maxTokens = 8000;
   const topP = 1.0;
   const frequencyPenalty = 0;
   const presencePenalty = 0;
@@ -892,7 +892,7 @@ async function generateStreamingResponse(port, content, systemPrompt, agentParam
 
   // Parametres de l'agent avec valeurs par defaut
   const temperature = agentParams.temperature ?? 0.7;
-  const maxTokens = agentParams.maxTokens ?? 4096;
+  const maxTokens = agentParams.maxTokens ?? 8000;
   const topP = agentParams.topP ?? 1.0;
   const frequencyPenalty = agentParams.frequencyPenalty ?? 0;
   const presencePenalty = agentParams.presencePenalty ?? 0;
