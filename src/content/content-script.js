@@ -1368,6 +1368,7 @@
       // Utiliser un port pour le streaming
       const port = chrome.runtime.connect({ name: 'streaming' });
       currentStreamingPort = port;
+      let keepAliveInterval = null;
 
       // Vider le contenu initial
       setTrustedHTML(element, '');
@@ -1436,6 +1437,17 @@
         if (chrome.runtime.lastError) {
           console.error('IA Helper: Port disconnected', chrome.runtime.lastError.message);
         }
+        // Nettoyer UI si deconnecte en cours de stream
+        try {
+          cursor.remove();
+        } catch (e) {}
+        const modal = document.getElementById('ia-helper-action-modal');
+        if (modal) {
+          const stopBtn = modal.querySelector('.ia-action-stop-generation');
+          if (stopBtn) stopBtn.style.display = 'none';
+        }
+        currentStreamingPort = null;
+        if (keepAliveInterval) clearInterval(keepAliveInterval);
       });
 
       // Envoyer la demande de generation
@@ -1444,6 +1456,17 @@
         content: content,
         systemPrompt: systemPrompt
       });
+
+      // Keep-alive pour le SW
+      keepAliveInterval = setInterval(() => {
+        try {
+          if (currentStreamingPort) {
+            currentStreamingPort.postMessage({ type: 'keepalive' });
+          }
+        } catch (e) {
+          // ignore
+        }
+      }, 4000);
 
     } catch (error) {
       console.error('IA Helper: Erreur generation', error);

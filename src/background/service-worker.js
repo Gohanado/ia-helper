@@ -867,6 +867,8 @@ chrome.runtime.onConnect.addListener((port) => {
             port.postMessage({ type: 'error', error: error.message });
           }
         }
+      } else if (message.type === 'keepalive') {
+        // ignore, keeps SW alive
       }
     });
 
@@ -913,7 +915,7 @@ async function generateStreamingResponse(port, content, systemPrompt, agentParam
           }
         }
       }
-    }, 10000);
+    }, 2000);
   };
 
   const stopKeepAlive = () => {
