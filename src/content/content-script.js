@@ -1470,8 +1470,22 @@
               thinkingEl = document.createElement('div');
               thinkingEl.className = 'ia-thinking-block';
               const thinkingLabel = ct('thinking') || 'Thinking...';
-              thinkingEl.innerHTML = `<div class="ia-thinking-title">${thinkingLabel}</div><div class="ia-thinking-body"></div>`;
+              thinkingEl.innerHTML = `
+                <div class="ia-thinking-header">
+                  <div class="ia-thinking-title">${thinkingLabel}</div>
+                  <div class="ia-thinking-toggle" data-state="open">▼</div>
+                </div>
+                <div class="ia-thinking-body"></div>
+              `;
               element.insertBefore(thinkingEl, responseEl);
+
+              const toggle = thinkingEl.querySelector('.ia-thinking-toggle');
+              const body = thinkingEl.querySelector('.ia-thinking-body');
+              thinkingEl.addEventListener('click', () => {
+                const isCollapsed = thinkingEl.classList.toggle('collapsed');
+                if (toggle) toggle.textContent = isCollapsed ? '►' : '▼';
+                if (body) body.style.display = isCollapsed ? 'none' : 'block';
+              });
             }
             const body = thinkingEl.querySelector('.ia-thinking-body');
             if (body) {

@@ -558,9 +558,23 @@ async function startGeneration() {
     if (!thinkingEl) {
       thinkingEl = document.createElement('div');
       thinkingEl.className = 'thinking-block';
-      thinkingEl.innerHTML = `<div class="thinking-title">${t('thinking', currentLang) || 'Thinking'}</div><div class="thinking-body"></div>`;
+      thinkingEl.innerHTML = `
+        <div class="thinking-header">
+          <div class="thinking-title">${t('thinking', currentLang) || 'Thinking'}</div>
+          <div class="thinking-toggle" data-state="open">▼</div>
+        </div>
+        <div class="thinking-body"></div>
+      `;
       thinkingBody = thinkingEl.querySelector('.thinking-body');
       elements.resultContent.insertBefore(thinkingEl, markdownBody);
+
+      const toggle = thinkingEl.querySelector('.thinking-toggle');
+      const body = thinkingEl.querySelector('.thinking-body');
+      thinkingEl.addEventListener('click', () => {
+        const isCollapsed = thinkingEl.classList.toggle('collapsed');
+        if (toggle) toggle.textContent = isCollapsed ? '►' : '▼';
+        if (body) body.style.display = isCollapsed ? 'none' : 'block';
+      });
     }
   };
   elements.resultContent.appendChild(markdownBody);
@@ -604,7 +618,11 @@ async function startGeneration() {
         }
       } else if (msg.type === 'thinking_end') {
         if (thinkingEl) {
-          thinkingEl.classList.add('thinking-done');
+          thinkingEl.classList.add('thinking-done', 'collapsed');
+          const toggle = thinkingEl.querySelector('.thinking-toggle');
+          const body = thinkingEl.querySelector('.thinking-body');
+          if (toggle) toggle.textContent = '►';
+          if (body) body.style.display = 'none';
         }
       } else if (msg.type === 'done') {
         currentPort.disconnect();
@@ -684,9 +702,23 @@ async function refine(additionalPrompt) {
     if (!thinkingEl) {
       thinkingEl = document.createElement('div');
       thinkingEl.className = 'thinking-block';
-      thinkingEl.innerHTML = `<div class="thinking-title">${t('thinking', currentLang) || 'Thinking'}</div><div class="thinking-body"></div>`;
+      thinkingEl.innerHTML = `
+        <div class="thinking-header">
+          <div class="thinking-title">${t('thinking', currentLang) || 'Thinking'}</div>
+          <div class="thinking-toggle" data-state="open">▼</div>
+        </div>
+        <div class="thinking-body"></div>
+      `;
       thinkingBody = thinkingEl.querySelector('.thinking-body');
       elements.resultContent.insertBefore(thinkingEl, markdownBody);
+
+      const toggle = thinkingEl.querySelector('.thinking-toggle');
+      const body = thinkingEl.querySelector('.thinking-body');
+      thinkingEl.addEventListener('click', () => {
+        const isCollapsed = thinkingEl.classList.toggle('collapsed');
+        if (toggle) toggle.textContent = isCollapsed ? '►' : '▼';
+        if (body) body.style.display = isCollapsed ? 'none' : 'block';
+      });
     }
   };
   elements.resultContent.appendChild(markdownBody);

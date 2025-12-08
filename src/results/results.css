@@ -485,22 +485,40 @@ textarea:focus {
   background: rgba(102, 126, 234, 0.08);
   border: 1px solid rgba(102, 126, 234, 0.2);
   border-radius: 8px;
-  padding: 10px 12px;
+  padding: 10px 12px 8px;
   margin-bottom: 12px;
   font-size: 0.95em;
+}
+
+.thinking-block .thinking-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  cursor: pointer;
 }
 
 .thinking-block .thinking-title {
   font-weight: 600;
   font-size: 0.85em;
   text-transform: uppercase;
-  margin-bottom: 6px;
   color: #3b4a7a;
+}
+
+.thinking-block .thinking-toggle {
+  font-size: 0.85em;
+  color: #3b4a7a;
+  opacity: 0.8;
 }
 
 .thinking-block .thinking-body {
   line-height: 1.5;
   color: var(--text-primary);
+  margin-top: 6px;
+}
+
+.thinking-block.collapsed .thinking-body {
+  display: none;
 }
 
 @keyframes blink {
