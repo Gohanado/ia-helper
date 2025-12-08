@@ -1310,9 +1310,15 @@
       });
     }
 
-    // Lancer la generation
+    // Lancer la generation (non-streaming pour fiabilite dans le popup inline)
     const responseEl = modal.querySelector('.ia-action-response-content');
-    generateActionResponse(responseEl, content, systemPrompt);
+    generateResponse(responseEl, content, systemPrompt).then((res) => {
+      currentPopupResult = res || '';
+      // Masquer le bouton stop (inutile en non-streaming)
+      if (stopBtn) {
+        stopBtn.style.display = 'none';
+      }
+    });
   }
 
   // Copier dans un format specifique
