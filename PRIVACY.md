@@ -1,91 +1,119 @@
-# Privacy Policy - IA Helper
+# Politique de Confidentialite - IA Helper
 
-**Last update:** December 7, 2025
+**Derniere mise a jour:** 26 novembre 2025
 
-## Summary
-IA Helper works entirely locally. We do not collect, store, or send personal data to external servers. Your data stays on your machine, except when you explicitly call an external AI provider you configured.
+## Resume
 
----
-
-## 1. Data Collected
-### We do **not** collect:
-- Personal data
-- Browsing history
-- Texts processed by the AI
-- Identifiers or tracking cookies
-- Telemetry or usage analytics
-
-### Data stored locally (your machine only):
-- Extension settings (provider URLs, selected model, languages)
-- Custom presets and prompts
-- Interface preferences
-
-Storage: `chrome.storage.local` (local to your browser profile).
+IA Helper est une extension Chrome qui fonctionne **100% en local**. Aucune donnee personnelle n'est collectee, stockee ou transmise a des serveurs externes.
 
 ---
 
-## 2. Network Communication
-### Possible connections
-| Destination | Purpose | Data sent |
-|-------------|---------|-----------|
-| `localhost:11434` (Ollama, default) | Local AI processing | Text you ask to process |
-| External provider (OpenAI/Anthropic/Groq/OpenRouter/custom) if configured | AI processing | Text you ask to process |
-| github.com (only if you click bug/feedback links) | Issue templates | None automatically |
+## 1. Donnees Collectees
 
-No tracking/ads/analytics calls are made by the extension.
+### Donnees que nous NE collectons PAS:
+- Aucune donnee personnelle
+- Aucun historique de navigation
+- Aucun texte traite par l'IA
+- Aucune information d'identification
+- Aucun cookie de tracking
+- Aucune telemetrie
+- Aucune statistique d'utilisation
 
----
+### Donnees stockees localement (sur votre machine uniquement):
+- Configuration de l'extension (URL Ollama, modele selectionne)
+- Presets personnalises que vous creez
+- Preferences d'interface (langue, theme)
 
-## 3. AI Processing
-- With Ollama, everything stays on your machine.
-- With cloud providers, your text goes only to the provider you chose.
-- No data is sent anywhere else.
-
----
-
-## 4. Permissions
-| Permission | Use |
-|------------|-----|
-| `contextMenus` | Right-click menu |
-| `activeTab` | Read selected text |
-| `storage` | Save preferences locally |
-| `scripting` | Inject features on pages |
-| `<all_urls>` | Allow actions on any site (no data collection) |
+Ces donnees sont stockees via `chrome.storage.local` et restent sur votre ordinateur.
 
 ---
 
-## 5. Data Sharing
-We do not sell or share data with third parties.
+## 2. Communication Reseau
+
+### Connexions effectuees:
+| Destination | Raison | Donnees envoyees |
+|-------------|--------|------------------|
+| `localhost:11434` (Ollama) | Traitement IA local | Texte a analyser |
+| GitHub.com | Signalement bugs (si vous cliquez) | Aucune auto |
+
+### Connexions NON effectuees:
+- Aucun serveur de tracking
+- Aucun service d'analytics
+- Aucun serveur publicitaire
+- Aucun serveur cloud IA externe
 
 ---
 
-## 6. Security
-- Open source, auditable code
-- No external telemetry
-- No minification for transparency
+## 3. Ollama et Traitement IA
+
+- Ollama s'execute **sur votre machine**
+- Les textes envoyes a l'IA ne quittent **jamais votre ordinateur**
+- Aucune donnee n'est envoyee a OpenAI, Google, ou tout autre service cloud
+- Vous avez le controle total sur les modeles utilises
 
 ---
 
-## 7. Your Rights
-- Remove the extension at any time.
-- Reset options from the settings page.
-- Inspect the source code on GitHub.
+## 4. Permissions de l'Extension
+
+| Permission | Utilisation |
+|------------|-------------|
+| `contextMenus` | Afficher le menu clic-droit |
+| `activeTab` | Lire le texte selectionne |
+| `storage` | Sauvegarder vos preferences localement |
+| `tabs` | Ouvrir la page de resultats |
+| `scripting` | Injecter les fonctionnalites dans les pages |
+| `<all_urls>` | Fonctionner sur tous les sites web |
+
+Toutes ces permissions sont utilisees **localement** pour le fonctionnement de l'extension.
 
 ---
 
-## 8. Changes
-Changes to this policy are documented in the changelog and on GitHub.
+## 5. Partage de Donnees
+
+Nous ne partageons, vendons ou transmettons **aucune donnee** a des tiers.
+
+---
+
+## 6. Securite
+
+- Tout le code est open source et verifiable
+- Aucune dependance a des services externes
+- Pas de minification du code pour transparence
+- Auditable par la communaute
+
+---
+
+## 7. Vos Droits
+
+Vous pouvez a tout moment:
+- Supprimer l'extension et toutes ses donnees
+- Reinitialiser les options dans les parametres
+- Inspecter le code source sur GitHub
+
+---
+
+## 8. Modifications
+
+Toute modification de cette politique sera documentee dans le CHANGELOG et sur GitHub.
 
 ---
 
 ## 9. Contact
-- Email: contact@badom.ch  
+
+Pour toute question concernant la confidentialite:
+- Email: contact@badom.ch
 - GitHub: https://github.com/Gohanado/ia-helper/issues
 
 ---
 
-## 10. Compliance
-- GDPR principles (data minimization, user control)
-- Chrome Web Store policies
+## 10. Conformite
 
-**IA Helper keeps your privacy first.**
+Cette extension respecte:
+- Le RGPD (Reglement General sur la Protection des Donnees)
+- Les politiques du Chrome Web Store
+- Le principe de minimisation des donnees
+
+---
+
+**IA Helper - Votre vie privee est notre priorite.**
+

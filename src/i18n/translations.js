@@ -1533,15 +1533,15 @@ export const AVAILABLE_LANGUAGES = [
 ];
 
 // Get translation
-export function t(key, lang = 'en') {
-  return TRANSLATIONS[lang]?.[key] || TRANSLATIONS['en'][key] || key;
+export function t(key, lang = 'fr') {
+  return TRANSLATIONS[lang]?.[key] || TRANSLATIONS['fr'][key] || key;
 }
 
 // Get current language from storage
 export async function getCurrentLanguage() {
   return new Promise((resolve) => {
     chrome.storage.local.get(['config'], (result) => {
-      resolve(result.config?.interfaceLanguage || 'en');
+      resolve(result.config?.interfaceLanguage || 'fr');
     });
   });
 }

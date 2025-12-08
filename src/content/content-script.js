@@ -39,13 +39,13 @@
     inlinePopupEnabled: true,
     directInputEnabled: false,
     directInputMode: 'replace',
-    interfaceLanguage: 'en',
+    interfaceLanguage: 'fr',
     speechEnabled: true,
     speechRate: 1.0,
     speechPitch: 1.0,
     speechVoiceName: '',
     speechLanguageMode: 'auto',
-    speechFixedLanguage: 'en'
+    speechFixedLanguage: 'fr'
   };
 
   let config = { ...DEFAULT_CONFIG };
@@ -135,8 +135,8 @@
   };
 
   function ct(key) {
-    const lang = config.interfaceLanguage || 'en';
-    return CONTENT_TRANSLATIONS[lang]?.[key] || CONTENT_TRANSLATIONS['en'][key] || key;
+    const lang = config.interfaceLanguage || 'fr';
+    return CONTENT_TRANSLATIONS[lang]?.[key] || CONTENT_TRANSLATIONS['fr'][key] || key;
   }
 
   // Element actif actuel
@@ -837,7 +837,7 @@
     }
 
     // Si aucune correspondance significative, retourner la langue de l'interface
-    return maxScore > 2 ? detectedLang : (config.interfaceLanguage || 'en');
+    return maxScore > 2 ? detectedLang : (config.interfaceLanguage || 'fr');
   }
 
   // Traduire un texte dans une langue cible via l'IA
@@ -942,7 +942,7 @@
 
     // Determiner la langue et le texte a lire
     let textToRead = cleanText;
-      let targetLang = config.speechFixedLanguage || 'en';
+    let targetLang = config.speechFixedLanguage || 'fr';
 
     if (config.speechLanguageMode === 'auto') {
       // Mode automatique: detecter la langue du texte (rapide, cote client)
@@ -1310,15 +1310,9 @@
       });
     }
 
-    // Lancer la generation (non-streaming pour fiabilite dans le popup inline)
+    // Lancer la generation
     const responseEl = modal.querySelector('.ia-action-response-content');
-    generateResponse(responseEl, content, systemPrompt).then((res) => {
-      currentPopupResult = res || '';
-      // Masquer le bouton stop (inutile en non-streaming)
-      if (stopBtn) {
-        stopBtn.style.display = 'none';
-      }
-    });
+    generateActionResponse(responseEl, content, systemPrompt);
   }
 
   // Copier dans un format specifique
@@ -1368,7 +1362,6 @@
       // Utiliser un port pour le streaming
       const port = chrome.runtime.connect({ name: 'streaming' });
       currentStreamingPort = port;
-      let keepAliveInterval = null;
 
       // Vider le contenu initial
       setTrustedHTML(element, '');
@@ -1437,17 +1430,6 @@
         if (chrome.runtime.lastError) {
           console.error('IA Helper: Port disconnected', chrome.runtime.lastError.message);
         }
-        // Nettoyer UI si deconnecte en cours de stream
-        try {
-          cursor.remove();
-        } catch (e) {}
-        const modal = document.getElementById('ia-helper-action-modal');
-        if (modal) {
-          const stopBtn = modal.querySelector('.ia-action-stop-generation');
-          if (stopBtn) stopBtn.style.display = 'none';
-        }
-        currentStreamingPort = null;
-        if (keepAliveInterval) clearInterval(keepAliveInterval);
       });
 
       // Envoyer la demande de generation
@@ -1456,17 +1438,6 @@
         content: content,
         systemPrompt: systemPrompt
       });
-
-      // Keep-alive pour le SW
-      keepAliveInterval = setInterval(() => {
-        try {
-          if (currentStreamingPort) {
-            currentStreamingPort.postMessage({ type: 'keepalive' });
-          }
-        } catch (e) {
-          // ignore
-        }
-      }, 4000);
 
     } catch (error) {
       console.error('IA Helper: Erreur generation', error);

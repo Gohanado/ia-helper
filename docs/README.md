@@ -1,191 +1,386 @@
-# IA Helper Documentation
+# Documentation IA Helper
 
-Technical and user guide for the Chrome/Firefox extension.
+Documentation technique et guide utilisateur complet pour l'extension IA Helper (Chrome/Firefox).
 
-## Table of contents
-1. Quick start
-2. Providers
-3. Local LLM (Ollama)
-4. Remote Ollama (VPS/VM)
-5. Advanced configuration
-6. Features
-7. API & architecture
-8. Troubleshooting
-9. FAQ
+## Table des matieres
 
----
-
-## Quick start
-IA Helper works with multiple providers. Easiest path: Ollama locally. You can also use OpenAI, Anthropic, Groq, OpenRouter, or any OpenAI-compatible endpoint.
-
-### 3-minute local setup (recommended)
-1. Install Ollama: https://ollama.ai/download  
-2. Pull a model: `ollama pull llama3.2` (or another)  
-3. Install the extension (dev mode or store)  
-4. Options: provider = Ollama, URL = `http://localhost:11434`, test connection  
-5. Use the context menu or chat.
-
-### Using a cloud provider
-1. Choose provider in Options (OpenAI, Anthropic, Groq, OpenRouter, custom)
-2. Enter URL/API key (per provider doc)
-3. Pick a model (badge in chat/popup)
-4. Save; all actions route to that provider.
-
-### Providers available
-- **Ollama (local)**: free, local data
-- **OpenAI / OpenRouter / Custom**: OpenAI-compatible API
-- **Anthropic / Groq**: streaming + system/user roles
+1. [Guide de demarrage rapide](#guide-de-demarrage-rapide)
+2. [Providers disponibles](#providers-disponibles)
+3. [Installer un LLM local (Ollama)](#installer-un-llm-local-ollama)
+4. [Serveur Ollama distant (VPS/VM)](#serveur-ollama-distant)
+5. [Configuration avancee](#configuration-avancee)
+6. [Fonctionnalites detaillees](#fonctionnalites-detaillees)
+7. [API et architecture](#api-et-architecture)
+8. [Depannage](#depannage)
+9. [FAQ](#faq)
 
 ---
 
-## Install a local LLM (Ollama)
-See https://ollama.ai/download and:
-- Windows: run installer, then `ollama pull llama3.2`
-- macOS: `brew install ollama`, then pull a model
-- Linux: `curl -fsSL https://ollama.ai/install.sh | sh`, start service, then pull a model
+## Guide de demarrage rapide
 
-Suggested models: `llama3.2` (general), `mistral` (very good FR), `gemma2`, `phi3`, `qwen2.5`.
+IA Helper fonctionne avec plusieurs providers. Le plus simple et gratuit : Ollama en local. Vous pouvez aussi brancher OpenAI, Anthropic, Groq, OpenRouter ou un endpoint compatible OpenAI.
+
+### 3 minutes pour demarrer en local (recommande)
+1. **Installez Ollama**: [ollama.ai/download](https://ollama.ai/download)
+2. **Telechargez un modele**: `ollama pull llama3.2` (ou autre)
+3. **Installez l'extension** (mode dev ou Web Store)
+4. **Options IA Helper**: provider = Ollama, URL = `http://localhost:11434`, test connexion
+5. Utilisez le menu contextuel ou le chat
+
+### Utiliser un provider cloud
+1. Choisissez le provider dans Options (OpenAI, Anthropic, Groq, OpenRouter, custom)
+2. Renseignez l'URL/API key (voir la doc du provider)
+3. Selectionnez un modele (badge modele dans le chat et le popup)
+4. Sauvegardez; IA Helper route toutes les actions vers ce provider
+
+### Providers disponibles
+- **Ollama (local)**: 100% gratuit, donnees locales
+- **OpenAI / OpenRouter / Custom**: API compatible OpenAI
+- **Anthropic / Groq**: support streaming et roles system/user
 
 ---
 
-## Remote Ollama (server)
-Install Ollama on a VPS/VM, expose port 11434 (use HTTPS/reverse proxy for production).
-Example (Linux):
-```bash
-curl -fsSL https://ollama.ai/install.sh | sh
+## Installer un LLM local (Ollama)
+
+---
+
+## Installation d'Ollama (detaille)
+
+### Sur Windows
+
+1. Telechargez l'installateur: [ollama.ai/download](https://ollama.ai/download)
+2. Executez `OllamaSetup.exe`
+3. Ollama demarre automatiquement en arriere-plan
+4. Ouvrez PowerShell et tapez:
+
+```powershell
+# Telecharger un modele (obligatoire)
 ollama pull llama3.2
-# Listen on all interfaces
+
+# Verifier que ca fonctionne
+ollama list
+```
+
+### Sur macOS
+
+```bash
+# Avec Homebrew
+brew install ollama
+
+# Ou telechargez depuis ollama.ai/download
+# Puis:
+ollama pull llama3.2
+```
+
+### Sur Linux
+
+```bash
+# Installation en une ligne
+curl -fsSL https://ollama.ai/install.sh | sh
+
+# Demarrer le service
+sudo systemctl start ollama
+
+# Telecharger un modele
+ollama pull llama3.2
+```
+
+### Quel modele choisir?
+
+| Modele | Taille | Usage | Commande |
+|--------|--------|-------|----------|
+| **llama3.2** | 4.7 GB | General, recommande | `ollama pull llama3.2` |
+| **mistral** | 4.1 GB | Tres bon en francais | `ollama pull mistral` |
+| **gemma2** | 5.4 GB | Google, performant | `ollama pull gemma2` |
+| **phi3** | 2.2 GB | Leger, rapide | `ollama pull phi3` |
+| **qwen2.5** | 4.4 GB | Multilangue | `ollama pull qwen2.5` |
+
+**Conseil**: Commencez par `llama3.2` ou `mistral` pour le francais.
+
+---
+
+## Serveur Ollama distant
+
+Si vous avez un serveur (VPS, VM, NAS), vous pouvez y installer Ollama et l'utiliser depuis n'importe ou.
+
+### Installation sur serveur Linux (Ubuntu/Debian)
+
+```bash
+# Connectez-vous en SSH
+ssh user@votre-serveur.com
+
+# Installez Ollama
+curl -fsSL https://ollama.ai/install.sh | sh
+
+# Telecharger un modele
+ollama pull llama3.2
+
+# Configurer pour ecouter sur toutes les interfaces
+sudo systemctl stop ollama
 sudo mkdir -p /etc/systemd/system/ollama.service.d
-cat <<EOF | sudo tee /etc/systemd/system/ollama.service.d/override.conf
+sudo tee /etc/systemd/system/ollama.service.d/override.conf <<EOF
 [Service]
 Environment="OLLAMA_HOST=0.0.0.0"
 EOF
 sudo systemctl daemon-reload
-sudo systemctl restart ollama
+sudo systemctl start ollama
 ```
-Open firewall port 11434. In IA Helper options, set URL to `http://YOUR_IP:11434`.
 
-Docker (alternative):
+### Ouvrir le port (pare-feu)
+
 ```bash
+# UFW (Ubuntu)
+sudo ufw allow 11434/tcp
+
+# firewalld (CentOS/RHEL)
+sudo firewall-cmd --add-port=11434/tcp --permanent
+sudo firewall-cmd --reload
+```
+
+### Configuration dans IA Helper
+
+1. Ouvrez les Options de l'extension
+2. Dans "URL Ollama", entrez: `http://VOTRE_IP:11434`
+3. Testez la connexion
+4. Selectionnez votre modele
+
+**Securite**: Pour un usage en production, utilisez un reverse proxy (nginx) avec HTTPS et authentification.
+
+### Docker (alternatif)
+
+```bash
+# CPU only
 docker run -d -p 11434:11434 --name ollama ollama/ollama
-# NVIDIA
+
+# Avec GPU NVIDIA
 docker run -d --gpus=all -p 11434:11434 --name ollama ollama/ollama
+
+# Telecharger un modele
 docker exec -it ollama ollama pull llama3.2
 ```
 
 ---
 
-## Install the extension
-### Dev mode
+## Installation de l'extension
+
+### Option A: Chrome Web Store (recommande)
+
+*(Bientot disponible)*
+
+### Option B: Mode developpeur
+
 ```bash
+# Cloner le depot
 git clone https://github.com/Gohanado/ia-helper.git
 ```
-1. Chrome: `chrome://extensions`, enable dev mode, “Load unpacked”, select repo folder.  
-2. Firefox: `about:debugging#/runtime/this-firefox`, “Load temporary add-on”, pick `manifest.json` from the repo folder.
 
-### Configuration
-1. Click the IA Helper icon
-2. Check status is OK
-3. Open Options to set provider/model/language/etc.
+1. Ouvrez Chrome > `chrome://extensions/`
+2. Activez "Mode developpeur" (toggle en haut a droite)
+3. Cliquez "Charger l'extension non empaquetee"
+4. Selectionnez le dossier `ia-helper`
 
----
+### Configuration initiale
 
-## Advanced configuration
-Connection:
-| Setting | Description | Default |
-|---------|-------------|---------|
-| Ollama URL | Server URL | http://localhost:11434 |
-| Model | Model to use | (first available) |
-| Streaming | Progressive responses | Enabled |
-
-Language:
-| Setting | Description | Options |
-|---------|-------------|---------|
-| Interface language | UI language | EN, FR, ES, IT, PT |
-| Response language | Force responses in | Auto, EN, FR, ES, IT, PT |
-
-Custom prompts:
-1. Options > Presets
-2. Customize a preset or action
-3. Save
-Available tokens: `{lang}` for translation targets; user text is added automatically.
+1. Cliquez sur l'icone IA Helper
+2. Verifiez que le status est "OK" (vert)
+3. Cliquez sur "Options" pour personnaliser
 
 ---
 
-## Features
-### Context menu
-Adapts to context:
-- **Selection**: summarize, explain, analyze, translate, extract key points
-- **Input fields**: correct, rephrase, expand, simplify, translate/replace
-- **Page**: summarize page, extract key points, page actions
+## Configuration avancee
 
-### Presets (140+ actions)
-Tech (Dev, Data), Business (Sales, Marketing, PM), Communication (Support, Community, Copy), Creative (Writer, UX, Content), Education (Student, Teacher), Specialized (HR, Manager, Legal, Health, E-commerce), Personal assistant.
+### Parametres de connexion
 
-### Popup inline
-Streaming, copy, TTS, stop, view details.
+| Parametre | Description | Valeur par defaut |
+|-----------|-------------|-------------------|
+| URL Ollama | Adresse du serveur Ollama | http://localhost:11434 |
+| Modele | Modele IA a utiliser | (premier disponible) |
+| Streaming | Affichage progressif des reponses | Active |
 
-### Chat
-Local history, export, multi-format copy, TTS, model/agent selector, suggestions.
+### Parametres de langue
 
-### Agents
-Create/duplicate with system prompt, temperature, top_p, penalties, model per agent.
+| Parametre | Description | Options |
+|-----------|-------------|---------|
+| Langue interface | Langue des menus et options | FR, EN, ES, IT, PT |
+| Langue reponses | Force les reponses dans une langue | Auto, FR, EN, ES, IT, PT |
 
-### Rendering
-Markdown, LaTeX, code blocks with copy buttons.
+### Personnalisation des prompts
+
+Chaque action peut avoir son prompt personnalise:
+
+1. Allez dans Options > Presets
+2. Cliquez "Personnaliser" sur un preset
+3. Modifiez le prompt de l'action souhaitee
+4. Sauvegardez
+
+**Variables disponibles dans les prompts:**
+- `{lang}` - Langue cible pour les traductions
+- Le texte utilisateur est automatiquement ajoute
 
 ---
 
-## API & architecture
-Key files:
+## Fonctionnalites detaillees
+
+### Menu contextuel
+
+Le menu contextuel s'adapte automatiquement au contexte:
+
+#### Sur du texte selectionne
+| Action | Description |
+|--------|-------------|
+| Resumer | Resume concis du texte |
+| Expliquer | Explication simple et claire |
+| Analyser | Analyse du contenu et du ton |
+| Traduire | Traduction vers 11 langues |
+| Extraire | Points cles et informations principales |
+
+#### Dans un champ de saisie (input/textarea)
+| Action | Description |
+|--------|-------------|
+| Corriger | Correction orthographe et grammaire |
+| Reformuler | Version plus professionnelle |
+| Developper | Enrichit et detaille le texte |
+| Simplifier | Version plus simple et claire |
+| Traduire | Traduction avec remplacement |
+
+#### Sur une page
+| Action | Description |
+|--------|-------------|
+| Resumer la page | Resume du contenu principal |
+| Extraire les points essentiels | Liste des informations cles |
+
+### 24 Presets Professionnels (140+ actions)
+
+| Categorie | Presets |
+|-----------|---------|
+| **Tech** | Support IT, Developpeur, Data Analyst |
+| **Business** | Commercial, Marketing, Product Manager, Freelance |
+| **Communication** | Service Client, Community Manager, Copywriter |
+| **Creatif** | Redacteur, Designer UX, Createur Contenu, Journaliste |
+| **Education** | Etudiant, Formateur, Chercheur |
+| **Specialise** | RH/Recruteur, Manager, Juriste, Traducteur, Sante, E-commerce |
+| **Personnel** | Assistant Personnel |
+
+Chaque preset contient 4 a 6 actions specialisees avec des prompts optimises.
+
+---
+
+## API et architecture
+
+### Structure des fichiers
+
 ```
 src/
-  background/service-worker.js  # menus, messaging, injection
-  content/content-script.js     # page interaction
-  popup/                        # popup UI
-  options/                      # settings UI
-  results/                      # streaming results page
-  i18n/translations.js          # translations
+├── background/
+│   └── service-worker.js    # Gestion menus, messages, injection
+├── content/
+│   ├── content-script.js    # Interaction avec les pages
+│   └── content-styles.css   # Styles injectes
+├── popup/
+│   ├── popup.html/js/css    # Interface popup
+├── options/
+│   ├── options.html/js/css  # Page d'options
+├── results/
+│   ├── results.html/js/css  # Page de resultats streaming
+└── i18n/
+    └── translations.js      # Traductions multilingues
 ```
 
-Data storage (`chrome.storage.local`):
-| Key | Description |
+### Communication entre composants
+
+```
+[Page Web] <--> [Content Script] <--> [Service Worker] <--> [Ollama API]
+                      |
+                      v
+               [Results Page]
+```
+
+### Stockage des donnees
+
+Toutes les donnees sont stockees localement via `chrome.storage.local`:
+
+| Cle | Description |
 |-----|-------------|
-| config | URL, model, languages, options |
-| activePresets | Enabled presets |
-| customPresets | User presets |
-| customPrompts | User-modified prompts |
+| config | Configuration generale (URL, modele, langues) |
+| activePresets | Liste des presets actives |
+| customPresets | Presets personnalises de l'utilisateur |
+| customPrompts | Prompts modifies par l'utilisateur |
 
 ---
 
-## Troubleshooting
-- **Cannot connect to Ollama**: ensure service running; `curl http://localhost:11434/api/tags`; check firewall.
-- **Context menu empty**: reload extension, refresh page, check SW console.
-- **Actions fail**: set a model; check console logs “IA Helper”.
-- **Slow responses**: choose lighter model (`phi3`, `gemma:2b`); ensure CPU/RAM available.
-- **“No content to process”**: select text or ensure input has text.
+## Depannage
+
+### L'extension ne se connecte pas a Ollama
+
+1. **Verifiez qu'Ollama est demarre**
+   ```bash
+   ollama serve
+   ```
+
+2. **Testez la connexion manuellement**
+   ```bash
+   curl http://localhost:11434/api/tags
+   ```
+
+3. **Verifiez le pare-feu**
+   - Le port 11434 doit etre accessible
+   - Desactivez temporairement le pare-feu pour tester
+
+4. **Probleme CORS**
+   - Ollama gere automatiquement CORS depuis la version 0.1.14
+
+### Le menu contextuel est vide
+
+1. Rechargez l'extension dans `chrome://extensions/`
+2. Rafraichissez la page web (F5)
+3. Ouvrez la console du Service Worker pour voir les erreurs
+
+### Les actions ne fonctionnent pas
+
+1. Verifiez que le modele est configure dans les options
+2. Ouvrez la console de la page (F12) et cherchez les erreurs "IA Helper"
+3. Verifiez la console du Service Worker
+
+### Reponses lentes
+
+- Utilisez un modele plus leger: `phi3`, `gemma:2b`
+- Verifiez les ressources CPU/RAM disponibles
+- Fermez les autres applications gourmandes
+
+### Erreur "Aucun contenu a traiter"
+
+- Selectionnez du texte avant de cliquer sur l'action
+- Pour les champs de saisie, assurez-vous qu'ils contiennent du texte
 
 ---
 
 ## FAQ
-**Is my data sent over the Internet?**  
-Local with Ollama. With cloud providers, only to the provider you configured.
 
-**Recommended models?**  
-`mistral` or `llama3.2` for general use; `phi3`/`gemma:2b` for speed.
+**Q: Mes donnees sont-elles envoyees sur Internet?**
+R: Non, tout reste local. Ollama fonctionne entierement sur votre machine.
 
-**Firefox support?**  
-Supported (Manifest V3 build); popup inline long-generation issue under investigation.
+**Q: Quels modeles sont recommandes?**
+R: Pour le francais, `mistral` ou `llama3.2` fonctionnent tres bien. Pour des reponses rapides, `phi3` ou `gemma:2b`.
+
+**Q: Puis-je utiliser un serveur Ollama distant?**
+R: Oui, modifiez l'URL dans les options (ex: `http://192.168.1.100:11434`).
+
+**Q: Comment creer un preset personnalise?**
+R: Options > Presets > Creer un preset. Ajoutez des actions avec leurs prompts.
+
+**Q: L'extension fonctionne-t-elle sur Firefox?**
+R: Non, actuellement Chrome uniquement (Manifest V3).
 
 ---
 
 ## Support
-- Bugs: https://github.com/Gohanado/ia-helper/issues/new?template=bug_report.md  
-- Features: https://github.com/Gohanado/ia-helper/issues/new?template=feature_request.md  
-- Discussions: https://github.com/Gohanado/ia-helper/discussions  
-- Donate: https://paypal.me/gohanado
+
+- [Signaler un bug](https://github.com/Gohanado/ia-helper/issues/new?template=bug_report.md)
+- [Demander une fonctionnalite](https://github.com/Gohanado/ia-helper/issues/new?template=feature_request.md)
+- [Discussions](https://github.com/Gohanado/ia-helper/discussions)
+- [Faire un don](https://paypal.me/gohanado)
 
 ---
 
-**Version:** 2.0.0  
-**Last updated:** 2025-12-08
+**Version:** 1.0.0
+**Derniere mise a jour:** 2025-11-26

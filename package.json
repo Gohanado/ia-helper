@@ -1,6 +1,6 @@
 {
   "name": "ia-helper",
-  "version": "2.0.1",
+  "version": "2.0.0",
   "description": "Extension IA Helper multi-providers (Ollama, OpenAI, Anthropic, Groq, OpenRouter) avec chat, menu contextuel et popup inline",
   "author": {
     "name": "Gohanado",

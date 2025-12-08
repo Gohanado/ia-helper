@@ -18,8 +18,8 @@ const DEFAULT_CONFIG = {
   inlinePopupEnabled: true,
   directInputEnabled: false,
   directInputMode: 'replace',
-  interfaceLanguage: 'en',
-  responseLanguage: 'en',
+  interfaceLanguage: 'fr',
+  responseLanguage: 'fr',
   speechEnabled: true,
   speechRate: 1.0,
   speechPitch: 1.0,
@@ -96,7 +96,7 @@ let customPrompts = {}; // Prompts personnalises pour les actions de base
 let config = { ...DEFAULT_CONFIG };
 let enabledActions = [...DEFAULT_ENABLED_ACTIONS];
 let customPresets = [];
-let currentLang = 'en';
+let currentLang = 'fr';
 
 // Agents
 let customAgents = [];
@@ -191,7 +191,7 @@ function handleHashNavigation() {
 
 // Appliquer les traductions a l'interface
 function applyTranslations() {
-  currentLang = config.interfaceLanguage || 'en';
+  currentLang = config.interfaceLanguage || 'fr';
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.dataset.i18n;
     const translation = t(key, currentLang);
@@ -215,7 +215,7 @@ async function loadAllSettings() {
       if (elements.inlinePopupEnabled) elements.inlinePopupEnabled.checked = config.inlinePopupEnabled !== false;
       if (elements.directInputEnabled) elements.directInputEnabled.checked = config.directInputEnabled === true;
       if (elements.directInputMode) elements.directInputMode.value = config.directInputMode || 'replace';
-      if (elements.interfaceLanguage) elements.interfaceLanguage.value = config.interfaceLanguage || 'en';
+      if (elements.interfaceLanguage) elements.interfaceLanguage.value = config.interfaceLanguage || 'fr';
       if (elements.responseLanguage) elements.responseLanguage.value = config.responseLanguage || 'auto';
 
       // Options de lecture vocale
@@ -234,7 +234,7 @@ async function loadAllSettings() {
         elements.speechLanguageMode.value = config.speechLanguageMode || 'auto';
       }
       if (elements.speechFixedLanguage) {
-        elements.speechFixedLanguage.value = config.speechFixedLanguage || 'en';
+        elements.speechFixedLanguage.value = config.speechFixedLanguage || 'fr';
       }
       // La voix sera selectionnee dans loadAvailableVoices() apres chargement des voix
 
@@ -752,13 +752,13 @@ async function saveConnectionSettings() {
   config.inlinePopupEnabled = elements.inlinePopupEnabled?.checked !== false;
   config.directInputEnabled = elements.directInputEnabled?.checked === true;
   config.directInputMode = elements.directInputMode?.value || 'replace';
-  config.interfaceLanguage = elements.interfaceLanguage?.value || 'en';
+  config.interfaceLanguage = elements.interfaceLanguage?.value || 'fr';
   config.responseLanguage = elements.responseLanguage?.value || 'auto';
   config.speechEnabled = elements.speechEnabled?.checked !== false;
   config.speechRate = parseFloat(elements.speechRate?.value) || 1.0;
   config.speechPitch = parseFloat(elements.speechPitch?.value) || 1.0;
   config.speechLanguageMode = elements.speechLanguageMode?.value || 'auto';
-  config.speechFixedLanguage = elements.speechFixedLanguage?.value || 'en';
+  config.speechFixedLanguage = elements.speechFixedLanguage?.value || 'fr';
   config.speechVoiceName = elements.speechVoice?.value || '';
 
   await saveConfig();

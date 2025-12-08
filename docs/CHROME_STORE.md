@@ -1,75 +1,105 @@
-# Chrome Web Store Listing
+# Publication Chrome Web Store
 
-## Required info
+## Informations requises
 
-### Extension name
+### Nom de l'extension
 ```
-IA Helper - Multi-Provider AI Assistant
-```
-
-### Short description (<=132 chars)
-```
-Multi-provider AI assistant (Ollama local, OpenAI, Anthropic, Groq, OpenRouter). Context menu, inline popup, chat, agents.
+IA Helper - Assistant IA Multi-Providers
 ```
 
-### Long description
+### Description courte (132 caracteres max)
 ```
-IA Helper - Your multi-provider AI assistant in the browser
+Assistant IA multi-providers (Ollama local, OpenAI, Anthropic, Groq, OpenRouter). Menu clic droit, popup inline, chat, agents.
+```
 
-Choose your LLM (local or cloud) and use it via right-click, inline popup, or full chat. Supports Ollama (local), OpenAI, Anthropic, Groq, OpenRouter, and OpenAI-compatible endpoints.
+### Description longue
+```
+IA Helper - Votre assistant IA multi-providers dans le navigateur
 
-MAIN FEATURES
-- Smart context menu (selection/input/page) with 140+ actions and custom actions
-- Inline popup with streaming, copy, TTS, stop, view details
-- Full chat with local history, export, TTS, multi-format copy, model/agent selector
-- Custom AI agents (prompts, temperature, top_p, penalties, model per agent)
-- Markdown/LaTeX rendering and code blocks with copy
-- Full translations (EN, FR, ES, IT, PT)
+Choisissez votre LLM (local ou cloud) et utilisez-le en un clic droit, dans un popup inline ou dans un chat complet. Support Ollama (local), OpenAI, Anthropic, Groq, OpenRouter et endpoints compatibles OpenAI.
 
-PRO PRESETS (140+ actions)
-- Developer: code review, explain, debug
-- Writer: rephrase, summarize, style
-- Support/Customer: replies, satisfaction
-- Analyst/Manager: synthesis, action plans
-- Plus 20+ more professional profiles
+FONCTIONNALITES PRINCIPALES
+- Menu contextuel intelligent (selection, champ, page) avec 140+ actions et actions personnalisees
+- Popup inline avec streaming, copie, TTS, stop, voir en detail
+- Chat complet avec historique local, export, TTS, copie multi-formats, selector modele/agent
+- Agents IA personnalises (prompts, temperature, top_p, penalties, modele par agent)
+- Rendu Markdown/LaTeX et code blocks avec bouton copie
+- UI et traductions completes (FR, EN, ES, IT, PT)
 
-PRIVACY
-- Local mode (Ollama) keeps data on your machine
-- No tracking/telemetry
-- For cloud providers, only your API requests are sent to the provider you choose
+PRESETS PROFESSIONNELS (140+ actions)
+- Developpeur : code review, explication, debug
+- Redacteur : reformulation, resume, style
+- Support/Service client : reponses, satisfaction
+- Analyste/Manager : synthese, plan d’action
+- Plus de 20 autres profils metiers
+
+CONFIDENTIALITE
+- Mode local (Ollama) sans fuite de donnees
+- Aucun tracking, aucune telemetrie
+- Pour les providers cloud, seules vos requetes API sont envoyees au provider choisi
 
 OPEN SOURCE
-Source available on GitHub. Contributions welcome.
+Code source disponible sur GitHub. Contributions bienvenues.
 ```
 
-### Category
+### Categorie
 ```
-Productivity
+Productivite
 ```
 
-### Languages
-- English (primary)
-- French
-- Spanish
-- Italian
-- Portuguese
+### Langues
+- Francais (principal)
+- Anglais
+- Espagnol
+- Italien
+- Portugais
 
-### Privacy policy URL
-https://github.com/Gohanado/ia-helper/blob/main/PRIVACY.md
+---
 
-### Permission justifications
-`contextMenus`: show right-click menu  
-`activeTab`: read selected text  
-`storage`: save local preferences (provider, model, language, shortcuts)  
-`scripting`: inject content script to interact with pages  
-`<all_urls>`: allow actions on any site (no data collection)
+## Assets requis
 
-### Screenshots (1280x800 or 640x400)
-1. Context menu with AI actions
-2. Inline popup UI
-3. Options/configuration page
-4. Streaming response
-5. Results page with Markdown rendering
+### Icones (deja pretes)
+- [x] icon16.png (16x16)
+- [x] icon32.png (32x32)
+- [x] icon48.png (48x48)
+- [x] icon128.png (128x128)
 
-### Uploads
-- Use `dist/ia-helper-chrome-v{version}.zip` for store upload.
+### A creer
+- [ ] Capture d'ecran 1: Menu contextuel (1280x800)
+- [ ] Capture d'ecran 2: Page de resultats (1280x800)
+- [ ] Capture d'ecran 3: Page d'options (1280x800)
+- [ ] Capture d'ecran 4: Popup (1280x800)
+- [ ] Icone promotionnelle (440x280)
+
+---
+
+## Checklist publication
+
+- [x] manifest.json valide
+- [x] Permissions justifiees
+- [x] Politique de confidentialite (PRIVACY.md)
+- [x] Licence claire
+- [x] Documentation complete
+- [x] Code propre et commente
+- [ ] Screenshots prepares
+- [ ] Icone promo preparee
+- [ ] Compte developpeur Chrome ($5 one-time)
+- [ ] ZIP de publication genere
+
+---
+
+## Commande pour generer le ZIP
+
+```powershell
+Remove-Item ia-helper-v1.0.0.zip -ErrorAction SilentlyContinue
+Compress-Archive -Path "manifest.json", "src", "assets" -DestinationPath "ia-helper-chrome-v2.0.0.zip" -Force
+```
+
+---
+
+## Liens utiles
+
+- [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/devconsole/)
+- [Guide de publication](https://developer.chrome.com/docs/webstore/publish/)
+- [Politiques du store](https://developer.chrome.com/docs/webstore/program_policies/)
+

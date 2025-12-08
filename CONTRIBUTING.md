@@ -1,64 +1,109 @@
-# Contributing Guide - IA Helper
+# Guide de Contribution - IA Helper
 
-Thanks for your interest in contributing!
+Merci de votre interet pour contribuer a IA Helper!
 
-## Ways to contribute
+## Comment Contribuer
 
-### 1) Report a bug
-1. Check existing [Issues](https://github.com/Gohanado/ia-helper/issues)
-2. Open a new “Bug Report” with:
-   - Clear description
-   - Steps to reproduce
-   - Expected vs observed behavior
-   - Browser + extension version
-   - Provider/model used
+### 1. Signaler un Bug
 
-### 2) Request a feature
-1. Open a “Feature Request”
-2. Describe the need, proposed solution, use cases, alternatives
+1. Verifiez que le bug n'a pas deja ete signale dans les [Issues](https://github.com/Gohanado/ia-helper/issues)
+2. Creez une nouvelle issue avec le template "Bug Report"
+3. Incluez:
+   - Description claire du probleme
+   - Etapes pour reproduire
+   - Comportement attendu vs observe
+   - Version de Chrome et de l'extension
+   - Modele Ollama utilise
 
-### 3) Submit code (PR)
-Before coding, open an issue to align. Then:
-1. Fork the repo
-2. Branch from `main`: `git checkout -b feature/my-feature`
-3. Implement + test
-4. Commit with a clear message: `git commit -m "feat: add X"`
-5. Push to your fork and open a PR
+### 2. Proposer une Fonctionnalite
 
-Commit prefixes:
-- `feat`: new feature
-- `fix`: bug fix
-- `docs`: docs only
-- `style`: formatting (no code change)
-- `refactor`: code refactor
-- `test`: add/update tests
-- `chore`: maintenance
+1. Ouvrez une issue avec le template "Feature Request"
+2. Decrivez:
+   - Le besoin ou probleme a resoudre
+   - La solution proposee
+   - Les cas d'utilisation
+   - Les alternatives considerees
 
-### 4) Add translations
-`src/i18n/translations.js` — copy an existing locale, translate all keys, test the UI.
+### 3. Soumettre du Code (Pull Request)
 
-### 5) Add presets
-`src/config/presets.js` — add a block with id, name, description, icon, and actions.
+#### Avant de coder:
+- Ouvrez d'abord une issue pour discuter du changement
+- Attendez la validation de l'equipe avant de commencer
 
-## Rules
-1. Clean code; clear names; no dead/commented code
-2. No external tracking/deps unless justified
-3. Compatibility: Chrome 88+ / Firefox target
-4. Tests: run and verify before PR
+#### Processus:
+1. Forkez le repository
+2. Creez une branche depuis `main`:
+   ```bash
+   git checkout -b feature/ma-fonctionnalite
+   ```
+3. Faites vos modifications
+4. Testez votre code
+5. Committez avec un message clair:
+   ```bash
+   git commit -m "feat: description de la fonctionnalite"
+   ```
+6. Pushez vers votre fork
+7. Ouvrez une Pull Request
 
-## Not accepted
-- Tracking/ads or external data collection
-- Copied code without attribution
-- Malicious behavior
+#### Convention de commits:
+- `feat:` Nouvelle fonctionnalite
+- `fix:` Correction de bug
+- `docs:` Documentation
+- `style:` Formatage (pas de changement de code)
+- `refactor:` Refactorisation
+- `test:` Ajout de tests
+- `chore:` Maintenance
 
-## IP
-By contributing, you agree:
-- Code is included under IA Helper license
-- You may be credited in CONTRIBUTORS.md
-- Maintainers may adjust your contribution if needed
+### 4. Ajouter des Traductions
+
+Les traductions sont dans `src/i18n/translations.js`. Pour ajouter une langue:
+1. Copiez une langue existante
+2. Traduisez toutes les chaines
+3. Testez l'interface dans cette langue
+
+### 5. Ajouter des Presets
+
+Les presets sont dans `src/config/presets.js`. Format:
+```javascript
+mon_preset: {
+  id: 'mon_preset',
+  name: 'Nom du Preset',
+  description: 'Description courte',
+  icon: 'icone',
+  actions: [
+    { id: 'action1', name: 'Nom Action', prompt: 'Prompt IA...' }
+  ]
+}
+```
+
+## Regles
+
+1. **Code propre** - Pas de code commente, noms de variables clairs
+2. **Pas de dependances externes** - L'extension doit rester legere
+3. **Compatibilite** - Chrome 88+ requis
+4. **Francais** - Les commentaires peuvent etre en francais ou anglais
+5. **Tests** - Testez vos modifications avant de soumettre
+
+## Ce que nous n'acceptons pas
+
+- Code copie sans attribution
+- Fonctionnalites qui envoient des donnees a des serveurs externes
+- Publicites ou tracking
+- Code malveillant
+
+## Propriete Intellectuelle
+
+En soumettant une contribution, vous acceptez que:
+- Votre code soit integre sous la licence IA Helper
+- Vous soyez credite dans CONTRIBUTORS.md
+- L'equipe puisse modifier votre contribution si necessaire
 
 ## Questions?
-- Open an issue with tag `question`
+
+- Ouvrez une issue avec le tag `question`
 - Email: contact@badom.ch
 
-Thanks for contributing to IA Helper!
+---
+
+Merci de contribuer a IA Helper!
+

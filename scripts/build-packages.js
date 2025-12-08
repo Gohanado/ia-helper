@@ -83,10 +83,7 @@ const firefoxManifest = JSON.parse(fs.readFileSync('manifest.json', 'utf8'));
 firefoxManifest.browser_specific_settings = {
     gecko: {
         id: "ia-helper@badom.ch",
-        strict_min_version: "142.0",
-        data_collection_permissions: {
-            required: ["none"]
-        }
+        strict_min_version: "142.0"
     }
 };
 firefoxManifest.background = {
@@ -135,3 +132,4 @@ createZipFromDir(chromeZip, 'dist/chrome')
         console.error('\x1b[31m%s\x1b[0m', 'Erreur:', err);
         process.exit(1);
     });
+

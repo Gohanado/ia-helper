@@ -1,48 +1,84 @@
-# Firefox Validation - Key Notes
+# Validation Firefox - Notes importantes
 
-## Known validation issues
-The AMO validator may report JavaScript syntax errors that are **false positives**. The code runs correctly in Firefox.
+## Erreurs de validation connues
 
-### Reported files
+Le validateur Firefox (addons.mozilla.org) rapporte des erreurs de syntaxe JavaScript qui sont des **faux positifs**. Le code fonctionne parfaitement dans Firefox.
+
+### Erreurs rapportees
+
 1. **src/content/content-script.js**
-   - “Unexpected token ;” or parsing errors
-   - Cause: complex template literals with nested expressions
-   - Status: false positive (valid ES2015+)
+   - Erreur: "Unexpected token ;" ou erreurs de parsing
+   - Cause: Template literals complexes avec expressions imbriquees
+   - Status: Faux positif - code valide ECMAScript 2015+
+
 2. **src/chat/chat.js**
-   - “Unexpected token ;” or “‘import’/‘export’ only allowed with sourceType: module”
-   - Cause: ES6 modules
-   - Status: false positive
+   - Erreur: "Unexpected token ;" ou "'import' and 'export' may appear only with 'sourceType: module'"
+   - Cause: Modules ES6 avec imports/exports
+   - Status: Faux positif - Firefox supporte les modules ES6
+
 3. **src/options/options.js**
-   - Similar module parsing errors
-   - Cause: ES6 modules
-   - Status: false positive
+   - Erreur: "Unexpected token ;" ou erreurs de parsing de modules
+   - Cause: Modules ES6 avec imports/exports
+   - Status: Faux positif - Firefox supporte les modules ES6
 
-### Why?
-The validator parser struggles with ES modules (`type="module"`), complex template literals, conditional expressions inside templates, and multi-line templates. These constructs are valid ES2015+ and work in Firefox 109+.
+### Pourquoi ces erreurs?
 
-### Technical stance
-We ship native ES modules. Firefox supports this since v60, but the validator can’t always parse them. Alternatives (bundling/transpiling/refactor) either introduced new issues or added complexity, so we keep ES modules as-is.
+Le validateur Firefox utilise un parser JavaScript strict qui a des problemes connus avec:
+- Les modules ES6 (import/export) dans les fichiers HTML avec `type="module"`
+- Les template literals complexes avec expressions imbriquees
+- Les expressions conditionnelles dans les templates
+- Les templates multi-lignes avec indentation
 
-### Verified runtime
+Ces constructions sont **100% valides** selon la specification ECMAScript 2015+ et fonctionnent parfaitement dans tous les navigateurs modernes, y compris Firefox 109+.
+
+### Solution technique
+
+L'extension utilise des modules ES6 natifs avec `<script type="module">` dans les fichiers HTML. Firefox supporte completement cette fonctionnalite depuis la version 60, mais le validateur automatique ne peut pas parser correctement ces fichiers.
+
+**Alternatives testees:**
+1. Bundling des modules: Cree d'autres erreurs de parsing avec les template literals
+2. Transpilation: Ajoute de la complexite et augmente la taille du package
+3. Refactorisation complete: Trop invasif pour un probleme de validateur
+
+**Solution retenue:** Soumettre le package tel quel avec les modules ES6 natifs.
+
+### Verification
+
+Le code a ete teste et fonctionne correctement dans:
 - Firefox 140+
 - Chrome 120+
 - Edge 120+
 
-### Acceptable warnings
-1) **innerHTML in dom-sanitizer.js**: sanitizer utility, intentional and controlled  
-2) **innerHTML in results.js**: uses sanitizer, acceptable by design
+### Warnings acceptables
 
-## AMO submission
-1. Syntax errors from the validator can be ignored (false positives).  
-2. innerHTML warnings are expected for the sanitizer.  
-3. Package works despite these reports.
+Les warnings suivants sont attendus et acceptables:
 
-## Recommended pre-submit tests
-1. Load the extension in Firefox dev mode.  
-2. Exercise main features.  
-3. Check consoles for errors.
+1. **innerHTML dans dom-sanitizer.js**
+   - C'est un utilitaire de sanitization HTML
+   - L'usage de innerHTML est intentionnel et securise
 
-## If AMO blocks submission
-- Explain validator false positives.  
-- Code is valid ECMAScript.  
-- Extension tested and working.
+2. **innerHTML dans results.js**
+   - Utilise la fonction de sanitization
+   - Securise par design
+
+## Soumission sur Firefox Add-ons
+
+Lors de la soumission:
+1. Les erreurs de syntaxe JavaScript peuvent etre ignorees (faux positifs)
+2. Les warnings innerHTML sont attendus pour un sanitizer
+3. Le package fonctionne correctement malgre ces rapports
+
+## Tests recommandes
+
+Avant de soumettre, tester manuellement:
+1. Charger l'extension en mode developpeur dans Firefox
+2. Tester toutes les fonctionnalites principales
+3. Verifier qu'il n'y a pas d'erreurs dans la console
+
+## Contact
+
+Si le validateur bloque la soumission, contacter le support Firefox Add-ons en expliquant que:
+- Les erreurs sont des faux positifs du validateur
+- Le code est valide ECMAScript
+- L'extension a ete testee et fonctionne correctement
+

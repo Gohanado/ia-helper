@@ -20,7 +20,7 @@ const agentKeyMap = {
 };
 
 // Langue courante (chargee au demarrage)
-let currentLang = 'en';
+let currentLang = 'fr';
 
 // Fonction synchrone pour obtenir la langue
 function getCurrentLanguage() {
@@ -31,7 +31,7 @@ function getCurrentLanguage() {
 async function loadLanguage() {
   return new Promise((resolve) => {
     chrome.storage.local.get(['config'], (result) => {
-      currentLang = result.config?.interfaceLanguage || 'en';
+      currentLang = result.config?.interfaceLanguage || 'fr';
       resolve(currentLang);
     });
   });

@@ -20,7 +20,6 @@ npm-debug.log*
 dist/
 build/
 *.zip
-gh_cli/
 
 # Environment
 .env
@@ -30,3 +29,4 @@ gh_cli/
 # Temporary
 *.tmp
 *.temp
+

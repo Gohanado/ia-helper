@@ -71,11 +71,11 @@ const MENU_TRANSLATIONS = {
 };
 
 // Langue courante pour les menus
-let interfaceLanguage = 'en';
+let interfaceLanguage = 'fr';
 
 // Fonction pour obtenir une traduction de menu
 function mt(key) {
-  return MENU_TRANSLATIONS[interfaceLanguage]?.[key] || MENU_TRANSLATIONS.en[key] || key;
+  return MENU_TRANSLATIONS[interfaceLanguage]?.[key] || MENU_TRANSLATIONS.fr[key] || key;
 }
 
 // Configuration par defaut
@@ -84,8 +84,7 @@ const DEFAULT_CONFIG = {
   apiUrl: 'http://localhost:11434',
   apiKey: '',
   selectedModel: '',
-  streamingEnabled: true,
-  interfaceLanguage: 'en'
+  streamingEnabled: true
 };
 
 // Providers supportes
@@ -274,7 +273,7 @@ async function loadConfig() {
     chrome.storage.local.get(['config'], (result) => {
       config = result.config || DEFAULT_CONFIG;
       // Charger la langue pour les menus
-      interfaceLanguage = config.interfaceLanguage || 'en';
+      interfaceLanguage = config.interfaceLanguage || 'fr';
       resolve(config);
     });
   });
@@ -733,18 +732,12 @@ async function generateAIResponse(content, systemPrompt) {
   const provider = config.provider || 'ollama';
   const apiUrl = config.apiUrl || DEFAULT_CONFIG.apiUrl;
   const apiKey = config.apiKey || '';
-  let model = config.selectedModel || '';
-  const temperature = 0.7;
-  const maxTokens = 8000;
-  const topP = 1.0;
-  const frequencyPenalty = 0;
-  const presencePenalty = 0;
+  const model = config.selectedModel || '';
 
   let response;
   let result = '';
 
   if (provider === 'ollama') {
-    if (!model) model = 'llama3.2';
     response = await fetch(`${apiUrl}/api/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -752,21 +745,12 @@ async function generateAIResponse(content, systemPrompt) {
         model: model,
         prompt: content,
         system: systemPrompt,
-        stream: false,
-        options: {
-          temperature: temperature,
-          num_predict: maxTokens,
-          top_p: topP,
-          frequency_penalty: frequencyPenalty,
-          presence_penalty: presencePenalty
-        }
+        stream: false
       })
     });
     const data = await response.json();
-    if (data.error) throw new Error(data.error);
     result = data.response || '';
   } else if (provider === 'openai' || provider === 'openrouter' || provider === 'custom') {
-    if (!model) model = 'gpt-3.5-turbo';
     const baseUrl = provider === 'openai' ? 'https://api.openai.com/v1' :
                     provider === 'openrouter' ? 'https://openrouter.ai/api/v1' : apiUrl;
     response = await fetch(`${baseUrl}/chat/completions`, {
@@ -779,21 +763,14 @@ async function generateAIResponse(content, systemPrompt) {
         model: model,
         messages: [
           { role: 'system', content: systemPrompt },
-        { role: 'user', content: content }
-      ],
-      temperature: temperature,
-      max_tokens: maxTokens,
-      top_p: topP,
-      frequency_penalty: frequencyPenalty,
-      presence_penalty: presencePenalty,
-      stream: false
+          { role: 'user', content: content }
+        ],
+        stream: false
       })
     });
     const data = await response.json();
-    if (data.error) throw new Error(data.error.message || data.error);
     result = data.choices?.[0]?.message?.content || '';
   } else if (provider === 'anthropic') {
-    if (!model) model = 'claude-3-haiku-20240307';
     response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -803,18 +780,14 @@ async function generateAIResponse(content, systemPrompt) {
       },
       body: JSON.stringify({
         model: model,
-        max_tokens: maxTokens,
-        temperature: temperature,
-        top_p: topP,
+        max_tokens: 4096,
         system: systemPrompt,
         messages: [{ role: 'user', content: content }]
       })
     });
     const data = await response.json();
-    if (data.error) throw new Error(data.error.message || data.error);
     result = data.content?.[0]?.text || '';
   } else if (provider === 'groq') {
-    if (!model) model = 'llama-3.1-8b-instant';
     response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -826,16 +799,10 @@ async function generateAIResponse(content, systemPrompt) {
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: content }
-        ],
-        temperature: temperature,
-        max_tokens: maxTokens,
-        top_p: topP,
-        frequency_penalty: frequencyPenalty,
-        presence_penalty: presencePenalty
+        ]
       })
     });
     const data = await response.json();
-    if (data.error) throw new Error(data.error.message || data.error);
     result = data.choices?.[0]?.message?.content || '';
   }
 
@@ -875,8 +842,6 @@ chrome.runtime.onConnect.addListener((port) => {
             port.postMessage({ type: 'error', error: error.message });
           }
         }
-      } else if (message.type === 'keepalive') {
-        // ignore, keeps SW alive
       }
     });
 
@@ -902,7 +867,7 @@ async function generateStreamingResponse(port, content, systemPrompt, agentParam
 
   // Parametres de l'agent avec valeurs par defaut
   const temperature = agentParams.temperature ?? 0.7;
-  const maxTokens = agentParams.maxTokens ?? 8000;
+  const maxTokens = agentParams.maxTokens ?? 4096;
   const topP = agentParams.topP ?? 1.0;
   const frequencyPenalty = agentParams.frequencyPenalty ?? 0;
   const presencePenalty = agentParams.presencePenalty ?? 0;
@@ -923,7 +888,7 @@ async function generateStreamingResponse(port, content, systemPrompt, agentParam
           }
         }
       }
-    }, 2000);
+    }, 10000);
   };
 
   const stopKeepAlive = () => {
