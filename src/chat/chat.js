@@ -799,13 +799,11 @@ async function sendMessage(content) {
         if (!thinkingEl) {
           thinkingEl = document.createElement('div');
           thinkingEl.className = 'thinking-section';
+          const thinkingLabel = t('thinking', currentLang) || 'Reflexion...';
           setTrustedHTML(thinkingEl, `
             <div class="thinking-header">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/>
-                <path d="M12 16v-4M12 8h.01"/>
-              </svg>
-              <span>Reflexion...</span>
+              <div class="thinking-title">${thinkingLabel}</div>
+              <div class="thinking-toggle">▼</div>
             </div>
             <div class="thinking-content"></div>
           `);
@@ -813,13 +811,25 @@ async function sendMessage(content) {
           responseEl = document.createElement('div');
           responseEl.className = 'response-content';
           messageTextEl.appendChild(responseEl);
+
+          const toggle = thinkingEl.querySelector('.thinking-toggle');
+          const body = thinkingEl.querySelector('.thinking-content');
+          thinkingEl.addEventListener('click', () => {
+            const isCollapsed = thinkingEl.classList.toggle('collapsed');
+            if (toggle) toggle.textContent = isCollapsed ? '►' : '▼';
+            if (body) body.style.display = isCollapsed ? 'none' : 'block';
+          });
         }
         assistantMessage.thinking += chunk;
         setTrustedHTML(thinkingEl.querySelector('.thinking-content'), formatMessageContent(assistantMessage.thinking));
       } else if (thinkingEnd) {
         // Fin du thinking
         if (thinkingEl) {
-          thinkingEl.querySelector('.thinking-header span').textContent = t('thinking', currentLang);
+          const toggle = thinkingEl.querySelector('.thinking-toggle');
+          const body = thinkingEl.querySelector('.thinking-content');
+          if (toggle) toggle.textContent = '►';
+          if (body) body.style.display = 'none';
+          thinkingEl.classList.add('collapsed');
         }
       } else {
         // Reponse normale

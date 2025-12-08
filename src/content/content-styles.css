@@ -93,14 +93,14 @@
 }
 
 .ia-thinking-block {
-  background: #f7f9ff;
-  border: 1px solid #d8e0ff;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(90, 115, 230, 0.08);
-  padding: 8px 10px;
+  background: #1f2642;
+  border: 1px solid #33457a;
+  border-radius: 10px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+  padding: 10px 12px;
   margin-bottom: 10px;
   font-size: 13px;
-  color: #1f2a4d;
+  color: #e6edff;
 }
 
 .ia-thinking-header {
@@ -116,19 +116,20 @@
   font-weight: 700;
   font-size: 12px;
   letter-spacing: 0.04em;
-  color: #23346a;
+  color: #9db5ff;
   text-transform: uppercase;
 }
 
 .ia-thinking-toggle {
   font-size: 12px;
-  color: #23346a;
-  opacity: 0.8;
+  color: #9db5ff;
+  opacity: 0.9;
 }
 
 .ia-thinking-body {
   line-height: 1.45;
   margin-top: 6px;
+  color: #e6edff;
 }
 
 .ia-thinking-block.collapsed .ia-thinking-body {

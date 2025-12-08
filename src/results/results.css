@@ -482,11 +482,11 @@ textarea:focus {
 }
 
 .thinking-block {
-  background: #f7f9ff;
-  border: 1px solid #d8e0ff;
-  border-radius: 8px;
-  box-shadow: 0 6px 14px rgba(90, 115, 230, 0.1);
-  padding: 10px 12px;
+  background: #1f2642;
+  border: 1px solid #33457a;
+  border-radius: 10px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
+  padding: 12px 14px;
   margin-bottom: 12px;
   font-size: 0.95em;
 }
@@ -497,6 +497,7 @@ textarea:focus {
   justify-content: space-between;
   gap: 8px;
   cursor: pointer;
+  user-select: none;
 }
 
 .thinking-block .thinking-title {
@@ -504,18 +505,18 @@ textarea:focus {
   font-size: 0.85em;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: #23346a;
+  color: #9db5ff;
 }
 
 .thinking-block .thinking-toggle {
   font-size: 0.85em;
-  color: #23346a;
-  opacity: 0.8;
+  color: #9db5ff;
+  opacity: 0.9;
 }
 
 .thinking-block .thinking-body {
   line-height: 1.5;
-  color: var(--text-primary);
+  color: #e6edff;
   margin-top: 6px;
 }
 

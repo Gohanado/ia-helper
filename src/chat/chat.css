@@ -693,28 +693,42 @@ body {
 /* Thinking section */
 .thinking-section {
   margin-bottom: 16px;
-  padding: 12px;
-  background: rgba(102, 126, 234, 0.05);
-  border-left: 3px solid var(--chat-accent);
-  border-radius: var(--chat-radius-sm);
+  padding: 12px 14px;
+  background: #1f2642;
+  border: 1px solid #33457a;
+  border-radius: var(--chat-radius);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
 }
 
 .thinking-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
-  margin-bottom: 8px;
-  color: var(--chat-accent);
+  margin-bottom: 6px;
+  color: #9db5ff;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  user-select: none;
+}
+
+.thinking-toggle {
+  color: #9db5ff;
+  opacity: 0.9;
+  font-size: 12px;
 }
 
 .thinking-content {
-  color: var(--chat-text-muted);
+  color: #e6edff;
   font-size: 13px;
-  line-height: 1.6;
+  line-height: 1.55;
+}
+
+.thinking-section.collapsed .thinking-content {
+  display: none;
 }
 
 .response-content {
