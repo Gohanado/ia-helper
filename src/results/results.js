@@ -547,10 +547,22 @@ async function startGeneration() {
 
   // Creer la structure DOM une seule fois
   elements.resultContent.innerHTML = '';
+  let thinkingContent = '';
+  let thinkingEl = null;
+  let thinkingBody = null;
   const markdownBody = document.createElement('div');
   markdownBody.className = 'markdown-body';
   const cursor = document.createElement('span');
   cursor.className = 'streaming-cursor';
+  const ensureThinking = () => {
+    if (!thinkingEl) {
+      thinkingEl = document.createElement('div');
+      thinkingEl.className = 'thinking-block';
+      thinkingEl.innerHTML = `<div class="thinking-title">${t('thinking', currentLang) || 'Thinking'}</div><div class="thinking-body"></div>`;
+      thinkingBody = thinkingEl.querySelector('.thinking-body');
+      elements.resultContent.insertBefore(thinkingEl, markdownBody);
+    }
+  };
   elements.resultContent.appendChild(markdownBody);
   elements.resultContent.appendChild(cursor);
 
@@ -570,16 +582,29 @@ async function startGeneration() {
         // Ignorer les messages de keep-alive
         return;
       } else if (msg.type === 'chunk') {
-        currentResult += msg.text;
+        if (msg.isThinking) {
+          ensureThinking();
+          thinkingContent += msg.text;
+          if (thinkingBody) {
+            const html = convertMarkdownToHtml(thinkingContent);
+            setTrustedHTML(thinkingBody, html);
+          }
+        } else {
+          currentResult += msg.text;
 
-        // Throttle avec requestAnimationFrame pour limiter a 60fps
-        if (!updateScheduled) {
-          updateScheduled = true;
-          requestAnimationFrame(() => {
-            const html = convertMarkdownToHtml(currentResult);
-            setTrustedHTML(markdownBody, html);
-            updateScheduled = false;
-          });
+          // Throttle avec requestAnimationFrame pour limiter a 60fps
+          if (!updateScheduled) {
+            updateScheduled = true;
+            requestAnimationFrame(() => {
+              const html = convertMarkdownToHtml(currentResult);
+              setTrustedHTML(markdownBody, html);
+              updateScheduled = false;
+            });
+          }
+        }
+      } else if (msg.type === 'thinking_end') {
+        if (thinkingEl) {
+          thinkingEl.classList.add('thinking-done');
         }
       } else if (msg.type === 'done') {
         currentPort.disconnect();
@@ -648,10 +673,22 @@ async function refine(additionalPrompt) {
 
   // Creer la structure DOM une seule fois
   elements.resultContent.innerHTML = '';
+  let thinkingContent = '';
+  let thinkingEl = null;
+  let thinkingBody = null;
   const markdownBody = document.createElement('div');
   markdownBody.className = 'markdown-body';
   const cursor = document.createElement('span');
   cursor.className = 'streaming-cursor';
+  const ensureThinking = () => {
+    if (!thinkingEl) {
+      thinkingEl = document.createElement('div');
+      thinkingEl.className = 'thinking-block';
+      thinkingEl.innerHTML = `<div class="thinking-title">${t('thinking', currentLang) || 'Thinking'}</div><div class="thinking-body"></div>`;
+      thinkingBody = thinkingEl.querySelector('.thinking-body');
+      elements.resultContent.insertBefore(thinkingEl, markdownBody);
+    }
+  };
   elements.resultContent.appendChild(markdownBody);
   elements.resultContent.appendChild(cursor);
 
@@ -670,10 +707,23 @@ async function refine(additionalPrompt) {
         // Ignorer les messages de keep-alive
         return;
       } else if (msg.type === 'chunk') {
-        currentResult += msg.text;
-        // Parser le markdown en live comme dans chat.js
-        const html = convertMarkdownToHtml(currentResult);
-        setTrustedHTML(markdownBody, html);
+        if (msg.isThinking) {
+          ensureThinking();
+          thinkingContent += msg.text;
+          if (thinkingBody) {
+            const html = convertMarkdownToHtml(thinkingContent);
+            setTrustedHTML(thinkingBody, html);
+          }
+        } else {
+          currentResult += msg.text;
+          // Parser le markdown en live comme dans chat.js
+          const html = convertMarkdownToHtml(currentResult);
+          setTrustedHTML(markdownBody, html);
+        }
+      } else if (msg.type === 'thinking_end') {
+        if (thinkingEl) {
+          thinkingEl.classList.add('thinking-done');
+        }
       } else if (msg.type === 'done') {
         currentPort.disconnect();
         currentPort = null;

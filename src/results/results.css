@@ -481,6 +481,28 @@ textarea:focus {
   vertical-align: text-bottom;
 }
 
+.thinking-block {
+  background: rgba(102, 126, 234, 0.08);
+  border: 1px solid rgba(102, 126, 234, 0.2);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  font-size: 0.95em;
+}
+
+.thinking-block .thinking-title {
+  font-weight: 600;
+  font-size: 0.85em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  color: #3b4a7a;
+}
+
+.thinking-block .thinking-body {
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
 @keyframes blink {
   0%, 100% { opacity: 1; }
   50% { opacity: 0; }
@@ -675,4 +697,3 @@ textarea:focus {
 .markdown-body tr:hover {
   background: rgba(102, 126, 234, 0.05);
 }
-

@@ -1373,10 +1373,16 @@
       // Vider le contenu initial
       setTrustedHTML(element, '');
       currentPopupResult = '';
+      let thinkingContent = '';
+      let thinkingEl = null;
 
       // Creer le curseur de streaming
       const cursor = document.createElement('span');
       cursor.className = 'ia-action-cursor';
+      // Zone de reponse principale
+      const responseEl = document.createElement('div');
+      responseEl.className = 'ia-action-response-text';
+      element.appendChild(responseEl);
       element.appendChild(cursor);
 
       // Afficher le bouton stop
@@ -1420,7 +1426,11 @@
 
           currentPopupResult = fallbackResult || '';
           cursor.remove();
-          element.textContent = currentPopupResult;
+          if (responseEl) {
+            responseEl.textContent = currentPopupResult;
+          } else {
+            element.textContent = currentPopupResult;
+          }
 
           const modal = document.getElementById('ia-helper-action-modal');
           if (modal) {
@@ -1454,10 +1464,25 @@
           // Ignorer les messages de keep-alive
           return;
         } else if (message.type === 'chunk') {
-          // Ajouter le texte avant le curseur
-          currentPopupResult += message.text;
-          element.textContent = currentPopupResult;
-          element.appendChild(cursor);
+          if (message.isThinking) {
+            thinkingContent += message.text;
+            if (!thinkingEl) {
+              thinkingEl = document.createElement('div');
+              thinkingEl.className = 'ia-thinking-block';
+              const thinkingLabel = ct('thinking') || 'Thinking...';
+              thinkingEl.innerHTML = `<div class="ia-thinking-title">${thinkingLabel}</div><div class="ia-thinking-body"></div>`;
+              element.insertBefore(thinkingEl, responseEl);
+            }
+            const body = thinkingEl.querySelector('.ia-thinking-body');
+            if (body) {
+              body.textContent = thinkingContent;
+            }
+          } else {
+            // Ajouter le texte avant le curseur
+            currentPopupResult += message.text;
+            responseEl.textContent = currentPopupResult;
+            element.appendChild(cursor);
+          }
 
           // Scroll vers le bas si necessaire
           const responseArea = element.closest('.ia-action-response-area');

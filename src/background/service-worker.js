@@ -84,7 +84,8 @@ const DEFAULT_CONFIG = {
   apiUrl: 'http://localhost:11434',
   apiKey: '',
   selectedModel: '',
-  streamingEnabled: true
+  streamingEnabled: true,
+  thinkingEnabled: true
 };
 
 // Providers supportes
@@ -271,7 +272,8 @@ let config = { ...DEFAULT_CONFIG };
 async function loadConfig() {
   return new Promise((resolve) => {
     chrome.storage.local.get(['config'], (result) => {
-      config = result.config || DEFAULT_CONFIG;
+      // fusionner pour avoir les valeurs par defaut si manquantes
+      config = { ...DEFAULT_CONFIG, ...(result.config || {}) };
       // Charger la langue pour les menus
       interfaceLanguage = config.interfaceLanguage || 'fr';
       resolve(config);
@@ -866,6 +868,7 @@ async function generateStreamingResponse(port, content, systemPrompt, agentParam
   const apiUrl = config.apiUrl || DEFAULT_CONFIG.apiUrl;
   const apiKey = config.apiKey || '';
   const model = agentParams.model || config.selectedModel || '';
+  const thinkingEnabled = config.thinkingEnabled !== false;
 
   // Parametres de l'agent avec valeurs par defaut
   const temperature = agentParams.temperature ?? 0.7;
@@ -926,6 +929,10 @@ async function generateStreamingResponse(port, content, systemPrompt, agentParam
         presence_penalty: presencePenalty
       }
     };
+    if (thinkingEnabled === false) {
+      // Certains modeles acceptent de couper le thinking via options; au pire ignore
+      requestBody.options.thinking = false;
+    }
 
     response = await fetch(`${apiUrl}/api/generate`, {
       method: 'POST',
@@ -1015,6 +1022,7 @@ async function generateStreamingResponse(port, content, systemPrompt, agentParam
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
   let isInThinking = false;
+  let bufferedLine = '';
 
   try {
     while (true) {
@@ -1026,8 +1034,11 @@ async function generateStreamingResponse(port, content, systemPrompt, agentParam
       const { done, value } = await reader.read();
       if (done) break;
 
-      const chunk = decoder.decode(value, { stream: true });
-      const lines = chunk.split('\n').filter(line => line.trim());
+      const decoded = decoder.decode(value, { stream: true });
+      const combined = bufferedLine + decoded;
+      const parts = combined.split('\n');
+      bufferedLine = parts.pop() || '';
+      const lines = parts.filter(line => line.trim());
 
       for (const line of lines) {
         try {
@@ -1036,6 +1047,9 @@ async function generateStreamingResponse(port, content, systemPrompt, agentParam
             const json = JSON.parse(line);
             if (json.response) {
               port.postMessage({ type: 'chunk', text: json.response });
+            }
+            if (thinkingEnabled && json.thinking) {
+              port.postMessage({ type: 'chunk', text: json.thinking, isThinking: true });
             }
           }
           // Format OpenAI/Groq/OpenRouter (SSE)
@@ -1057,14 +1071,16 @@ async function generateStreamingResponse(port, content, systemPrompt, agentParam
                 port.postMessage({
                   type: 'chunk',
                   text: text,
-                  isThinking: isInThinking
+                  isThinking: thinkingEnabled && isInThinking
                 });
               }
 
               // Detecter la fin du thinking
               if (choice?.finish_reason === 'stop' && isInThinking) {
                 isInThinking = false;
-                port.postMessage({ type: 'thinking_end' });
+                if (thinkingEnabled) {
+                  port.postMessage({ type: 'thinking_end' });
+                }
               }
             }
           }
@@ -1081,6 +1097,48 @@ async function generateStreamingResponse(port, content, systemPrompt, agentParam
         } catch (e) {
           // Ignorer les erreurs de parsing JSON
         }
+      }
+    }
+
+    // Traiter une ligne tamponnee restante
+    if (bufferedLine.trim()) {
+      try {
+        const line = bufferedLine.trim();
+        if (provider === 'ollama') {
+          const json = JSON.parse(line);
+          if (json.response) {
+            port.postMessage({ type: 'chunk', text: json.response });
+          }
+          if (thinkingEnabled && json.thinking) {
+            port.postMessage({ type: 'chunk', text: json.thinking, isThinking: true });
+          }
+        } else if (provider === 'openai' || provider === 'groq' || provider === 'openrouter' || provider === 'custom') {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6);
+            if (data !== '[DONE]') {
+              const json = JSON.parse(data);
+              const choice = json.choices?.[0];
+              const text = choice?.delta?.content || '';
+              if (text) {
+                port.postMessage({
+                  type: 'chunk',
+                  text: text,
+                  isThinking: thinkingEnabled && isInThinking
+                });
+              }
+            }
+          }
+        } else if (provider === 'anthropic') {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6);
+            const json = JSON.parse(data);
+            if (json.type === 'content_block_delta' && json.delta?.text) {
+              port.postMessage({ type: 'chunk', text: json.delta.text });
+            }
+          }
+        }
+      } catch (e) {
+        // Ignorer
       }
     }
 

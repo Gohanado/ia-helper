@@ -15,6 +15,7 @@ const DEFAULT_CONFIG = {
   apiKey: '',
   selectedModel: '',
   streamingEnabled: true,
+  thinkingEnabled: true,
   inlinePopupEnabled: true,
   directInputEnabled: false,
   directInputMode: 'replace',
@@ -118,6 +119,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     apiUrlLabel: document.getElementById('api-url-label'),
     modelSelect: document.getElementById('model-select'),
     streamingEnabled: document.getElementById('streaming-enabled'),
+    thinkingEnabled: document.getElementById('thinking-enabled'),
     inlinePopupEnabled: document.getElementById('inline-popup-enabled'),
     interfaceLanguage: document.getElementById('interface-language'),
     responseLanguage: document.getElementById('response-language'),
@@ -212,6 +214,7 @@ async function loadAllSettings() {
       if (elements.apiUrl) elements.apiUrl.value = config.apiUrl || PROVIDERS[config.provider]?.defaultUrl || '';
       if (elements.apiKey) elements.apiKey.value = config.apiKey || '';
       if (elements.streamingEnabled) elements.streamingEnabled.checked = config.streamingEnabled !== false;
+      if (elements.thinkingEnabled) elements.thinkingEnabled.checked = config.thinkingEnabled !== false;
       if (elements.inlinePopupEnabled) elements.inlinePopupEnabled.checked = config.inlinePopupEnabled !== false;
       if (elements.directInputEnabled) elements.directInputEnabled.checked = config.directInputEnabled === true;
       if (elements.directInputMode) elements.directInputMode.value = config.directInputMode || 'replace';
@@ -749,6 +752,7 @@ async function saveConnectionSettings() {
   config.apiKey = elements.apiKey?.value.trim() || '';
   config.selectedModel = elements.modelSelect?.value || '';
   config.streamingEnabled = elements.streamingEnabled?.checked !== false;
+  config.thinkingEnabled = elements.thinkingEnabled?.checked !== false;
   config.inlinePopupEnabled = elements.inlinePopupEnabled?.checked !== false;
   config.directInputEnabled = elements.directInputEnabled?.checked === true;
   config.directInputMode = elements.directInputMode?.value || 'replace';

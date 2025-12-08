@@ -92,6 +92,28 @@
   color: #333;
 }
 
+.ia-thinking-block {
+  background: rgba(102, 126, 234, 0.08);
+  border: 1px solid rgba(102, 126, 234, 0.25);
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: #243b6b;
+}
+
+.ia-thinking-title {
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  letter-spacing: 0.02em;
+}
+
+.ia-thinking-body {
+  line-height: 1.4;
+}
+
 .ia-helper-streaming-actions {
   display: flex;
   gap: 10px;
@@ -192,4 +214,3 @@
   border: 6px solid transparent;
   border-top-color: #333;
 }
-
