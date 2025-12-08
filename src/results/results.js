@@ -20,6 +20,12 @@ let config = {
   speechFixedLanguage: 'fr'
 };
 
+function getSttLang() {
+  const lang = config.responseLanguage || config.interfaceLanguage || 'en';
+  const map = { fr: 'fr-FR', en: 'en-US', es: 'es-ES', it: 'it-IT', pt: 'pt-BR' };
+  return lang.includes('-') ? lang : (map[lang] || 'en-US');
+}
+
 let pendingResult = null;
 let currentResult = '';
 let startTime = 0;
@@ -27,6 +33,8 @@ let startTime = 0;
 // Variables TTS
 let isSpeaking = false;
 let currentSpeechUtterance = null;
+let sttRecognition = null;
+let sttListening = false;
 
 // Port de streaming
 let currentPort = null;
@@ -422,6 +430,62 @@ function setupEventListeners() {
     speakBtn.addEventListener('click', toggleSpeech);
   } else {
     speakBtn.style.display = 'none';
+  }
+
+  // Dictée (STT) pour instructions
+  const sttBtn = document.getElementById('btn-stt-custom');
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (SpeechRecognition && sttBtn) {
+    sttRecognition = new SpeechRecognition();
+    sttRecognition.lang = getSttLang();
+    sttRecognition.interimResults = true;
+    sttRecognition.continuous = false;
+
+    const updateSttUi = () => {
+      sttBtn.classList.toggle('listening', sttListening);
+      sttBtn.title = sttListening ? (t('stopVoiceInput', currentLang) || 'Stop') : (t('startVoiceInput', currentLang) || 'Dicter');
+    };
+
+    sttRecognition.onstart = () => {
+      sttListening = true;
+      updateSttUi();
+    };
+    sttRecognition.onerror = () => {
+      sttListening = false;
+      updateSttUi();
+      showNotification(t('voiceInputNotSupported', currentLang) || 'Voice input not supported');
+    };
+    sttRecognition.onend = () => {
+      sttListening = false;
+      updateSttUi();
+    };
+    sttRecognition.onresult = (event) => {
+      let transcript = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        transcript += event.results[i][0].transcript;
+      }
+      if (transcript.trim()) {
+        const prefix = elements.customPrompt.value.trim().length ? ' ' : '';
+        elements.customPrompt.value = elements.customPrompt.value + prefix + transcript.trim();
+      }
+    };
+
+    sttBtn.addEventListener('click', () => {
+      if (!sttRecognition) {
+        showNotification(t('voiceInputNotSupported', currentLang) || 'Voice input not supported');
+        return;
+      }
+      if (sttListening) {
+        sttRecognition.stop();
+        return;
+      }
+      sttRecognition.lang = getSttLang();
+      sttRecognition.start();
+    });
+
+    updateSttUi();
+  } else if (sttBtn) {
+    sttBtn.style.display = 'none';
   }
 
   // Bouton stop generation

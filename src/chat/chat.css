@@ -1333,6 +1333,32 @@ body {
   cursor: not-allowed;
 }
 
+.btn-stt {
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--chat-border);
+  background: transparent;
+  color: var(--chat-text);
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+  flex-shrink: 0;
+}
+
+.btn-stt:hover {
+  border-color: var(--chat-accent);
+  color: var(--chat-accent);
+}
+
+.btn-stt.listening {
+  border-color: var(--chat-accent);
+  color: var(--chat-accent);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+}
+
 .input-footer {
   max-width: 800px;
   margin: 8px auto 0;

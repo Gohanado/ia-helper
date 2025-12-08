@@ -88,6 +88,8 @@ let selectedConversations = new Set();
 let customAgents = [];
 let selectedAgent = null;
 let allAgents = [];
+let sttRecognition = null;
+let isListening = false;
 
 // === ELEMENTS DOM ===
 const elements = {
@@ -99,6 +101,7 @@ const elements = {
   welcomeScreen: null,
   messageInput: null,
   btnSend: null,
+  btnStt: null,
   btnNewChat: null,
   btnToggleSidebar: null,
   btnSettings: null,
@@ -139,6 +142,7 @@ function initElements() {
   elements.welcomeScreen = document.getElementById('welcome-screen');
   elements.messageInput = document.getElementById('message-input');
   elements.btnSend = document.getElementById('btn-send');
+  elements.btnStt = document.getElementById('btn-stt');
   elements.btnNewChat = document.getElementById('btn-new-chat');
   elements.btnToggleSidebar = document.getElementById('btn-toggle-sidebar');
   elements.btnSettings = document.getElementById('btn-settings');
@@ -174,6 +178,12 @@ async function loadConfig() {
       resolve();
     });
   });
+}
+
+function getSttLang() {
+  const lang = config.responseLanguage || config.interfaceLanguage || 'en';
+  const map = { fr: 'fr-FR', en: 'en-US', es: 'es-ES', it: 'it-IT', pt: 'pt-BR' };
+  return lang.includes('-') ? lang : (map[lang] || 'en-US');
 }
 
 function updateModelBadge() {
@@ -1073,6 +1083,68 @@ function setupEventListeners() {
     // Activer/desactiver le bouton envoyer
     elements.btnSend.disabled = !elements.messageInput.value.trim();
   });
+
+  // Voice input (STT)
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (SpeechRecognition && elements.btnStt) {
+    sttRecognition = new SpeechRecognition();
+    sttRecognition.lang = getSttLang();
+    sttRecognition.interimResults = true;
+    sttRecognition.continuous = false;
+
+    const updateSttUi = () => {
+      const tr = translations[getCurrentLanguage()] || translations.fr;
+      elements.btnStt.classList.toggle('listening', isListening);
+      elements.btnStt.title = isListening ? (tr.stopVoiceInput || 'Stop voice') : (tr.startVoiceInput || 'Voice input');
+    };
+
+    sttRecognition.onstart = () => {
+      isListening = true;
+      updateSttUi();
+    };
+
+    sttRecognition.onerror = () => {
+      isListening = false;
+      updateSttUi();
+      const tr = translations[getCurrentLanguage()] || translations.fr;
+      showToast(tr.voiceInputNotSupported || 'Voice input not supported');
+    };
+
+    sttRecognition.onend = () => {
+      isListening = false;
+      updateSttUi();
+    };
+
+    sttRecognition.onresult = (event) => {
+      let transcript = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        transcript += event.results[i][0].transcript;
+      }
+      if (transcript.trim()) {
+        const prefix = elements.messageInput.value.trim().length ? ' ' : '';
+        elements.messageInput.value = elements.messageInput.value + prefix + transcript.trim();
+        elements.messageInput.dispatchEvent(new Event('input'));
+      }
+    };
+
+    elements.btnStt.addEventListener('click', () => {
+      if (!sttRecognition) {
+        const tr = translations[getCurrentLanguage()] || translations.fr;
+        showToast(tr.voiceInputNotSupported || 'Voice input not supported');
+        return;
+      }
+      if (isListening) {
+        sttRecognition.stop();
+        return;
+      }
+      sttRecognition.lang = getSttLang();
+      sttRecognition.start();
+    });
+
+    updateSttUi();
+  } else if (elements.btnStt) {
+    elements.btnStt.style.display = 'none';
+  }
 
   // Envoi avec Enter
   elements.messageInput.addEventListener('keydown', (e) => {

@@ -405,6 +405,29 @@ textarea:focus {
   background: rgba(255, 255, 255, 0.1);
 }
 
+.btn-stt {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background: rgba(0, 0, 0, 0.15);
+  color: var(--text-primary);
+}
+
+.btn-stt:hover {
+  border-color: var(--accent-start);
+  color: var(--accent-start);
+}
+
+.btn-stt.listening {
+  border-color: var(--accent-start);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+}
+
 /* Footer */
 .results-footer {
   display: flex;
@@ -652,5 +675,4 @@ textarea:focus {
 .markdown-body tr:hover {
   background: rgba(102, 126, 234, 0.05);
 }
-
 

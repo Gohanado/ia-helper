@@ -1778,7 +1778,17 @@
           </div>
         ` : ''}
         <div class="ia-quick-input-wrapper">
-          <textarea class="ia-quick-input" placeholder="${selectedText ? 'Que voulez-vous faire avec ce texte?' : 'Posez votre question ou donnez une instruction...'}" rows="3"></textarea>
+          <div class="ia-quick-input-row">
+            <textarea class="ia-quick-input" placeholder="${selectedText ? 'Que voulez-vous faire avec ce texte?' : 'Posez votre question ou donnez une instruction...'}" rows="3"></textarea>
+            <button class="ia-quick-stt" title="${ct('startVoiceInput') || 'Dicter'}">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3z"/>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                <line x1="12" y1="19" x2="12" y2="22"/>
+                <line x1="8" y1="22" x2="16" y2="22"/>
+              </svg>
+            </button>
+          </div>
         </div>
         <div class="ia-quick-actions">
           <button class="ia-quick-btn ia-quick-btn-secondary ia-quick-cancel">Annuler</button>
@@ -1907,6 +1917,11 @@
       .ia-quick-input-wrapper {
         padding: 20px;
       }
+      .ia-quick-input-row {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+      }
       .ia-quick-input {
         width: 100%;
         box-sizing: border-box;
@@ -1927,6 +1942,29 @@
       .ia-quick-input:focus {
         border-color: #667eea;
         box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+      }
+      .ia-quick-stt {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.05);
+        color: rgba(255, 255, 255, 0.8);
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        flex-shrink: 0;
+      }
+      .ia-quick-stt:hover {
+        border-color: #667eea;
+        color: #fff;
+      }
+      .ia-quick-stt.listening {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        color: #fff;
       }
       .ia-quick-actions {
         display: flex;
@@ -1981,8 +2019,74 @@
     const input = modal.querySelector('.ia-quick-input');
     setTimeout(() => input.focus(), 100);
 
-    // Stocker le texte selectionne
+    // STT (dictée)
+    const sttBtn = modal.querySelector('.ia-quick-stt');
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let quickRecognition = null;
+    let quickListening = false;
+    const getQuickLang = () => {
+      const lang = config.responseLanguage || config.interfaceLanguage || 'en';
+      const map = { fr: 'fr-FR', en: 'en-US', es: 'es-ES', it: 'it-IT', pt: 'pt-BR' };
+      return lang.includes('-') ? lang : (map[lang] || 'en-US');
+    };
+
+    const updateQuickSttUi = () => {
+      if (!sttBtn) return;
+      sttBtn.classList.toggle('listening', quickListening);
+      sttBtn.title = quickListening ? (ct('stopVoiceInput') || 'Stop dictee') : (ct('startVoiceInput') || 'Dicter');
+    };
+
+    if (SpeechRecognition && sttBtn) {
+      quickRecognition = new SpeechRecognition();
+      quickRecognition.lang = getQuickLang();
+      quickRecognition.interimResults = true;
+      quickRecognition.continuous = false;
+
+      quickRecognition.onstart = () => {
+        quickListening = true;
+        updateQuickSttUi();
+      };
+      quickRecognition.onerror = () => {
+        quickListening = false;
+        updateQuickSttUi();
+        showNotification(ct('voiceInputNotSupported') || 'Dictee vocale non supportee', 'error');
+      };
+      quickRecognition.onend = () => {
+        quickListening = false;
+        updateQuickSttUi();
+      };
+      quickRecognition.onresult = (event) => {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
+        }
+        if (transcript.trim()) {
+          const prefix = input.value.trim().length ? ' ' : '';
+          input.value = input.value + prefix + transcript.trim();
+        }
+      };
+
+      sttBtn.addEventListener('click', () => {
+        if (!quickRecognition) {
+          showNotification(ct('voiceInputNotSupported') || 'Dictee vocale non supportee', 'error');
+          return;
+        }
+        if (quickListening) {
+          quickRecognition.stop();
+          return;
+        }
+        quickRecognition.lang = getQuickLang();
+        quickRecognition.start();
+      });
+
+      updateQuickSttUi();
+    } else if (sttBtn) {
+      sttBtn.style.display = 'none';
+    }
+
+    // Stocker le texte selectionne et la reconnaissance pour nettoyage
     modal.dataset.selectedText = selectedText;
+    modal._quickRecognition = quickRecognition;
 
     // Event listeners
     modal.querySelector('.ia-quick-close').addEventListener('click', closeQuickModal);
@@ -2018,6 +2122,11 @@
     }
 
     const modal = document.getElementById('ia-helper-quick-modal');
+    if (modal && modal._quickRecognition) {
+      try {
+        modal._quickRecognition.stop();
+      } catch (e) {}
+    }
     if (modal) modal.remove();
   }
 

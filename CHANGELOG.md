@@ -20,6 +20,9 @@ et ce projet respecte le [Versionnage Semantique](https://semver.org/lang/fr/).
 - **VERSION STABLE CHROME**: OK
 - **VERSION STABLE FIREFOX**: OK (popup streaming long texte fixe)
 
+### Ajoute
+- Bouton dictée vocale (STT) sur toutes les zones de saisie (popup rapide, chat live, page results).
+
 ### Corrige
 - Popup Firefox: streaming longue reponse ne se coupe plus (keepalive + fallback non-streaming).
 - Bouton Stop: libelle corrige et traduit proprement.
