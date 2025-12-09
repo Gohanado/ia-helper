@@ -743,8 +743,8 @@ async function sendMessage(content) {
 
   // Afficher le message
   const lang = getCurrentLanguage();
-  const t = translations[lang] || translations.fr;
-  const userEl = createMessageElement(userMessage, t);
+  const tObj = translations[lang] || translations.fr;
+  const userEl = createMessageElement(userMessage, tObj);
   elements.messagesWrapper.appendChild(userEl);
 
   // Vider l'input
@@ -785,7 +785,7 @@ async function sendMessage(content) {
       timestamp: new Date().toISOString()
     };
 
-    const assistantEl = createMessageElement(assistantMessage, t);
+    const assistantEl = createMessageElement(assistantMessage, tObj);
     elements.messagesWrapper.appendChild(assistantEl);
     const messageTextEl = assistantEl.querySelector('.message-text');
 
@@ -795,15 +795,16 @@ async function sendMessage(content) {
     // Generer avec streaming
     const result = await generateResponseStreaming(conv.messages, (chunk, isThinking, thinkingEnd) => {
       if (isThinking) {
+        console.debug('IA Helper Chat: thinking chunk', chunk?.slice(0, 80));
         // Creer la section thinking si elle n'existe pas
         if (!thinkingEl) {
           thinkingEl = document.createElement('div');
           thinkingEl.className = 'thinking-section';
-          const thinkingLabel = t('thinking', currentLang) || 'Reflexion...';
+          const thinkingLabel = tObj.thinking || 'Reflexion...';
           setTrustedHTML(thinkingEl, `
             <div class="thinking-header">
               <div class="thinking-title">${thinkingLabel}</div>
-              <div class="thinking-toggle">▼</div>
+              <div class="thinking-toggle">\u25BE</div>
             </div>
             <div class="thinking-content"></div>
           `);
@@ -816,7 +817,7 @@ async function sendMessage(content) {
           const body = thinkingEl.querySelector('.thinking-content');
           thinkingEl.addEventListener('click', () => {
             const isCollapsed = thinkingEl.classList.toggle('collapsed');
-            if (toggle) toggle.textContent = isCollapsed ? '►' : '▼';
+            if (toggle) toggle.textContent = isCollapsed ? '\u25B6' : '\u25BE';
             if (body) body.style.display = isCollapsed ? 'none' : 'block';
           });
         }
@@ -827,9 +828,8 @@ async function sendMessage(content) {
         if (thinkingEl) {
           const toggle = thinkingEl.querySelector('.thinking-toggle');
           const body = thinkingEl.querySelector('.thinking-content');
-          if (toggle) toggle.textContent = '►';
-          if (body) body.style.display = 'none';
-          thinkingEl.classList.add('collapsed');
+          if (toggle) toggle.textContent = '\u25BE';
+          if (body) body.style.display = 'block';
         }
       } else {
         // Reponse normale
@@ -923,6 +923,7 @@ async function generateResponseStreaming(messages, onChunk) {
       } else if (msg.type === 'thinking_end') {
         isInThinking = false;
         if (onChunk) onChunk('', false, true); // Signal fin du thinking
+        console.debug('IA Helper Chat: thinking_end reçu');
       } else if (msg.type === 'done') {
         currentPort.disconnect();
         currentPort = null;
@@ -1697,4 +1698,6 @@ chrome.storage.session.get(['pendingPrompt'], (result) => {
     }, 500);
   }
 });
+
+
 

@@ -48,6 +48,15 @@
     speechFixedLanguage: 'fr'
   };
 
+  const QUICK_TRANSLATE_LANGS = [
+    { code: 'en', label: 'English' },
+    { code: 'fr', label: 'Français' },
+    { code: 'es', label: 'Español' },
+    { code: 'de', label: 'Deutsch' },
+    { code: 'it', label: 'Italiano' },
+    { code: 'pt', label: 'Português' }
+  ];
+
   let config = { ...DEFAULT_CONFIG };
 
   // Mini-systeme de traduction pour le content-script
@@ -1024,6 +1033,7 @@
             <span class="ia-action-cursor"></span>
           </div>
         </div>
+        <div class="ia-action-translation" style="display:none;"></div>
         <div class="ia-action-actions">
          <button class="ia-action-btn ia-action-btn-warning ia-action-stop-generation" style="display: none;">${ct('stopGeneration') || 'Stop'}</button>
           <div class="ia-action-copy-dropdown">
@@ -1033,6 +1043,10 @@
               <button class="ia-action-copy-option" data-format="text">${ct('plainText') || 'Texte brut'}</button>
               <button class="ia-action-copy-option" data-format="html">HTML</button>
             </div>
+          </div>
+          <div class="ia-action-translate-dropdown">
+            <button class="ia-action-btn ia-action-btn-secondary ia-action-translate-toggle">Traduire</button>
+            <div class="ia-action-translate-menu"></div>
           </div>
           ${config.speechEnabled !== false ? `<button class="ia-action-btn ia-action-btn-secondary ia-action-speak">${ct('speak')}</button>` : ''}
           <button class="ia-action-btn ia-action-btn-secondary ia-action-detail">${ct('viewDetails')}</button>
@@ -1112,10 +1126,26 @@
         color: #fff;
       }
       .ia-action-response-area {
-        padding: 20px;
+        padding: 16px;
         max-height: 400px;
         overflow-y: auto;
         flex: 1;
+      }
+      .ia-action-translation {
+        margin: 0 16px 10px 16px;
+        padding: 10px 12px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.9);
+      }
+      .ia-action-translation h4 {
+        margin: 0 0 6px 0;
+        font-size: 12px;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.7);
       }
       .ia-action-response-content {
         font-size: 14px;
@@ -1123,6 +1153,49 @@
         color: rgba(255, 255, 255, 0.9);
         white-space: pre-wrap;
         word-wrap: break-word;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      /* Thinking block (same styling as live chat/results) */
+      .ia-thinking-block {
+        background: rgba(22, 33, 62, 0.9);
+        border: 1px solid rgba(157, 181, 255, 0.18);
+        border-radius: 10px;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+        padding: 10px 12px;
+        margin: 0 0 10px 0;
+        font-size: 13px;
+        color: #e6edff;
+      }
+      .ia-thinking-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        cursor: pointer;
+        user-select: none;
+        margin-bottom: 4px;
+      }
+      .ia-thinking-title {
+        font-weight: 700;
+        font-size: 12px;
+        letter-spacing: 0.04em;
+        color: #9db5ff;
+        text-transform: uppercase;
+      }
+      .ia-thinking-toggle {
+        font-size: 12px;
+        color: #9db5ff;
+        opacity: 0.9;
+      }
+      .ia-thinking-body {
+        line-height: 1.45;
+        margin-top: 4px;
+        color: #d7e1ff;
+      }
+      .ia-thinking-block.collapsed .ia-thinking-body {
+        display: none;
       }
       .ia-action-cursor {
         display: inline-block;
@@ -1151,6 +1224,7 @@
         padding: 16px 20px;
         border-top: 1px solid rgba(255, 255, 255, 0.05);
         background: rgba(0, 0, 0, 0.2);
+        flex-wrap: wrap;
       }
       .ia-action-btn {
         display: flex;
@@ -1197,6 +1271,43 @@
       }
       .ia-action-copy-menu.active {
         display: block;
+      }
+      .ia-action-translate-dropdown {
+        position: relative;
+      }
+      .ia-action-translate-menu {
+        display: none;
+        position: absolute;
+        bottom: 100%;
+        left: 0;
+        background: #1a1a2e;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 8px;
+        padding: 4px;
+        margin-bottom: 4px;
+        min-width: 140px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        z-index: 5;
+      }
+      .ia-action-translate-menu.active {
+        display: block;
+      }
+      .ia-action-translate-option {
+        display: block;
+        width: 100%;
+        padding: 10px 14px;
+        background: none;
+        border: none;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 13px;
+        text-align: left;
+        cursor: pointer;
+        border-radius: 6px;
+        transition: all 0.15s;
+      }
+      .ia-action-translate-option:hover {
+        background: rgba(102, 126, 234, 0.2);
+        color: #fff;
       }
       .ia-action-copy-option {
         display: block;
@@ -1254,6 +1365,9 @@
     // Menu copie dropdown
     const copyToggle = modal.querySelector('.ia-action-copy-toggle');
     const copyMenu = modal.querySelector('.ia-action-copy-menu');
+    const translateMenu = modal.querySelector('.ia-action-translate-menu');
+    const translateToggle = modal.querySelector('.ia-action-translate-toggle');
+    const translationBox = modal.querySelector('.ia-action-translation');
 
     copyToggle.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -1269,9 +1383,44 @@
       });
     });
 
+    // Remplir le menu de traduction
+    if (translateMenu) {
+      translateMenu.innerHTML = QUICK_TRANSLATE_LANGS.map(lang => `
+        <button class="ia-action-translate-option" data-lang="${lang.code}">${lang.label}</button>
+      `).join('');
+    }
+
+    // Traduction rapide
+      const performTranslation = async (lang) => {
+        const baseText = currentPopupResult || responseEl.textContent || element.textContent || '';
+        if (!baseText.trim()) return;
+        const translated = await translateText(baseText, lang);
+        if (translationBox) {
+          translationBox.style.display = 'block';
+          setTrustedHTML(translationBox, `
+            <h4>Traduction (${lang.toUpperCase()})</h4>
+            <div>${escapeHtml(translated)}</div>
+          `);
+        }
+        showNotification(`Traduction (${lang.toUpperCase()}) prête`, 'success');
+        translateMenu.classList.remove('active');
+      };
+
+    if (translateToggle && translateMenu) {
+      translateToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        translateMenu.classList.toggle('active');
+      });
+      translateMenu.addEventListener('click', (e) => {
+        const btn = e.target.closest('.ia-action-translate-option');
+        if (btn?.dataset.lang) performTranslation(btn.dataset.lang);
+      });
+    }
+
     // Fermer menu au clic ailleurs
     modal.addEventListener('click', () => {
       copyMenu.classList.remove('active');
+      translateMenu?.classList.remove('active');
     });
 
     // Event listeners
@@ -1459,11 +1608,11 @@
         }, 3000);
       };
 
+      
       port.onMessage.addListener((message) => {
-        if (message.type === 'ping') {
-          // Ignorer les messages de keep-alive
-          return;
-        } else if (message.type === 'chunk') {
+        if (message.type === 'ping') return;
+
+        if (message.type === 'chunk') {
           if (message.isThinking) {
             thinkingContent += message.text;
             if (!thinkingEl) {
@@ -1473,7 +1622,7 @@
               thinkingEl.innerHTML = `
                 <div class="ia-thinking-header">
                   <div class="ia-thinking-title">${thinkingLabel}</div>
-                  <div class="ia-thinking-toggle" data-state="open">▼</div>
+                  <div class="ia-thinking-toggle" data-state="open">\u25BE</div>
                 </div>
                 <div class="ia-thinking-body"></div>
               `;
@@ -1483,72 +1632,62 @@
               const body = thinkingEl.querySelector('.ia-thinking-body');
               thinkingEl.addEventListener('click', () => {
                 const isCollapsed = thinkingEl.classList.toggle('collapsed');
-                if (toggle) toggle.textContent = isCollapsed ? '►' : '▼';
+                if (toggle) toggle.textContent = isCollapsed ? '\u25B6' : '\u25BE';
                 if (body) body.style.display = isCollapsed ? 'none' : 'block';
               });
             }
             const body = thinkingEl.querySelector('.ia-thinking-body');
-            if (body) {
-              body.textContent = thinkingContent;
-            }
-          } else if (message.type === 'thinking_end') {
-            if (thinkingEl) {
-              thinkingEl.classList.add('collapsed');
-              const toggle = thinkingEl.querySelector('.ia-thinking-toggle');
-              const body = thinkingEl.querySelector('.ia-thinking-body');
-              if (toggle) toggle.textContent = '►';
-              if (body) body.style.display = 'none';
-            }
+            if (body) body.textContent = thinkingContent;
           } else {
-            // Ajouter le texte avant le curseur
             currentPopupResult += message.text;
             responseEl.textContent = currentPopupResult;
             element.appendChild(cursor);
           }
 
-          // Scroll vers le bas si necessaire
           const responseArea = element.closest('.ia-action-response-area');
-          if (responseArea) {
-            responseArea.scrollTop = responseArea.scrollHeight;
+          if (responseArea) responseArea.scrollTop = responseArea.scrollHeight;
+          return;
+        }
+
+        if (message.type === 'thinking_end') {
+          if (thinkingEl) {
+            thinkingEl.classList.add('collapsed');
+            const toggle = thinkingEl.querySelector('.ia-thinking-toggle');
+            const body = thinkingEl.querySelector('.ia-thinking-body');
+            if (toggle) toggle.textContent = '\u25B6';
+            if (body) body.style.display = 'none';
           }
-        } else if (message.type === 'done') {
+          return;
+        }
+
+        if (message.type === 'done') {
           finished = true;
           clearKeepAlive();
-          // Retirer le curseur
           cursor.remove();
           if (thinkingEl && !thinkingEl.classList.contains('collapsed')) {
             thinkingEl.classList.add('collapsed');
             const toggle = thinkingEl.querySelector('.ia-thinking-toggle');
             const body = thinkingEl.querySelector('.ia-thinking-body');
-            if (toggle) toggle.textContent = '►';
+            if (toggle) toggle.textContent = '\u25B6';
             if (body) body.style.display = 'none';
           }
           port.disconnect();
           currentStreamingPort = null;
 
-          // Masquer le bouton stop
           const modal = document.getElementById('ia-helper-action-modal');
           if (modal) {
             const stopBtn = modal.querySelector('.ia-action-stop-generation');
-            if (stopBtn) {
-              stopBtn.style.display = 'none';
-            }
+            if (stopBtn) stopBtn.style.display = 'none';
           }
-        } else if (message.type === 'error') {
+          return;
+        }
+
+        if (message.type === 'error') {
           finished = true;
           clearKeepAlive();
           setTrustedHTML(element, `<span class="ia-action-error">Erreur: ${message.error}</span>`);
           port.disconnect();
           currentStreamingPort = null;
-
-          // Masquer le bouton stop
-          const modal = document.getElementById('ia-helper-action-modal');
-          if (modal) {
-            const stopBtn = modal.querySelector('.ia-action-stop-generation');
-            if (stopBtn) {
-              stopBtn.style.display = 'none';
-            }
-          }
         }
       });
 
@@ -2398,4 +2537,5 @@
     console.log('IA Helper Content Script charge');
   });
 })();
+
 

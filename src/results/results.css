@@ -150,6 +150,27 @@ body {
   animation: fadeIn 0.2s ease;
 }
 
+.panel-translation {
+  margin-top: 12px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+}
+.translation-header {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 6px;
+}
+.translation-body {
+  font-size: 14px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.92);
+  white-space: pre-wrap;
+}
+
 .copy-option {
   display: flex;
   align-items: center;

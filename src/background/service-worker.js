@@ -1063,17 +1063,38 @@ async function generateStreamingResponse(port, content, systemPrompt, agentParam
 
               // Detecter le thinking (certains modeles utilisent un role special)
               const choice = json.choices?.[0];
-              if (choice?.delta?.role === 'reasoning' || choice?.message?.role === 'reasoning') {
+              const delta = choice?.delta || {};
+
+              // Reasoning explicite (OpenAI/gpt-oss)
+              let reasoningText = delta.reasoning_content || choice?.message?.reasoning_content;
+              if (Array.isArray(reasoningText)) {
+                reasoningText = reasoningText.map(part => part?.text || '').join('');
+              }
+              if (thinkingEnabled && reasoningText) {
+                isInThinking = true;
+                hasThinking = true;
+                console.debug('IA Helper SW: thinking chunk (SSE reasoning)', reasoningText.slice(0, 80));
+                port.postMessage({ type: 'chunk', text: reasoningText, isThinking: true });
+              }
+
+              if (delta.role === 'reasoning' || choice?.message?.role === 'reasoning') {
                 isInThinking = true;
               }
 
-              const text = choice?.delta?.content || '';
+              let text = delta.content || '';
+              if (Array.isArray(text)) {
+                text = text.map(part => part?.text || '').join('');
+              }
               if (text) {
+                const isThinkFlag = thinkingEnabled && isInThinking;
+                if (isThinkFlag) {
+                  console.debug('IA Helper SW: thinking chunk (SSE content flagged)', text.slice(0, 80));
+                }
                 // Envoyer avec le type approprie
                 port.postMessage({
                   type: 'chunk',
                   text: text,
-                  isThinking: thinkingEnabled && isInThinking
+                  isThinking: isThinkFlag
                 });
               }
 
@@ -1121,12 +1142,32 @@ async function generateStreamingResponse(port, content, systemPrompt, agentParam
             if (data !== '[DONE]') {
               const json = JSON.parse(data);
               const choice = json.choices?.[0];
-              const text = choice?.delta?.content || '';
+              const delta = choice?.delta || {};
+
+              let reasoningText = delta.reasoning_content || choice?.message?.reasoning_content;
+              if (Array.isArray(reasoningText)) {
+                reasoningText = reasoningText.map(part => part?.text || '').join('');
+              }
+              if (thinkingEnabled && reasoningText) {
+                isInThinking = true;
+                hasThinking = true;
+                console.debug('IA Helper SW: thinking chunk (SSE reasoning - buffered)', reasoningText.slice(0, 80));
+                port.postMessage({ type: 'chunk', text: reasoningText, isThinking: true });
+              }
+
+              let text = delta.content || '';
+              if (Array.isArray(text)) {
+                text = text.map(part => part?.text || '').join('');
+              }
               if (text) {
+                const isThinkFlag = thinkingEnabled && isInThinking;
+                if (isThinkFlag) {
+                  console.debug('IA Helper SW: thinking chunk (SSE content flagged - buffered)', text.slice(0, 80));
+                }
                 port.postMessage({
                   type: 'chunk',
                   text: text,
-                  isThinking: thinkingEnabled && isInThinking
+                  isThinking: isThinkFlag
                 });
               }
             }

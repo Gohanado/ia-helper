@@ -52,6 +52,15 @@
             <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
           </svg>
         </button>
+        <div class="copy-dropdown">
+          <button class="btn-icon" id="btn-translate-menu" title="Traduire">
+            <span>Traduire</span>
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+              <path d="M2 4L6 8L10 4"/>
+            </svg>
+          </button>
+          <div class="copy-menu" id="translate-menu"></div>
+        </div>
         <button class="btn-icon btn-settings" id="btn-settings" data-i18n-title="options" title="Options">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="3"/>
@@ -85,6 +94,10 @@
         </div>
         <div class="panel-content" id="result-content">
           <p class="placeholder" data-i18n="responseWillAppear">La reponse apparaitra ici...</p>
+        </div>
+        <div class="panel-translation" id="translation-box" style="display:none;">
+          <div class="translation-header">Traduction</div>
+          <div class="translation-body" id="translation-body"></div>
         </div>
       </section>
     </main>

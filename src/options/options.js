@@ -176,7 +176,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Export config
     if (elements.exportConfigBtn) {
       elements.exportConfigBtn.addEventListener('click', () => {
-        const payload = { config };
+        const payload = {
+          config,
+          customActions,
+          customPrompts,
+          enabledActions,
+          shortcuts,
+          shortcutsEnabled,
+          defaultTranslateLang,
+          enabledTranslations,
+          customPresets,
+          customAgents,
+          selectedAgent
+        };
         const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -197,15 +209,52 @@ document.addEventListener('DOMContentLoaded', async () => {
         reader.onload = async (evt) => {
           try {
             const data = JSON.parse(evt.target.result);
-            if (data?.config && typeof data.config === 'object') {
-              config = { ...DEFAULT_CONFIG, ...data.config };
-              await saveConfig();
-              await loadAllSettings();
-              applyTranslations();
-              showNotification(t('settingsSaved', currentLang) || 'Settings restored', 'success');
-            } else {
+            if (!data || typeof data !== 'object') {
               showNotification(t('importError', currentLang) || 'Import error', 'error');
+              return;
             }
+
+            // Restaurer tous les blocs de configuration
+            config = { ...DEFAULT_CONFIG, ...(data.config || {}) };
+            customActions = data.customActions || [];
+            customPrompts = data.customPrompts || {};
+            enabledActions = data.enabledActions || [...DEFAULT_ENABLED_ACTIONS];
+            shortcuts = data.shortcuts || { ...DEFAULT_SHORTCUTS };
+            shortcutsEnabled = data.shortcutsEnabled !== false;
+            defaultTranslateLang = data.defaultTranslateLang || defaultTranslateLang || 'en';
+            enabledTranslations = data.enabledTranslations || enabledTranslations || ['fr', 'en', 'es', 'de'];
+            customPresets = data.customPresets || [];
+            customAgents = data.customAgents || [];
+            selectedAgent = data.selectedAgent || selectedAgent || DEFAULT_AGENT.id;
+
+            // Sauvegarder en une fois
+            await chrome.storage.local.set({
+              config,
+              customActions,
+              customPrompts,
+              enabledActions,
+              shortcuts,
+              shortcutsEnabled,
+              defaultTranslateLang,
+              enabledTranslations,
+              customPresets,
+              customAgents,
+              selectedAgent
+            });
+
+            // Recharger l'UI
+            await loadAllSettings();
+            await loadEnabledActions();
+            await loadCustomActions();
+            await loadShortcuts();
+            await loadCustomPresets();
+            await loadCustomAgents();
+            renderActionsGrid();
+            renderShortcutsList();
+            renderAgentsGrids();
+            applyTranslations();
+
+            showNotification(t('settingsSaved', currentLang) || 'Settings restored', 'success');
           } catch (err) {
             console.error('Import config error', err);
             showNotification(t('importError', currentLang) || 'Import error', 'error');

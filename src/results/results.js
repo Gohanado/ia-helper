@@ -48,8 +48,21 @@ const elements = {
   statusText: document.querySelector('.status-text'),
   tokenCount: document.getElementById('token-count'),
   generationTime: document.getElementById('generation-time'),
-  customPrompt: document.getElementById('custom-prompt')
+  customPrompt: document.getElementById('custom-prompt'),
+  translateMenu: document.getElementById('translate-menu'),
+  translateToggle: document.getElementById('btn-translate-menu'),
+  translationBox: document.getElementById('translation-box'),
+  translationBody: document.getElementById('translation-body')
 };
+
+const QUICK_TRANSLATE_LANGS = [
+  { code: 'en', label: 'English' },
+  { code: 'fr', label: 'Français' },
+  { code: 'es', label: 'Español' },
+  { code: 'de', label: 'Deutsch' },
+  { code: 'it', label: 'Italiano' },
+  { code: 'pt', label: 'Português' }
+];
 
 // Noms des actions
 const ACTION_NAMES = {
@@ -79,6 +92,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   applyTranslations();
   await loadPendingResult();
   setupEventListeners();
+  setupTranslateMenu();
 
   if (pendingResult) {
     // Si on a un resultat pre-genere, l'afficher directement
@@ -107,6 +121,44 @@ function applyTranslations() {
   document.querySelectorAll('[data-i18n-title]').forEach(el => {
     const key = el.getAttribute('data-i18n-title');
     el.title = t(key, currentLang);
+  });
+}
+
+function setupTranslateMenu() {
+  if (!elements.translateMenu || !elements.translateToggle) return;
+  elements.translateMenu.innerHTML = QUICK_TRANSLATE_LANGS.map(l => `
+    <button class="copy-option" data-lang="${l.code}">
+      <span class="copy-icon">${l.code.toUpperCase()}</span>
+      <span>${l.label}</span>
+    </button>
+  `).join('');
+
+  const closeMenus = () => {
+    document.querySelectorAll('.copy-menu').forEach(m => m.classList.remove('active'));
+  };
+
+  elements.translateToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeMenus();
+    elements.translateMenu.classList.toggle('active');
+  });
+
+  elements.translateMenu.addEventListener('click', async (e) => {
+    const btn = e.target.closest('.copy-option');
+    if (!btn) return;
+    const lang = btn.dataset.lang;
+    if (!lang || !currentResult) return;
+    const translated = await translateText(currentResult, lang);
+    if (elements.translationBox && elements.translationBody) {
+      elements.translationBox.style.display = 'block';
+      elements.translationBody.textContent = translated;
+      elements.translationBox.querySelector('.translation-header').textContent = `Traduction (${lang.toUpperCase()})`;
+    }
+    elements.translateMenu.classList.remove('active');
+  });
+
+  document.addEventListener('click', () => {
+    elements.translateMenu.classList.remove('active');
   });
 }
 
